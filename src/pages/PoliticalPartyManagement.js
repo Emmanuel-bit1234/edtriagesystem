@@ -176,7 +176,7 @@ export const PoliticalPartyManagement = () => {
             <React.Fragment>
                 <div className="my-2">
                     <Button label="Add party" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                    {/* <Button label="DeActivate" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
+                    <Button label="DeActivate" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
                 </div>
             </React.Fragment>
         );
@@ -218,14 +218,17 @@ export const PoliticalPartyManagement = () => {
         );
     };
 
-    // const categoryBodyTemplate = (rowData) => {
-    //     return (
-    //         <>
-    //             <span className="p-column-title">Actions</span>
-    //             {rowData.category}
-    //         </>
-    //     );
-    // }
+    const categoryBodyTemplate = (rowData) => {
+        return (
+            <>
+                <span className="p-column-title">Actions</span>
+                <div className="actions">
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} />
+            </div>
+            </>
+        );
+    }
 
     // const ratingBodyTemplate = (rowData) => {
     //     return (
@@ -248,8 +251,8 @@ export const PoliticalPartyManagement = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div className="actions">
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-warning mt-2" onClick={() => confirmDeleteProduct(rowData)} />
+                {/* <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} /> */}
             </div>
         );
     };
@@ -303,16 +306,16 @@ export const PoliticalPartyManagement = () => {
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                         globalFilter={globalFilter}
-                        emptyMessage="No products found."
+                        emptyMessage="No political parties found."
                         header={header}
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: "3rem" }}></Column>
                         {/* <Column field="code" header="Code" sortable body={codeBodyTemplate} headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
                         <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        <Column field="abbreviation" header="Abbreviation" body={priceBodyTemplate} sortable headerStyle={{ width: "14%", minWidth: "8rem" }}></Column>
+                        <Column field="abbreviation" header="Abbreviation" body={priceBodyTemplate} headerStyle={{ width: "14%", minWidth: "8rem" }}></Column>
                         <Column header="Logo" body={imageBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        {/* <Column field="actions" header="Actions" sortable body={categoryBodyTemplate} headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
+                        <Column field="actions" header="Actions" body={categoryBodyTemplate} headerStyle={{ width: '14%', minWidth: '10rem' }}></Column>
                         {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
                         {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
                         <Column body={actionBodyTemplate}></Column>
@@ -337,7 +340,7 @@ export const PoliticalPartyManagement = () => {
                             <label htmlFor="slogan">Slogan</label>
                             <InputTextarea id="slogan" value={product.slogan} onChange={(e) => onInputChange(e, "slogan")} required rows={4} cols={20} />
                         </div>
-
+                        
                         <div className="field">
                             <label className="mb-3">Date registered</label>
                             <Calendar
