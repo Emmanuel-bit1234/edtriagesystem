@@ -13,7 +13,7 @@ import { RadioButton } from "primereact/radiobutton";
 import { InputNumber } from "primereact/inputnumber";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
-import {Calendar} from "primereact/calendar"
+import { Calendar } from "primereact/calendar";
 import { ProductService } from "../service/ProductService";
 
 export const PoliticalPartyManagement = () => {
@@ -28,9 +28,19 @@ export const PoliticalPartyManagement = () => {
         price: 0,
         quantity: 0,
         rating: 0,
-        date:"",
+        date: "",
+        date1: "",
         inventoryStatus: "INSTOCK",
     };
+    const [politicalParty, setPoliticalParty] = useState({
+        date: "",
+        date1:"",
+    });
+    
+    const onGetInput = (value, key) => {
+        setPoliticalParty({...politicalParty, [key]:value})
+    };
+
     const [products, setProducts] = useState(null);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
@@ -47,9 +57,9 @@ export const PoliticalPartyManagement = () => {
         productService.getProducts().then((data) => setProducts(data));
     }, []);
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
-    };
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+    // };
 
     const openNew = () => {
         setProduct(emptyPoliticalParty);
@@ -72,7 +82,7 @@ export const PoliticalPartyManagement = () => {
 
     const saveProduct = () => {
         setSubmitted(true);
-
+        console.log(product)
         if (product.name.trim()) {
             let _products = [...products];
             let _product = { ...product };
@@ -203,19 +213,20 @@ export const PoliticalPartyManagement = () => {
     const imageBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Abbreviation</span>
+                {/* <span className="p-column-title">Abbreviation</span> */}
                 <img src={`assets/demo/images/product/${rowData.image}`} alt={rowData.image} className="shadow-2" width="100" />
             </>
         );
     };
 
     const priceBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Actions</span>
-                {(rowData.abbreviation)}
-            </>
-        );
+        return <>{rowData.abbreviation}</>;
+    };
+    const RegisteredBodyTemplate = (rowData) => {
+        return <>{rowData.date}</>;
+    };
+    const AnniversaryBodyTemplate = (rowData) => {
+        return <>{rowData.date1}</>;
     };
 
     const categoryBodyTemplate = (rowData) => {
@@ -223,21 +234,29 @@ export const PoliticalPartyManagement = () => {
             <>
                 <span className="p-column-title">Actions</span>
                 <div className="actions">
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} />
-            </div>
+                    <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
+                    <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} />
+                </div>
             </>
         );
-    }
+    };
 
-    // const ratingBodyTemplate = (rowData) => {
-    //     return (
-    //         <>
-    //             <span className="p-column-title">Reviews</span>
-    //             <Rating value={rowData.rating} readonly cancel={false} />
-    //         </>
-    //     );
-    // }
+    const codeBodyTemplate = (rowData) => {
+        return (
+            <>
+                {/* <span className="p-column-title">Reviews</span> */}
+                {rowData.description}
+            </>
+        );
+    };
+    const sloganBodyTemplate = (rowData) => {
+        return (
+            <>
+                {/* <span className="p-column-title">Reviews</span> */}
+                {rowData.slogan}
+            </>
+        );
+    };
 
     // const statusBodyTemplate = (rowData) => {
     //     return (
@@ -304,21 +323,24 @@ export const PoliticalPartyManagement = () => {
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Political Parties"
                         globalFilter={globalFilter}
                         emptyMessage="No political parties found."
                         header={header}
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: "3rem" }}></Column>
-                        {/* <Column field="code" header="Code" sortable body={codeBodyTemplate} headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
                         <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column field="abbreviation" header="Abbreviation" body={priceBodyTemplate} headerStyle={{ width: "14%", minWidth: "8rem" }}></Column>
+                        <Column field="description" header="Description" body={codeBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="slogan" header="Slogan" body={sloganBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         <Column header="Logo" body={imageBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                        <Column field="actions" header="Actions" body={categoryBodyTemplate} headerStyle={{ width: '14%', minWidth: '10rem' }}></Column>
+                        <Column field="Date Registered" header="Date Registered" body={RegisteredBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="Anniversary" header="Anniversary" body={AnniversaryBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                        <Column field="actions" header="Actions" body={categoryBodyTemplate} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                         {/* <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
-                        {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ width: '14%', minWidth: '10rem' }}></Column> */}
-                        <Column body={actionBodyTemplate}></Column>
+                        {/* <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable headerStyle={{ width: 'f14%', minWidth: '10rem' }}></Column> */}
+                        {/* <Column body={actionBodyTemplate}></Column> */}
                     </DataTable>
 
                     <Dialog visible={productDialog} style={{ width: "450px" }} header="Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
@@ -340,33 +362,28 @@ export const PoliticalPartyManagement = () => {
                             <label htmlFor="slogan">Slogan</label>
                             <InputTextarea id="slogan" value={product.slogan} onChange={(e) => onInputChange(e, "slogan")} required rows={4} cols={20} />
                         </div>
-                        
+
                         <div className="field">
                             <label className="mb-3">Date registered</label>
                             <Calendar
-                            // value={this.state.date}
-                            // onChange={e => this.setState({ date: e.value })}
-                            showIcon={true}
-                            >
-
-                            </Calendar>
-                            
+                                value={product.date}
+                                onChange={(e) => onInputChange(1, "date")}
+                                // onChange={(e) => this.setDate(e, "date")}
+                                showIcon={true}
+                            ></Calendar>
                         </div>
                         <div className="field">
                             <label className="mb-3">Anniversary</label>
                             <Calendar
-                            // value={this.state.date}
-                            // onChange={e => this.setState({ date: e.value })}
-                            showIcon={true}
-                            >
-
-                            </Calendar>
-                            
+                                // value={product.date1}
+                                // onChange={(e) => onInputChange(e, "date1")}
+                                showIcon={true}
+                            ></Calendar>
                         </div>
                         <div className="field">
-                        <label htmlFor="description">Logo/Symbol</label>
+                            <label htmlFor="description">Logo/Symbol</label>
                             <React.Fragment>
-                                <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} label="Choose file" chooseLabel="Choose file"/>
+                                <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} label="Choose file" chooseLabel="Choose file" />
                                 {/* <Button label="Export" icon="pi pi-upload" className="p-button-help" onClick={exportCSV} /> */}
                             </React.Fragment>
                         </div>
