@@ -6,6 +6,7 @@ import { Column } from "primereact/column";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
+import TextInput from "../componets/TextInput";
 import { Rating } from "primereact/rating";
 import { Toolbar } from "primereact/toolbar";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -15,6 +16,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { ProductService } from "../service/ProductService";
+import DropDown from "../componets/DropDown";
 
 export const Objections = () => {
     let emptyPoliticalParty = {
@@ -39,6 +41,14 @@ export const Objections = () => {
     const onGetInput = (value, key) => {
         setPoliticalParty({ ...politicalParty, [key]: value });
     };
+    var [form, setForm] = useState({
+        eventGroup: "SELECT AN OPTION",
+        event: "SELECT AN OPTION",
+        registration: "SELECT AN OPTION",
+    });
+    var getInput = (key, ev) => {
+        setForm({ ...form, [key]: ev.value });
+    };
 
     const [products, setProducts] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
@@ -55,6 +65,11 @@ export const Objections = () => {
     //     const productService = new ProductService();
     //     productService.getProducts().then((data) => setProducts(data));
     // }, []);
+    const eventGroupOptions = [
+        { key: "NAME1", name: "NAME1", label: "DESCRIPTION1" },
+        { key: "NAME2", name: "NAME2", label: "DESCRIPTION2" },
+        { key: "NAME3", name: "NAME3", label: "DESCRIPTION3" },
+    ];
 
     const openNew = () => {
         setProduct(emptyPoliticalParty);
@@ -211,11 +226,46 @@ export const Objections = () => {
     };
     const leftToolbar = () => {
         return (
-            <React.Fragment>
-                <div className="my-2">
-                    <text>Buttons will come here</text>
-                </div>
-            </React.Fragment>
+            <Toolbar
+                className="mb-4"
+                left={
+                    <div>
+                        <div className="grid  p-grid p-align-stretch vertical-container">
+                            <div className="col-12 lg:col-1"></div>
+                            <div className="col-12 lg:col-2">
+                                <DropDown
+                                    label={"Event Group"}
+                                    options={eventGroupOptions}
+                                    value={form.eventGroup}
+                                    onChange={(e) => getInput("eventGroup", e)}
+                                    // error={'invalid  selection'}
+                                />
+                            </div>
+                            <div className="col-12 lg:col-2"></div>
+                            <div className="col-12 lg:col-2">
+                                <DropDown
+                                    label={"Event"}
+                                    options={eventGroupOptions}
+                                    value={form.event}
+                                    onChange={(e) => getInput("event", e)}
+                                    // error={'invalid  selection'}
+                                />
+                            </div>
+                            <div className="col-12 lg:col-2"></div>
+                            <div className="col-12 lg:col-2">
+                                <TextInput label="Registration No"></TextInput>
+                            </div>
+                        </div>
+
+                        <Button
+                            className="p-button-success mr-1"
+                            icon="pi pi-plus"
+                            label="GO"
+                            // onClick={(e) => setAddCandidatePage(true)}
+                        />
+                    </div>
+                }
+            ></Toolbar>
         );
     };
 
