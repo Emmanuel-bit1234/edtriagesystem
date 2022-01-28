@@ -40,7 +40,7 @@ export const Objections = () => {
         setPoliticalParty({ ...politicalParty, [key]: value });
     };
 
-    const [products, setProducts] = useState(null);
+    const [products, setProducts] = useState([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
@@ -51,10 +51,10 @@ export const Objections = () => {
     const toast = useRef(null);
     const dt = useRef(null);
 
-    useEffect(() => {
-        const productService = new ProductService();
-        productService.getProducts().then((data) => setProducts(data));
-    }, []);
+    // useEffect(() => {
+    //     const productService = new ProductService();
+    //     productService.getProducts().then((data) => setProducts(data));
+    // }, []);
 
     const openNew = () => {
         setProduct(emptyPoliticalParty);
@@ -204,7 +204,7 @@ export const Objections = () => {
             <React.Fragment>
                 <div className="my-2">
                     <Button label="Add Objection" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} />
-                    <Button label="Delete Ojection" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} />
+                    {/* <Button label="Delete Ojection" icon="pi pi-trash" className="p-button-danger" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} /> */}
                 </div>
             </React.Fragment>
         );

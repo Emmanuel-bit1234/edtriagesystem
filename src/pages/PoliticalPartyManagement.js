@@ -41,7 +41,7 @@ export const PoliticalPartyManagement = () => {
     setPoliticalParty({ ...politicalParty, [key]: value })
   }
 
-  const [products, setProducts] = useState(null)
+  const [products, setProducts] = useState([])
   const [productDialog, setProductDialog] = useState(false)
   const [deleteProductDialog, setDeleteProductDialog] = useState(false)
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false)
@@ -52,10 +52,10 @@ export const PoliticalPartyManagement = () => {
   const toast = useRef(null)
   const dt = useRef(null)
 
-  useEffect(() => {
-    const productService = new ProductService()
-    productService.getProducts().then((data) => setProducts(data))
-  }, [])
+//   useEffect(() => {
+//     const productService = new ProductService()
+//     productService.getProducts().then((data) => setProducts(data))
+//   }, [])
 
   // const formatCurrency = (value) => {
   //     return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
@@ -214,13 +214,13 @@ export const PoliticalPartyManagement = () => {
             className="p-button-success mr-2"
             onClick={openNew}
           />
-          <Button
+          {/* <Button
             label="DeActivate"
             icon="pi pi-trash"
             className="p-button-danger"
             onClick={confirmDeleteSelected}
             disabled={!selectedProducts || !selectedProducts.length}
-          />
+          /> */}
         </div>
       </React.Fragment>
     )
