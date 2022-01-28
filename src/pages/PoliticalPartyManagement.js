@@ -188,7 +188,7 @@ export const PoliticalPartyManagement = () => {
   const onInputChange = (e, name) => {
     var val = ''
     if (e?.value) val = e.value.toString()
-    if (e?.target) val = e.target.value 
+    else if (e?.target) val = e.target.value 
     else val = ''
 
     let _product = { ...product }
@@ -546,8 +546,8 @@ export const PoliticalPartyManagement = () => {
             <div className="field">
               <label className="mb-3">Anniversary</label>
               <Calendar
-                // value={product.date1}
-                // onChange={(e) => onInputChange(e, "date1")}
+                value={product.date1}
+                onChange={(e) => onInputChange(e, "date1")}
                 showIcon={true}
               ></Calendar>
             </div>
