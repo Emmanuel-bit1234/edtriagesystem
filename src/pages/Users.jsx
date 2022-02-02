@@ -17,6 +17,7 @@ import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
 import AddUsers from "../componets/AddUsers";
 import UsersService from "../service/UsersService";
+import { Chip } from 'primereact/chip';
 
 export const Users = () => {
     const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -78,6 +79,7 @@ export const Users = () => {
             {/* end */}
 
             <DataTable
+            size="small"
                 scrollable={true}
                 value={data}
                 dataKey="id"
@@ -91,10 +93,14 @@ export const Users = () => {
                 responsiveLayout="scroll"
                 selection={selectedUsers}
                 onSelectionChange={(e) => setSelectedUsers(e.value)}
+                resizableColumns columnResizeMode="expand"
             >
+                <Column field="email" header="Email"  sortable></Column>
                 <Column field="username" header="Username"></Column>
-                <Column field="email" header="Email" sortable></Column>
-                <Column field="active" header="Status" sortable></Column>
+                
+                <Column field="active" header="Status" body={e=>e.active=="Y"?
+                <Button label="Active" style={{ textAlign: "center",  height: "30px" }} className="p-button-success p-button-rounded" />:
+                <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded"/>} sortable></Column>
                 <Column
                     field="actions"
                     header="Actions"

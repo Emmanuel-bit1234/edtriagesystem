@@ -17,7 +17,11 @@ import StaffService from "../service/StaffService";
 import { Dialog } from "primereact/dialog";
 import GenderService from "../service/GenderService";
 import UsersService from "../service/UsersService";
+import { useHistory } from "react-router-dom";
 export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
+   
+
+
     var sysGroupService = new SysGroupService();
     var [groups, setGroup] = useState([]);
     const [selectedGroups, setSelecedGroups] = useState([]);
@@ -35,10 +39,7 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
 
     var [gender, setGender] = useState([]);
 
-   
-
     useEffect(() => {
-    
         genderService.getAllGender().then((data) => {
             setGender(data);
         });
@@ -114,9 +115,12 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
         });
         // console.log(form);
         /***
-         * message 
+         * message
          * catch
          */
+
+     
+        window.location.reload();
     }
 
     return (
