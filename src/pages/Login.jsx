@@ -55,12 +55,12 @@ class Login extends React.Component {
             <div>
                 <Toast ref={(el) => (this.toast = el)} />
                 <div className="App App1">
-                    <div className="content-section implementation" style={{ marginTop: "10rem" }}>
+                    <div className="content-section implementation">
                         <Card className="p-shadow-14">
                             <div>
                                 <div className="p-fluid p-grid">
                                     <div className="p-field p-col-12 p-md-5">
-                                        <Image src={CoatOfArms} alt="Image" width="90%" />
+                                        <Image src={CoatOfArms} alt="Image" width="69%" />
                                     </div>
                                     <div className="p-field p-col-12 p-md-1">
                                         <Divider layout="vertical" />
