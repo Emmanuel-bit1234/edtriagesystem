@@ -8,6 +8,7 @@ import { AppMenu } from "./AppMenu";
 import { AppConfig } from "./AppConfig";
 
 import { Dashboard } from "./pages/Dashboard";
+import Login from "./pages/Login";
 
 import { Users } from "./pages/Users";
 import { SystemParameters } from "./pages/SystemParameters";
@@ -47,6 +48,7 @@ const App = () => {
     const [mobileTopbarMenuActive, setMobileTopbarMenuActive] = useState(false);
     const copyTooltipRef = useRef();
     const location = useLocation();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     PrimeReact.ripple = true;
 
@@ -278,33 +280,37 @@ const App = () => {
 
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
-            <Tooltip ref={copyTooltipRef} target=".block-action-copy" position="bottom" content="Copied to clipboard" event="focus" />
+            {isLoggedIn === false ? (
+                <Route path="/" component={Login} />
+            ) : (
+                <>
+                    <Tooltip ref={copyTooltipRef} target=".block-action-copy" position="bottom" content="Copied to clipboard" event="focus" />
 
-            <AppTopbar onToggleMenuClick={onToggleMenuClick} layoutColorMode={layoutColorMode} mobileTopbarMenuActive={mobileTopbarMenuActive} onMobileTopbarMenuClick={onMobileTopbarMenuClick} onMobileSubTopbarMenuClick={onMobileSubTopbarMenuClick} />
-
-            <div className="layout-sidebar" onClick={onSidebarClick}>
-                <AppMenu model={menu} onMenuItemClick={onMenuItemClick} layoutColorMode={layoutColorMode} />
-            </div>
-
-            <div className="layout-main-container">
-                <div className="layout-main">
-                    <Route path="/" exact render={() => <Dashboard colorMode={layoutColorMode} />} />
-                    <Route path="/users" component={Users} />
-                    <Route path="/user-groups" component={UserGroups} />
-                    <Route path="/kit-configuration" component={KitConfiguration} />
-                    <Route path="/system-parameters" component={SystemParameters} />
-                    <Route path="/delimitation-management" component={DelimitationManagement} />
-                    <Route path="/voter-data" component={VoterData} />
-                    <Route path="/voter-audit-history" component={VoterAuditHistory} />
-                    <Route path="/objections" component={Objections} />
-                    <Route path="/political-party-management" component={PoliticalPartyManagement} />
-                    <Route path="/political-party-reports" component={PoliticalPartyReports} />
-                    <Route path="/candidate-management" component={CandidateManagement} />
-                    <Route path="/candidate-reports" component={CandidateReports} />
-                    <Route path="/event" component={Events} />
-                    <Route path="/event-group" component={EventGroup} />
-                </div>
-            </div>
+                    <AppTopbar onToggleMenuClick={onToggleMenuClick} layoutColorMode={layoutColorMode} mobileTopbarMenuActive={mobileTopbarMenuActive} onMobileTopbarMenuClick={onMobileTopbarMenuClick} onMobileSubTopbarMenuClick={onMobileSubTopbarMenuClick} />
+                    <div className="layout-sidebar" onClick={onSidebarClick}>
+                        <AppMenu model={menu} onMenuItemClick={onMenuItemClick} layoutColorMode={layoutColorMode} />
+                    </div>
+                    <div className="layout-main-container">
+                        <div className="layout-main">
+                            <Route path="/" exact render={() => <Dashboard colorMode={layoutColorMode} />} />
+                            <Route path="/users" component={Users} />
+                            <Route path="/user-groups" component={UserGroups} />
+                            <Route path="/kit-configuration" component={KitConfiguration} />
+                            <Route path="/system-parameters" component={SystemParameters} />
+                            <Route path="/delimitation-management" component={DelimitationManagement} />
+                            <Route path="/voter-data" component={VoterData} />
+                            <Route path="/voter-audit-history" component={VoterAuditHistory} />
+                            <Route path="/objections" component={Objections} />
+                            <Route path="/political-party-management" component={PoliticalPartyManagement} />
+                            <Route path="/political-party-reports" component={PoliticalPartyReports} />
+                            <Route path="/candidate-management" component={CandidateManagement} />
+                            <Route path="/candidate-reports" component={CandidateReports} />
+                            <Route path="/event" component={Events} />
+                            <Route path="/event-group" component={EventGroup} />
+                        </div>
+                    </div>
+                </>
+            )}
 
             <AppConfig rippleEffect={ripple} onRippleEffect={onRipple} inputStyle={inputStyle} onInputStyleChange={onInputStyleChange} layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 

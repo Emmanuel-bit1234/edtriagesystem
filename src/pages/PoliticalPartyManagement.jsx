@@ -410,10 +410,10 @@ export const PoliticalPartyManagement = () => {
             header={header}
             responsiveLayout="scroll"
           >
-            <Column
+            {/* <Column
               selectionMode="multiple"
               headerStyle={{ width: '3rem' }}
-            ></Column>
+            ></Column> */}
             <Column
               field="name"
               header="Name"
