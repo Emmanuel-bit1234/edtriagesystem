@@ -36,6 +36,7 @@ import "./assets/layout/layout.scss";
 import "./App.scss";
 import { KitConfiguration } from "./pages/KitConfiguration";
 import { UserGroups } from "./pages/UserGroups";
+import Cookies from 'js-cookie'
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState("static");
@@ -56,6 +57,16 @@ const App = () => {
     let mobileTopbarMenuClick = false;
 
     useEffect(() => {
+
+        var loginValue = Cookies.get("LoggedIn");
+        var errors = ["null", "false", "undefined", null, false, undefined];
+        if (errors.includes(loginValue)) {
+            Cookies.set("LoggedIn", false);
+            setIsLoggedIn(false);
+        } else {
+            setIsLoggedIn(true);
+        }
+
         if (mobileMenuActive) {
             addClass(document.body, "body-overflow-hidden");
         } else {

@@ -65,6 +65,25 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
         setPageIndex(pageIndex);
     };
 
+    var [form, setForm] = useState({
+        username: "username",
+        name: "name",
+        surname: "surname",
+        email: "email",
+        password: "password",
+        createdBy: 3,
+        registrationCentreIds: [],
+        sysGroupIds: [],
+        auditUser: "auditUser",
+        staffPositionID: "staffPositionID",
+        staffTypeID: "staffTypeID",
+        address: "address",
+        signatureImage: "",
+        appointmentDate: "2021-06-06 00:00",
+        gender: "gender",
+        contactNumber: "contactNumber",
+    });
+
     return (
         <Dialog
             header="Add User"
@@ -108,32 +127,33 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
                             <TabPanel header="Personal Details" disabled={pageIndex == 0 ? false : true}>
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="User Name" />
+                                        <TextInput label="User Name" value={form.username} onChange={(e) => setForm({ ...form, username: e.value })} />
                                     </div>
 
                                     <div className="col-12 lg:col-4">
-                                        <TextInput label="Password" />
+                                        <TextInput value={form.password} onChange={(e) => setForm({ ...form, password: e.value })} label="Password" />
                                     </div>
 
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Name" />
+                                        <TextInput label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Surname" />
-                                    </div>
-
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput label="Contact Number" />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput label="Email Address" />
+                                        <TextInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.value })} />
                                     </div>
 
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Address" />
+                                        <TextInput label="Contact Number" value={form.contactNumber} onChange={(e) => setForm({ ...form, contactNumber: e.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <DropDown value={genderValue} onChange={(e) => setGenderValue(e.value)} options={gender} label="Gender" optionLabel="description" optionValue="id" />
+                                        <TextInput label="Email Address" value={form.email} onChange={(e) => setForm({ ...form, email: e.value })} />
+                                    </div>
+
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.value })} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <DropDown
+                                         value={genderValue} onChange={(e) => setGenderValue(e.value)} options={gender} label="Gender" optionLabel="description" optionValue="id" />
                                     </div>
                                 </div>
                             </TabPanel>
@@ -147,7 +167,7 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
                                         <DropDown value={staffTypeValue} onChange={(e) => setStaffTypeValue(e.value)} options={staffType} label="Staff Type" optionLabel="description" optionValue="id" />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Appointment Date" />
+                                        <TextInput type="Calendar" label="Appointment Date"  value={form.appointmentDate} onChange={(e) => setForm({ ...form,appointmentDate: e.value })}  />
                                     </div>
                                 </div>
                             </TabPanel>
