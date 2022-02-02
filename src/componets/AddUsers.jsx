@@ -77,55 +77,17 @@ export default function AddUsers({
             <TextInput label="Email Address" />
           </div>
 
-          <div className="col-12 lg:col-12">
+          <div className="col-12 lg:col-6">
             <MultiSelect style={{ "width": "100%" }} value={selectedGroups} options={groups} onChange={(e) => setSelectedGroups(e.value)} optionLabel="name" placeholder="Select groups" filter className="multiselect-custom"
               display="chip"
             />
-            {selectedGroups !== null && selectedGroups?.length > 0 ? <>
-              <DataTable
-                scrollable={true}
-                value={selectedGroups}
-                dataKey="id"
-                paginator
-                rows={5}
-                rowsPerPageOptions={[5, 10, 25]}
-                className="datatable-responsive"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
-                emptyMessage="No groups found."
-                header={<Header name='Selected Groups'></Header>}
-                responsiveLayout="scroll"
-              >
-                <Column field="code" header="Id" sortable></Column>
-                <Column field="name" header="Group" sortable></Column>
-
-              </DataTable>
-            </> : ""}
           </div>
 
 
-          <div className="col-12 lg:col-12">
+          <div className="col-12 lg:col-6">
             <MultiSelect style={{ "width": "100%" }} value={selectedCentre} options={centre} onChange={(e) => setSelectedCentre(e.value)} optionLabel="name" placeholder="Select Registration Centre" filter className="multiselect-custom"
               display="chip"
             />
-            {selectedCentre !== null && selectedCentre?.length > 0 ? <>
-              <DataTable
-                scrollable={true}
-                value={selectedCentre}
-                dataKey="id"
-                paginator
-                rows={5}
-                rowsPerPageOptions={[5, 10, 25]}
-                className="datatable-responsive"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Registration Centre"
-                emptyMessage="No Registration Centre found."
-                header={<Header name='Selected Registration Centre'></Header>}
-                responsiveLayout="scroll"
-              >
-                <Column field="code" header="Id" sortable></Column>
-                <Column field="name" header="Registration Centre" sortable></Column>
-
-              </DataTable>
-            </> : ""}
           </div>
 
           <div className="col-12  lg:col-12">
