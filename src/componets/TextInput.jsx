@@ -14,7 +14,9 @@ export default function TextInput({ label = "", type = "text", value = "", onCha
     ) : (
         <div className="p-fluid">
             <label>{label}</label>
-            <Calendar value={value} onChange={onChange} showIcon={true} required />
+            <Calendar
+            dateFormat="yy-mm-dd"
+             value={value} onChange={onChange} showIcon={true} required />
             <small style={{ width: "100%" }} className="p-error">
                 input error{" "}
             </small>

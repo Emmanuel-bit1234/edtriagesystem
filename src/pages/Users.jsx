@@ -16,6 +16,7 @@ import { Image } from "primereact/image";
 import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
 import AddUsers from "../componets/AddUsers";
+import UsersService from "../service/UsersService";
 
 export const Users = () => {
     const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -23,12 +24,12 @@ export const Users = () => {
 
     let [data, setData] = useState([
         {
-            "first name": "Mark",
+            email: "Mark",
             "last name": " Blue",
             actions: (
                 <>
                     <Button icon={"pi pi-check-square"} className="p-button-info p-button-rounded mr-2" tooltip="Click to Select" />
-                    <Button icon={"pi pi-pencil"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
+                    <Button icon={"pi pi-pencil"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Delete" />
                     <Button icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
                 </>
             ),
@@ -42,6 +43,14 @@ export const Users = () => {
             <h5 className="m-0">Users</h5>
         </div>
     );
+
+    var usersService = new UsersService();
+    useEffect(() => {
+        usersService.getAllUsers().then((data) => {
+            console.log(data);
+            setData(data);
+        });
+    }, []);
 
     return (
         <div className="card  p-align-stretch vertical-container">
@@ -83,11 +92,20 @@ export const Users = () => {
                 selection={selectedUsers}
                 onSelectionChange={(e) => setSelectedUsers(e.value)}
             >
-                <Column field="username" header="User Name" sortable></Column>
-                <Column field="first name" header="First name" sortable></Column>
-                <Column field="last name" header="Last name" sortable></Column>
-                <Column field="status" header="Status" sortable></Column>
-                <Column field="actions" header="Actions"></Column>
+                <Column field="username" header="Username"></Column>
+                <Column field="email" header="Email" sortable></Column>
+                <Column field="active" header="Status" sortable></Column>
+                <Column
+                    field="actions"
+                    header="Actions"
+                    body={(e) => (
+                        <>
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-ban"} className="p-button-info p-button-rounded mr-2 " tooltip="Click to De-Activate" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2" tooltip="Click to Delete" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
+                        </>
+                    )}
+                ></Column>
             </DataTable>
         </div>
     );

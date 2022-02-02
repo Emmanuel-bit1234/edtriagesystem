@@ -16,6 +16,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import StaffService from "../service/StaffService";
 import { Dialog } from "primereact/dialog";
 import GenderService from "../service/GenderService";
+import UsersService from "../service/UsersService";
 export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     var sysGroupService = new SysGroupService();
     var [groups, setGroup] = useState([]);
@@ -31,9 +32,13 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
     var [staffPosition, setStaffPosition] = useState([]);
 
     var genderService = new GenderService();
+
     var [gender, setGender] = useState([]);
 
+   
+
     useEffect(() => {
+    
         genderService.getAllGender().then((data) => {
             setGender(data);
         });
@@ -63,11 +68,11 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
     };
 
     var [form, setForm] = useState({
-        username: "username",
-        name: "name",
-        surname: "surname",
-        email: "email",
-        password: "password",
+        username: "",
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
         createdBy: 3,
         registrationCentreIds: [],
         sysGroupIds: [],
@@ -76,10 +81,22 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
         staffTypeID: "",
         address: "address",
         signatureImage: "",
-        appointmentDate: "2021-06-06 00:00",
+        appointmentDate: "",
         gender: "",
         contactNumber: "contactNumber",
     });
+
+    function formatDate(date) {
+        var d = new Date(date),
+            month = "" + (d.getMonth() + 1),
+            day = "" + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+    }
 
     function SubmitForm() {
         var groupIDs = [];
@@ -89,6 +106,17 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
 
         form.registrationCentreIds = centerIDS;
         form.sysGroupIds = groupIDs;
+        form.appointmentDate = formatDate(form.appointmentDate) + " 00:00";
+
+        var usersService = new UsersService();
+        usersService.createUser(form).then((res) => {
+            console.log(res);
+        });
+        // console.log(form);
+        /***
+         * message 
+         * catch
+         */
     }
 
     return (
