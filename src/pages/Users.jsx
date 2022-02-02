@@ -17,7 +17,7 @@ import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
 import AddUsers from "../componets/AddUsers";
 import UsersService from "../service/UsersService";
-import { Chip } from 'primereact/chip';
+import { Chip } from "primereact/chip";
 
 export const Users = () => {
     const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -79,7 +79,7 @@ export const Users = () => {
             {/* end */}
 
             <DataTable
-            size="small"
+                size="small"
                 scrollable={true}
                 value={data}
                 dataKey="id"
@@ -93,21 +93,30 @@ export const Users = () => {
                 responsiveLayout="scroll"
                 selection={selectedUsers}
                 onSelectionChange={(e) => setSelectedUsers(e.value)}
-                resizableColumns columnResizeMode="expand"
+                resizableColumns
+                columnResizeMode="expand"
             >
-                <Column field="email" header="Email"  sortable></Column>
+                <Column field="email" header="Email" sortable></Column>
                 <Column field="username" header="Username"></Column>
-                
-                <Column field="active" header="Status" body={e=>e.active=="Y"?
-                <Button label="Active" style={{ textAlign: "center",  height: "30px" }} className="p-button-success p-button-rounded" />:
-                <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded"/>} sortable></Column>
+
+                <Column
+                    field="active"
+                    header="Status"
+                    body={(e) => (e.active == "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />)}
+                    sortable
+                ></Column>
                 <Column
                     field="actions"
                     header="Actions"
                     body={(e) => (
                         <>
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-ban"} className="p-button-info p-button-rounded mr-2 " tooltip="Click to De-Activate" />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2" tooltip="Click to Delete" />
+                            {e.active == "Y" ? (
+                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-check"} className="p-button-primary p-button-rounded mr-2"tooltip="Click to De-Activate" />
+                            ) : (
+                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
+                            )}
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 "  tooltip="Click to Edit" />
+
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
                         </>
                     )}
