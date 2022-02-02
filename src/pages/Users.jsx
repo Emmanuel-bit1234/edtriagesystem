@@ -111,11 +111,11 @@ export const Users = () => {
                     body={(e) => (
                         <>
                             {e.active == "Y" ? (
-                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-check"} className="p-button-primary p-button-rounded mr-2"tooltip="Click to De-Activate" />
+                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
-                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
+                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 "  tooltip="Click to Edit" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
 
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
                         </>
