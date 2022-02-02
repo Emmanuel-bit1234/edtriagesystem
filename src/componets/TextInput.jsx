@@ -6,13 +6,13 @@ export default function TextInput({ label = "", type = "text" }) {
     return type == 'text' ?
         <div className="p-fluid">
             <label>{label}</label>
-            <InputText  />
+            <InputText  required />
             <small style={{ width: "100%" }} className="p-error">input error </small>
         </div> :
         <div className="p-fluid">
             <label>{label}</label>
 
-            <Calendar showIcon={true}/>
+            <Calendar showIcon={true} required/>
             <small style={{ width: "100%" }} className="p-error">input error </small>
         </div>
 }
