@@ -303,7 +303,7 @@ export const Objections = () => {
                 <span className="p-column-title">Actions</span>
                 <div className="actions">
                     <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                    <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} />
+                    {/* <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" onClick={() => confirmDeleteProduct(rowData)} /> */}
                 </div>
             </>
         );
