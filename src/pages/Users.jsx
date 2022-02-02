@@ -16,12 +16,13 @@ import { Image } from 'primereact/image'
 import AddEdit from '../componets/AddEdit'
 import { InputText } from 'primereact/inputtext'
 import AddUsers from '../componets/AddUsers'
+import RegistrationCentreService from '../service/RegistrationCentreService'
 
-import { MultiSelect } from 'primereact/multiselect'
-// import 'react-multiple-select-dropdown-lite/dist/index.css'
+
 
 export const Users = () => {
 
+ 
   const [value, setvalue] = useState('')
 
   const handleOnchange = val => {
@@ -79,7 +80,7 @@ export const Users = () => {
                 className="p-button-success mr-2"
                 icon="pi pi-plus"
                 label="Add User"
-                onClick={e=> setShowAddUserForm(true)}
+                onClick={e => setShowAddUserForm(true)}
               />
             </div>
           }
