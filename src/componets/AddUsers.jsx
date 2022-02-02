@@ -32,8 +32,8 @@ export default function AddUsers({
     { name: 'United States', code: 10 }
   ])
 
-  const [selectedDelimitation, setSelectedDelimitation] = useState(null);
-  var [delimitation, setDelimitation] = useState([
+  const [selectedCentre, setSelectedCentre] = useState(null);
+  var [centre, setCentre] = useState([
     { name: 'Australia', code: 1 },
     { name: 'Brazil', code: 2 },
     { name: 'China', code: 3 },
@@ -78,8 +78,8 @@ export default function AddUsers({
           </div>
 
           <div className="col-12 lg:col-12">
-            <MultiSelect  style={{ "width": "100%" }} value={selectedGroups} options={groups} onChange={(e) => setSelectedGroups(e.value)} optionLabel="name" placeholder="Select groups" filter className="multiselect-custom"
-            display="chip"
+            <MultiSelect style={{ "width": "100%" }} value={selectedGroups} options={groups} onChange={(e) => setSelectedGroups(e.value)} optionLabel="name" placeholder="Select groups" filter className="multiselect-custom"
+              display="chip"
             />
             {selectedGroups !== null && selectedGroups?.length > 0 ? <>
               <DataTable
@@ -104,25 +104,25 @@ export default function AddUsers({
 
 
           <div className="col-12 lg:col-12">
-            <MultiSelect style={{ "width": "100%" }}  value={selectedDelimitation} options={delimitation} onChange={(e) => setSelectedDelimitation(e.value)} optionLabel="name"  placeholder="Select Delimitation" filter className="multiselect-custom"
-         display="chip"
-         />
-            {selectedDelimitation !== null && selectedDelimitation?.length > 0 ? <>
+            <MultiSelect style={{ "width": "100%" }} value={selectedCentre} options={centre} onChange={(e) => setSelectedCentre(e.value)} optionLabel="name" placeholder="Select Registration Centre" filter className="multiselect-custom"
+              display="chip"
+            />
+            {selectedCentre !== null && selectedCentre?.length > 0 ? <>
               <DataTable
                 scrollable={true}
-                value={selectedDelimitation}
+                value={selectedCentre}
                 dataKey="id"
                 paginator
                 rows={5}
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} delimitations"
-                emptyMessage="No delimitations found."
-                header={<Header name='Selected Delimitation'></Header>}
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Registration Centre"
+                emptyMessage="No Registration Centre found."
+                header={<Header name='Selected Registration Centre'></Header>}
                 responsiveLayout="scroll"
               >
                 <Column field="code" header="Id" sortable></Column>
-                <Column field="name" header="Delimitations" sortable></Column>
+                <Column field="name" header="Registration Centre" sortable></Column>
 
               </DataTable>
             </> : ""}
