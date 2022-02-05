@@ -67,8 +67,8 @@ class Login extends React.Component {
                                     </div>
 
                                     <div className="p-field p-col-12 p-md-6">
-                                        <h1 className="p-text-uppercase">Login</h1>
-                                        <Image src={LesothoIcon} alt="Image" width="70%" />
+                                        <h1 className="p-text-uppercase">LOGIN</h1>
+                                        <Image src={LesothoIcon} alt="Image" width="90%" />
 
                                         <div className="Card">
                                             <div className="p-field">
