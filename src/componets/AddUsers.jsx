@@ -90,7 +90,7 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
         staffPositionID: "",
         // staffTypeID: "",
         physicalAddress: "",
-        signatureImage: "",
+        signatureImage: "signatureImage",
         appointmentDate: "",
         gender: "",
         contactNumber: "",
@@ -120,7 +120,10 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
     function SubmitForm() {
         var groupIDs = [];
         var centerIDS = [];
+
         if (selectedGroups != null && Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
+        else groupIDs.push(selectedGroups.id);
+
         if (selectedCentre != null && Array.isArray(selectedCentre) == true) selectedCentre.map((centre) => centerIDS.push(centre.id));
 
         var newForm = {};
@@ -134,7 +137,22 @@ export default function AddUsers({ buttonName = "Save", buttonIcon = "pi pi-save
         newForm["appointmentDate"] = formatDate(form.appointmentDate) + " 00:00";
         newForm["dateOfBirth"] = formatDate(form.dateOfBirth) + " 00:00";
 
-        // if (error == true) return toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+        var error = false;
+
+        Object.keys(newForm).map((key) => {
+            var value = newForm[key];
+            if (value?.length === 0) {
+                error = true;
+            }
+        });
+
+        if (error == true) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            return false;
+        }
+
+        // console.log(newForm);
+        // return false;
 
         var usersService = new UsersService();
         usersService
