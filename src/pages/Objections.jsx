@@ -27,6 +27,8 @@ export const Objections = () => {
         {
             name: "Mark",
             DateLodged: "",
+            IDNumber:"",
+            RegistrationNumber:"",
             actions: (
                 <>
                     <Button icon={"pi pi-pencil"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Delete" />
@@ -150,6 +152,8 @@ export const Objections = () => {
             >
                 <Column field="Name" header="Name" sortable></Column>
                 <Column field="DateLodged" header="Date Lodged"></Column>
+                <Column field="IDNumber" header="ID Number"></Column>
+                <Column field="RegistrationNumber" header="Registration Number"></Column>
 
                 {/* <Column
                     field="active"
