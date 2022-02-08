@@ -37,6 +37,7 @@ import "./App.scss";
 import { KitConfiguration } from "./pages/KitConfiguration";
 import { UserGroups } from "./pages/UserGroups";
 import Cookies from 'js-cookie'
+import VoterAllocationParams from "./pages/VoterAllocationParams";
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState("static");
@@ -307,6 +308,7 @@ const App = () => {
                             <Route path="/users" component={Users} />
                             <Route path="/user-groups" component={UserGroups} />
                             <Route path="/kit-configuration" component={KitConfiguration} />
+                            <Route path="/voter-allocation-params" component={ VoterAllocationParams} />
                             <Route path="/system-parameters" component={SystemParameters} />
                             <Route path="/delimitation-management" component={DelimitationManagement} />
                             <Route path="/voter-data" component={VoterData} />
