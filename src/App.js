@@ -36,7 +36,7 @@ import "./assets/layout/layout.scss";
 import "./App.scss";
 import { KitConfiguration } from "./pages/KitConfiguration";
 import { UserGroups } from "./pages/UserGroups";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 import VoterAllocationParams from "./pages/VoterAllocationParams";
 
 const App = () => {
@@ -58,7 +58,6 @@ const App = () => {
     let mobileTopbarMenuClick = false;
 
     useEffect(() => {
-
         var loginValue = Cookies.get("LoggedIn");
         var errors = ["null", "false", "undefined", null, false, undefined];
         if (errors.includes(loginValue)) {
@@ -172,14 +171,14 @@ const App = () => {
                     icon: "pi pi-fw pi-folder-open",
                     items: [
                         {
-                            label: "Voter Allocation Params",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/voter-allocation-params",
-                        },
-                        {
                             label: "Kit Configuration",
                             icon: "pi pi-fw pi-bookmark",
                             to: "/kit-configuration",
+                        },
+                        {
+                            label: "Voter Allocation Params",
+                            icon: "pi pi-fw pi-bookmark",
+                            to: "/voter-allocation-params",
                         },
                         {
                             label: "User Management",
@@ -313,7 +312,7 @@ const App = () => {
                             <Route path="/users" component={Users} />
                             <Route path="/user-groups" component={UserGroups} />
                             <Route path="/kit-configuration" component={KitConfiguration} />
-                            <Route path="/voter-allocation-params" component={ VoterAllocationParams} />
+                            <Route path="/voter-allocation-params" component={VoterAllocationParams} />
                             <Route path="/system-parameters" component={SystemParameters} />
                             <Route path="/delimitation-management" component={DelimitationManagement} />
                             <Route path="/voter-data" component={VoterData} />
