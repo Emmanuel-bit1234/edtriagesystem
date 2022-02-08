@@ -172,6 +172,11 @@ const App = () => {
                     icon: "pi pi-fw pi-folder-open",
                     items: [
                         {
+                            label: "Voter Allocation Params",
+                            icon: "pi pi-fw pi-bookmark",
+                            to: "/voter-allocation-params",
+                        },
+                        {
                             label: "Kit Configuration",
                             icon: "pi pi-fw pi-bookmark",
                             to: "/kit-configuration",
