@@ -14,8 +14,20 @@ export default function VoterAllocationParams() {
     let [data, setData] = useState([
         {
             name: "Election 1",
-            sortorder: null,
-            sortfield: null,
+            MinimumVotersPS: "...",
+            SortField: "...",
+            SortedOrder: "...",
+            SortedField: "...",
+            Threshold: "...",
+            ThresholdAction: "...",
+        },
+        {
+            name: "Local election 58",
+            MinimumVotersPS: "some description",
+            SortedOrder: "some description",
+            SortedField: "some description",
+            Threshold: "some description",
+            ThresholdAction: "some description",
         },
     ]);
 
@@ -38,7 +50,7 @@ export default function VoterAllocationParams() {
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">VoterAllocationParams</h5>
+            <h5 className="m-0">Voter Allocation Params</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search By Event Name" />
@@ -50,7 +62,7 @@ export default function VoterAllocationParams() {
         {
             name: "MinimumVotersinPS",
             description: <InputText style={{ width: "100%" }} />,
-            value: <InputText style={{ width: "100%" }}/>,
+            value: <InputText style={{ width: "100%" }} />,
         },
         {
             name: "SortOrder",
@@ -138,11 +150,11 @@ export default function VoterAllocationParams() {
                         globalFilterFields={["name"]}
                     >
                         <Column filterField="name" field="name" header="Event Name" sortable body={(item) => <b>{item.name}</b>}></Column>
-                        <Column header="MinimumVotersPS" body={"none"}></Column>
-                        <Column header="SortedOrder" body={"none"}></Column>
-                        <Column header="SortedField" body={"none"}></Column>
-                        <Column header="Threshold" body={"none"}></Column>
-                        <Column header="ThresholdAction" body={"none"}></Column>
+                        <Column field="MinimumVotersPS" header="MinimumVotersPS" sortable></Column>
+                        <Column field="SortedOrder" header="SortedOrder"></Column>
+                        <Column field="SortedField" header="SortedField"></Column>
+                        <Column field="Threshold" header="Threshold"></Column>
+                        <Column field="ThresholdAction" header="ThresholdAction"></Column>
                         <Column
                             field="action"
                             header="Action"
