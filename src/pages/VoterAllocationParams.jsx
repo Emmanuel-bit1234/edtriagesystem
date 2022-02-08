@@ -19,7 +19,7 @@ export default function VoterAllocationParams() {
             SortedOrder: "...",
             SortedField: "...",
             Threshold: "...",
-            ThresholdAction: "...",
+            //ThresholdAction: "...",
         },
         {
             name: "Local election 58",
@@ -27,7 +27,7 @@ export default function VoterAllocationParams() {
             SortedOrder: "some description",
             SortedField: "some description",
             Threshold: "some description",
-            ThresholdAction: "some description",
+            //ThresholdAction: "some description",
         },
     ]);
 
@@ -154,7 +154,7 @@ export default function VoterAllocationParams() {
                         <Column field="SortedOrder" header="SortedOrder"></Column>
                         <Column field="SortedField" header="SortedField"></Column>
                         <Column field="Threshold" header="Threshold"></Column>
-                        <Column field="ThresholdAction" header="ThresholdAction"></Column>
+                        {/* <Column field="ThresholdAction" header="ThresholdAction"></Column> */}
                         <Column
                             field="action"
                             header="Action"
