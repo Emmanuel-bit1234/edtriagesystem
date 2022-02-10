@@ -109,7 +109,7 @@ export const CandidateManagement = () => {
     </div>
   )
   return (
-    <div className="card  p-align-stretch vertical-container">
+    <div className="card  p-align-stretch vertical-container" style={{height: "calc(100vh - 9rem)"}}>
       <div className="">
         <Toolbar
           className="mb-4"
