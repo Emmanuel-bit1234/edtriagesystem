@@ -5,29 +5,26 @@ import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import VoterAuditHistoryServices from "../service/VoterAuditHistoryServices";
 import { TabPanel, TabView } from "primereact/tabview";
 import GenderService from "../service/GenderService";
+import { Toolbar } from "primereact/toolbar";
+import { Toast } from "primereact/toast";
 
 export const VoterAuditHistory = () => {
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const [isEdit, setIsEdit] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const toast = useRef(null);
 
     let [data, setData] = useState([]);
     var [selectedUser, setSelectedUser] = useState([]);
 
+    const [idNumber, setIdNumber] = useState("");
     var voterAuditHistory = new VoterAuditHistoryServices();
 
-    useEffect(() => {
-        voterAuditHistory.getAuditHistory().then((e) => {
-            console.log(e);
-            setData(e?.AHVoters ? e.AHVoters : []);
-            setLoading(false);
-        });
-    }, []);
+  
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -46,12 +43,24 @@ export const VoterAuditHistory = () => {
         setGlobalFilterValue(value);
     };
 
+    const submitForm = () => {
+        if (isNaN(idNumber.trim())) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            return false;
+        }
+
+        voterAuditHistory.getAuditHistoryByID(idNumber).then((e) => {
+            console.log(e);
+            setData(e?.AHVoters ? e.AHVoters : []);
+        });
+    };
+
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Voter Audit History</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search By Event Name" />
+                {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
             </span>
         </div>
     );
@@ -123,6 +132,21 @@ export const VoterAuditHistory = () => {
     return (
         <div className="grid">
             <div className="col-12">
+                <Toast ref={toast} />
+                <div>
+                    <Toolbar
+                        className="mb-4"
+                        left={
+                            <div>
+                                <span className="block mt-2 md:mt-0 p-input-icon-left">
+                                    <i className="pi pi-search" />
+                                    <InputText type="search" placeholder="Search by ID Number" value={idNumber} onInput={(e) => setIdNumber(e.target.value)} />
+                                    <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
+                                </span>
+                            </div>
+                        }
+                    ></Toolbar>
+                </div>
                 <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
                     <Dialog
                         header="Voter Audit History"
@@ -153,7 +177,6 @@ export const VoterAuditHistory = () => {
                     </Dialog>
 
                     <DataTable
-                        loading={loading}
                         size="small"
                         scrollable={true}
                         value={data}
