@@ -41,6 +41,7 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
     }
 
     var submittedForm = false;
+    
     function SubmitForm() {
         var newForm = {};
         Object.keys(form).map((key) => {
