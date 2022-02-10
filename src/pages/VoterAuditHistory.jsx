@@ -3,18 +3,14 @@ import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import VoterAuditHistoryServices from "../service/VoterAuditHistoryServices";
 import { TabPanel, TabView } from "primereact/tabview";
-import GenderService from "../service/GenderService";
 import { Toolbar } from "primereact/toolbar";
 import { Toast } from "primereact/toast";
 
 export const VoterAuditHistory = () => {
-    const [globalFilterValue, setGlobalFilterValue] = useState("");
-    const [isEdit, setIsEdit] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const toast = useRef(null);
 
@@ -24,28 +20,17 @@ export const VoterAuditHistory = () => {
     const [idNumber, setIdNumber] = useState("");
     var voterAuditHistory = new VoterAuditHistoryServices();
 
-  
-
-    const [filters, setFilters] = useState({
+    const filters = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: {
             operator: FilterOperator.AND,
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
-    });
-
-    const onGlobalFilterChange = (e) => {
-        const value = e.target.value;
-        let _filters1 = { ...filters };
-        _filters1["global"].value = value;
-
-        setFilters(_filters1);
-        setGlobalFilterValue(value);
     };
 
     const submitForm = () => {
         if (isNaN(idNumber.trim())) {
-            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required field", life: 3000 });
             return false;
         }
 
