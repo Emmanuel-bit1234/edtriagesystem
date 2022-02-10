@@ -1,24 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-import DropDown from "../componets/DropDown";
-import { Sidebar } from "primereact/sidebar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Toolbar } from "primereact/toolbar";
-import { TabPanel, TabView } from "primereact/tabview";
-import { Checkbox } from "primereact//checkbox";
-
-import { FileUpload } from "primereact/fileupload";
-import TextInput from "../componets/TextInput";
-import { Carousel } from "primereact/carousel";
-import { Dialog } from "primereact/dialog";
-import { Image } from "primereact/image";
-import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
 import AddUsers from "../componets/AddUsers";
 import UsersService from "../service/UsersService";
-import { Chip } from "primereact/chip";
-import { Toast } from "primereact/toast";
+
 
 export const Users = () => {
     const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -112,7 +100,7 @@ export const Users = () => {
                     field="active"
                     header="Status"
                     body={(e) =>
-                        e.sysUser.active == "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        e.sysUser.active === "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                     sortable
                 ></Column>
@@ -121,7 +109,8 @@ export const Users = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            {e.sysUser?.active == "Y" ? (
+                            {e.sysUser?.active ===
+                             "Y" ? (
                                 <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
                                 <Button onClick={(a) => activateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />

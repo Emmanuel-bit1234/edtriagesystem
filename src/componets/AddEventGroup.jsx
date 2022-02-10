@@ -1,19 +1,8 @@
 import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { FileUpload } from "primereact/fileupload";
-import { Image } from "primereact/image";
-import { MultiSelect } from "primereact/multiselect";
 import React, { useEffect, useState, useRef } from "react";
-import RegistrationCentreService from "../service/RegistrationCentreService";
-import DropDown from "./DropDown";
 import TextInput from "./TextInput";
-import { OrderList } from "primereact/orderlist";
-import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
-import StaffService from "../service/StaffService";
 import { Dialog } from "primereact/dialog";
-import { useHistory } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import EventGroupService from "../service/EventGroupService";
 export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {

@@ -1,24 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-import DropDown from "../componets/DropDown";
-import { Sidebar } from "primereact/sidebar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Toolbar } from "primereact/toolbar";
-import { TabPanel, TabView } from "primereact/tabview";
-import { Checkbox } from "primereact//checkbox";
-
-import { FileUpload } from "primereact/fileupload";
-import TextInput from "../componets/TextInput";
-import { Carousel } from "primereact/carousel";
-import { Dialog } from "primereact/dialog";
-import { Image } from "primereact/image";
-import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
 import AddEventGroup from "../componets/AddEventGroup";
 import EventGroupService from "../service/EventGroupService";
-import { Chip } from "primereact/chip";
-import { Toast } from "primereact/toast";
 
 export const EventGroup = () => {
     const [showAddEventGroupForm, setShowAddEventGroupForm] = useState(false);

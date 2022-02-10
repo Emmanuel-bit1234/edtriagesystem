@@ -3,7 +3,7 @@ import { Calendar } from "primereact/calendar";
 import React from "react";
 
 export default function TextInput({ label = "", type = "text", value = "", onChange = null }) {
-    return type == "text" ? (
+    return type === "text" ? (
         <div className="p-fluid">
             <label>{label}</label>
             <InputText value={value} onChange={onChange} required />
