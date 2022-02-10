@@ -50,11 +50,11 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
         var error = false;
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
-            if (value?.length === 0) {
+            if (value === "") {
                 error = true;
             }
         });
-        
+        console.log(newForm)
         if (error == true) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
@@ -112,19 +112,20 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
+                <Toast ref={toast} />
                     <form method="post">
                         <TabView onTabChange={(e) => (e.index = pageIndex)} activeIndex={pageIndex}>
                             <TabPanel header="EventGroup Details" disabled={pageIndex == 0 ? false : true}>
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="EventGroup Name" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
+                                        <TextInput label="EventGroup Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                     </div>
 
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Description" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                                        <TextInput label="Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput type="Calendar" label="EventDate" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
+                                        <TextInput type="Calendar" label="EventDate" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
                                     </div>
                                 </div>
                             </TabPanel>
