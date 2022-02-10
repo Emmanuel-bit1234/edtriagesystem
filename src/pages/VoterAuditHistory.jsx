@@ -1,12 +1,199 @@
-import React from "react";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { Button } from "primereact/button";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { Dialog } from "primereact/dialog";
+import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
+import React, { useEffect, useState } from "react";
+import VoterAuditHistoryServices from "../service/VoterAuditHistoryServices";
+import { TabPanel, TabView } from "primereact/tabview";
+import GenderService from "../service/GenderService";
 
 export const VoterAuditHistory = () => {
+    const [globalFilterValue, setGlobalFilterValue] = useState("");
+    const [isEdit, setIsEdit] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    let [data, setData] = useState([]);
+    var [selectedUser, setSelectedUser] = useState([]);
+
+    var voterAuditHistory = new VoterAuditHistoryServices();
+
+    useEffect(() => {
+        voterAuditHistory.getAuditHistory().then((e) => {
+            console.log(e);
+            setData(e?.AHVoters ? e.AHVoters : []);
+            setLoading(false);
+        });
+    }, []);
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: {
+            operator: FilterOperator.AND,
+            constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+        },
+    });
+
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters1 = { ...filters };
+        _filters1["global"].value = value;
+
+        setFilters(_filters1);
+        setGlobalFilterValue(value);
+    };
+
+    const header = (
+        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+            <h5 className="m-0">Voter Audit History</h5>
+            <span className="block mt-2 md:mt-0 p-input-icon-left">
+                <i className="pi pi-search" />
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search By Event Name" />
+            </span>
+        </div>
+    );
+
+    function VoterDetails() {
+        var gender = JSON?.parse(localStorage.getItem("genders"))?.filter((e) => e.id === selectedUser?.Gender)[0]?.description;
+
+        return [
+            {
+                name: "Firstname:",
+                value: selectedUser?.Firstname,
+            },
+            {
+                name: "Surname:",
+                value: selectedUser?.Surname,
+            },
+            {
+                name: "Gender:",
+                value: gender,
+            },
+            {
+                name: "Date of birth:",
+                value: selectedUser?.DayBirth,
+            },
+            {
+                name: "Address:",
+                value: selectedUser?.Address,
+            },
+            {
+                name: "Email:",
+                value: selectedUser?.Email_address,
+            },
+            {
+                name: "ContactNumber:",
+                value: selectedUser?.Contact_Number,
+            },
+        ];
+    }
+
+    function RegistrationDetails() {
+        return [
+            {
+                name: "ID Number:",
+                value: selectedUser?.IDNumber,
+            },
+            {
+                name: "Registration Number:",
+                value: selectedUser?.Surname,
+            },
+            {
+                name: "Date of Issue:",
+                value: selectedUser?.DateOfIssue,
+            },
+            {
+                name: "Date of Expiry:",
+                value: selectedUser?.DateOfExpiry,
+            },
+            {
+                name: "Date Registered",
+                value: selectedUser?.DateRegistered,
+            },
+            {
+                name: "Place of Issue",
+                value: selectedUser?.PlaceOfIssue,
+            },
+        ];
+    }
+
     return (
         <div className="grid">
             <div className="col-12">
-                <div className="card">
-                    <h5>Voter Audit History</h5>
-                    <p>Use this page to start from scratch and place your custom content.</p>
+                <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
+                    <Dialog
+                        header="Voter Audit History"
+                        visible={showDialog}
+                        style={{ width: "50%", height: "100vh" }}
+                        modal
+                        onHide={(e) => {
+                            setShowDialog(false);
+                        }}
+                    >
+                        <TabView>
+                            <TabPanel header="Voters Details">
+                                <DataTable size="small" scrollable={true} value={VoterDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                                    <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
+                                    <Column field="value"></Column>
+                                </DataTable>
+                            </TabPanel>
+                            <TabPanel header="Images">No Content</TabPanel>
+                            <TabPanel header="Registration Details">
+                                <DataTable size="small" scrollable={true} value={RegistrationDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                                    <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
+                                    <Column field="value"></Column>
+                                </DataTable>
+                            </TabPanel>
+                            <TabPanel header="Anomalies">No Content</TabPanel>
+                            <TabPanel header="Objections">No Content</TabPanel>
+                        </TabView>
+                    </Dialog>
+
+                    <DataTable
+                        loading={loading}
+                        size="small"
+                        scrollable={true}
+                        value={data}
+                        dataKey="id"
+                        paginator
+                        rows={10}
+                        rowsPerPageOptions={[5, 10, 25]}
+                        className="datatable-responsive"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
+                        emptyMessage="No voter audit history."
+                        header={header}
+                        responsiveLayout="scroll"
+                        resizableColumns
+                        columnResizeMode="expand"
+                        filters={filters}
+                        filterDisplay="menu"
+                        globalFilterFields={["name", "Firstname", "IDNumber"]}
+                    >
+                        <Column field="Firstname" header="Name" sortable></Column>
+                        <Column filterField="Surname" field="Surname" header="Surname" sortable></Column>
+                        <Column field="IDNumber" header="IDNumber"></Column>
+                        <Column
+                            field="action"
+                            header="Action"
+                            body={(item) => (
+                                <>
+                                    <Button
+                                        onClick={(e) => {
+                                            setShowDialog(true);
+                                            setSelectedUser(item);
+                                        }}
+                                        tooltip="Click to View"
+                                        icon={"pi pi-eye"}
+                                        tooltipOptions={{ position: "top" }}
+                                        className=" p-button-rounded mr-2"
+                                    />
+                                </>
+                            )}
+                        ></Column>
+                    </DataTable>
                 </div>
             </div>
         </div>

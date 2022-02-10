@@ -151,9 +151,9 @@ export default function VoterAllocationParams() {
                     >
                         <Column filterField="name" field="name" header="Event Name" sortable body={(item) => <b>{item.name}</b>}></Column>
                         <Column field="MinimumVotersPS" header="MinimumVotersPS" sortable></Column>
-                        <Column field="SortedOrder" header="SortedOrder"></Column>
+                        {/* <Column field="SortedOrder" header="SortedOrder"></Column>
                         <Column field="SortedField" header="SortedField"></Column>
-                        <Column field="Threshold" header="Threshold"></Column>
+                        <Column field="Threshold" header="Threshold"></Column> */}
                         {/* <Column field="ThresholdAction" header="ThresholdAction"></Column> */}
                         <Column
                             field="action"
