@@ -46,7 +46,7 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
         });
-        newForm["EventDate"] = formatDate(form.dateOfBirth) + " 00:00";
+        newForm["EventDate"] = formatDate(form.EventDate) + " 00:00";
         var error = false;
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
@@ -126,18 +126,6 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
                                     <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="EventDate" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
                                     </div>
-                                    {/* <div className="col-12  lg:col-4">
-                                        <TextInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
-                                    </div> */}
-                                    {/* <div className="col-12  lg:col-4">
-                                        <DropDown label="Objection Type" optionLabel="Objection Type" optionValue="id" />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <DropDown label="Objection Status" optionLabel="Objection Status" optionValue="id" />
-                                    </div> */}
-                                    {/* <div className="col-12  lg:col-4">
-                                        <DropDown value={form.gender} onChange={(e) => setForm({ ...form, gender: e.value })} options={gender} label="Gender" optionLabel="description" optionValue="id" />
-                                    </div> */}
                                 </div>
                             </TabPanel>
                         </TabView>
