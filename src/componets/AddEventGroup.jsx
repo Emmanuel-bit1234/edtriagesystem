@@ -4,74 +4,28 @@ import { DataTable } from "primereact/datatable";
 import { FileUpload } from "primereact/fileupload";
 import { Image } from "primereact/image";
 import { MultiSelect } from "primereact/multiselect";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import RegistrationCentreService from "../service/RegistrationCentreService";
 import DropDown from "./DropDown";
 import TextInput from "./TextInput";
-
 import { OrderList } from "primereact/orderlist";
 import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import StaffService from "../service/StaffService";
 import { Dialog } from "primereact/dialog";
-import UsersService from "../service/UsersService";
 import { useHistory } from "react-router-dom";
+import { Toast } from "primereact/toast";
+import EventGroupService from "../service/EventGroupService";
 export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
-   
-    // var sysGroupService = new SysGroupService();
-    // var [groups, setGroup] = useState([]);
-    // const [selectedGroups, setSelecedGroups] = useState([]);
-
-    // var [staffPosition, setStaffPosition] = useState([]);
-
-    // var genderService = new GenderService();
-
-    // var [gender, setGender] = useState([]);
-
-    useEffect(() => {
-        // genderService.getAllGender().then((data) => {
-        //     setGender(data);
-        // });
-        // staffService.getStaffType().then((data) => {
-        //     setStaffType(data);
-        // });
-        // staffService.getStaffPosition().then((data) => {
-        //     setStaffPosition(data);
-        // });
-        // registrationService.getRegistrationCentres().then((data) => {
-        //     setCentre(data);
-        // });
-        // sysGroupService.getSysAllGroup().then((data) => {
-        //     // console.log(data);
-        //     setGroup(data);
-        // });
-    }, []);
-
     var [pageIndex, setPageIndex] = useState(0);
-    var backWardPage = () => {
-        pageIndex--;
-        setPageIndex(pageIndex);
-    };
-    var forwardPage = () => {
-        pageIndex++;
-        setPageIndex(pageIndex);
-    };
-
+    const toast = useRef(null);
     var [form, setForm] = useState({
-        username: "",
-        name: "",
-        surname: "",
-        email: "",
-        password: "",
-        createdBy: 3,
-        registrationCentreIds: [],
-        sysGroupIds: [],
-        auditUser: "auditUser",
-        staffTypeID: "",
-        address: "address",
-        signatureImage: "",
-        appointmentDate: "",
-        contactNumber: "contactNumber",
+        Name: "",
+        Description: "",
+        EventDate: "",
+        Status: 1,
+        StatusReason: null,
+        Events: null,
     });
 
     function formatDate(date) {
@@ -86,30 +40,40 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
         return [year, month, day].join("-");
     }
 
+    var submittedForm = false;
     function SubmitForm() {
-        // var groupIDs = [];
-        // var centerIDS = [];
-        // if (selectedGroups != null && Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
-        // if (selectedCentre != null && Array.isArray(selectedCentre) == true) selectedCentre.map((centre) => centerIDS.push(centre.id));
-
-        // form.registrationCentreIds = centerIDS;
-        // form.sysGroupIds = groupIDs;
-        // form.appointmentDate = formatDate(form.appointmentDate) + " 00:00";
-
-        // var usersService = new UsersService();
-        // usersService.createUser(form).then((res) => {
-        //     console.log(res);
-        // });
-        // console.log(form);
-        /***
-         * message
-         * catch
-         */
-
-     
-        window.location.reload();
+        var newForm = {};
+        Object.keys(form).map((key) => {
+            newForm[key] = form[key];
+        });
+        newForm["EventDate"] = formatDate(form.dateOfBirth) + " 00:00";
+        var error = false;
+        Object.keys(newForm).map((key) => {
+            var value = newForm[key];
+            if (value?.length === 0) {
+                error = true;
+            }
+        });
+        
+        if (error == true) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            return false;
+        }
+        var eventGroupService  = new EventGroupService();
+        eventGroupService
+            .createEventGroup(newForm)
+            .then((res) => {
+                setTimeout(() => {
+                    window.location.reload();
+                    submittedForm = true;
+                }, 2000);
+                return toast.current.show({ severity: "success", summary: "Success Message", detail: "User was added successfully", life: 2000 });
+            })
+            .catch((e) => {
+                submittedForm = false;
+                return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
+            });
     }
-
     return (
         <Dialog
             header="Add EventGroup"
@@ -144,7 +108,7 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
             }
             visible={show}
             onHide={(e) => setShow(false)}
-            style={{ width: "95%", height: "90%" }}
+            style={{ width: "50%", height: "50%" }}
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
@@ -158,6 +122,9 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
 
                                     <div className="col-12  lg:col-4">
                                         <TextInput label="Description" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput type="Calendar" label="EventDate" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
                                     </div>
                                     {/* <div className="col-12  lg:col-4">
                                         <TextInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />

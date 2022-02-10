@@ -160,7 +160,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                         <TextInput label="Reason" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Surname" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
+                                        <TextInput label="Raised by" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
                                         <DropDown label="Objection Type" optionLabel="Objection Type" optionValue="id" />

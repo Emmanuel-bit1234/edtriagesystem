@@ -3,7 +3,11 @@ import { NET_IP } from "../config/Config";
 
 export default function ObjectionsService() {
     this.getAllObjections = () => {
-        var url = `${NET_IP}/DataInspection/GetObjections?regNo=DCON00000055`;
+        var url = `${NET_IP}/DataInspection/GetObjections?regNo=DCON00000088`;
         return axios.get(url).then((response) => response.data.Objections);
     };
+    // this.createObjection = (data) => {
+    //     var url = `${NET_IP}/DataInspection/InsertObjection`;
+    //     return axios.post(url, data).then((response) => response.data);
+    // };
 }

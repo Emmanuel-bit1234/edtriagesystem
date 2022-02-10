@@ -142,7 +142,7 @@ export const Objections = () => {
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
-                emptyMessage="No users found."
+                emptyMessage="No Objections found."
                 header={header}
                 responsiveLayout="scroll"
                 selection={selectedObjections}

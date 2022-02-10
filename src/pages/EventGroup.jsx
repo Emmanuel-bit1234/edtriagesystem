@@ -18,7 +18,7 @@ import { InputText } from "primereact/inputtext";
 import AddEventGroup from "../componets/AddEventGroup";
 import EventGroupService from "../service/EventGroupService";
 import { Chip } from "primereact/chip";
-import { Toast } from "primereact/toast";   
+import { Toast } from "primereact/toast";
 
 export const EventGroup = () => {
     const [showAddEventGroupForm, setShowAddEventGroupForm] = useState(false);
@@ -103,13 +103,17 @@ export const EventGroup = () => {
                 resizableColumns
                 columnResizeMode="expand"
             >
-                <Column field="Name" header="Name" body={(e) => e.sysUser?.username}></Column>
+                <Column field="Name" header="Name" ></Column>
 
                 <Column
                     field="active"
                     header="Status"
+                    // body={(e) =>
+                    //     e.sysUser.active == "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                    // }
                     body={(e) =>
-                        e.sysUser.active == "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                    <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> 
+                    
                     }
                     sortable
                 ></Column>
@@ -118,17 +122,22 @@ export const EventGroup = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            {e.sysUser?.active == "Y" ? (
+                            {/* {e.sysUser?.active == "Y" ? (
                                 <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
                                 <Button onClick={(a) => activateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" /> */}
+
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
+
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
+
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
                         </>
                     )}
                 ></Column>
             </DataTable>
-            
         </div>
     );
 };
