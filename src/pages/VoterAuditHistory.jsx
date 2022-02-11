@@ -96,7 +96,7 @@ export const VoterAuditHistory = () => {
         value: selectedUser?.Email_address,
       },
       {
-        name: 'ContactNumber:',
+        name: 'Contact Number:',
         value: selectedUser?.Contact_Number,
       },
     ]
