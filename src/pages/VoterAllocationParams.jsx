@@ -14,7 +14,7 @@ export default function VoterAllocationParams() {
     let [data, setData] = useState([
         {
             name: "Election 1",
-            MinimumVotersPS: "...",
+            MinimumVotersPS: "",
             SortField: "...",
             SortedOrder: "...",
             SortedField: "...",
