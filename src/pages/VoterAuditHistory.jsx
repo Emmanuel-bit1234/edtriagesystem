@@ -57,22 +57,14 @@ export const VoterAuditHistory = () => {
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
       <h5 className="m-0">Voter Audit History</h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
-        <i className="pi pi-search" />
+        {/* <i className="pi pi-search" /> */}
         {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
       </span>
     </div>
   )
 
   function VoterDetails() {
-    var objectionsService = new ObjectionsService()
-    if (selectedUser?.RegistrationNumber) {
-      objectionsService
-        .getObjectionsByID(selectedUser.RegistrationNumber)
-        .then((e) => {
-          console.log(e)
-          setObjection(e)
-        })
-    }
+
 
     var gender = JSON?.parse(localStorage.getItem('genders'))?.filter(
       (e) => e.id === selectedUser?.Gender,
@@ -226,8 +218,8 @@ export const VoterAuditHistory = () => {
                   rows={10}
                   rowsPerPageOptions={[5, 10, 25]}
                   className="datatable-responsive"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
-                  emptyMessage="No voter audit history."
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Objections"
+                  emptyMessage="No Objections."
                   responsiveLayout="scroll"
                   resizableColumns
                   columnResizeMode="expand"
@@ -301,8 +293,21 @@ export const VoterAuditHistory = () => {
                 <>
                   <Button
                     onClick={(e) => {
-                      setShowDialog(true)
-                      setSelectedUser(item)
+                      setShowDialog(true);
+                      setSelectedUser(item);
+
+                      
+                      var objectionsService = new ObjectionsService()
+                      if (selectedUser?.RegistrationNumber) {
+                        objectionsService
+                          .getObjectionsByID(selectedUser.RegistrationNumber)
+                          .then((e) => {
+                            console.log(e)
+                            setObjection(e)
+                          })
+                      }
+
+
                     }}
                     tooltip="Click to View"
                     icon={'pi pi-eye'}
