@@ -64,8 +64,6 @@ export const VoterAuditHistory = () => {
   )
 
   function VoterDetails() {
-
-
     var gender = JSON?.parse(localStorage.getItem('genders'))?.filter(
       (e) => e.id === selectedUser?.Gender,
     )[0]?.description
@@ -231,7 +229,10 @@ export const VoterAuditHistory = () => {
                     header="Name"
                     sortable
                   ></Column>
-                  <Column  header="RegistrationNumber" body={ selectedUser?.RegistrationNumber}></Column>
+                  <Column
+                    header="RegistrationNumber"
+                    body={selectedUser?.RegistrationNumber}
+                  ></Column>
                   <Column field="DateLodged" header="DateLodged"></Column>
                 </DataTable>
               </TabPanel>
@@ -258,14 +259,15 @@ export const VoterAuditHistory = () => {
             filterDisplay="menu"
             globalFilterFields={['name', 'Firstname', 'IDNumber']}
           >
-            <Column field="Firstname" header="Name" sortable></Column>
+            <Column field="Firstname" header="Firstname" sortable></Column>
             <Column
               filterField="Surname"
               field="Surname"
               header="Surname"
               sortable
             ></Column>
-            <Column field="IDNumber" header="IDNumber"></Column>
+            <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
+            <Column field="IDNumber" header="ID Number"></Column>
             <Column
               field="active"
               header="Status"
@@ -293,10 +295,9 @@ export const VoterAuditHistory = () => {
                 <>
                   <Button
                     onClick={(e) => {
-                      setShowDialog(true);
-                      setSelectedUser(item);
+                      setShowDialog(true)
+                      setSelectedUser(item)
 
-                      
                       var objectionsService = new ObjectionsService()
                       if (selectedUser?.RegistrationNumber) {
                         objectionsService
@@ -306,8 +307,6 @@ export const VoterAuditHistory = () => {
                             setObjection(e)
                           })
                       }
-
-
                     }}
                     tooltip="Click to View"
                     icon={'pi pi-eye'}
