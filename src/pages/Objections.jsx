@@ -56,7 +56,7 @@ export const Objections = () => {
         });
     }, []);
     return (
-        <div className="card  p-align-stretch vertical-container">
+        <div className="card  p-align-stretch vertical-container" style={{height: "calc(100vh - 9rem)"}}>
             <div className="">
                 <Toolbar
                     className="mb-4"
@@ -162,8 +162,8 @@ export const Objections = () => {
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" /> */}
 
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" /> */}
-                            <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
-                            <Button icon="pi pi-trash" className="p-button-rounded p-button-danger mt-2" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
                             {/* 
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
 

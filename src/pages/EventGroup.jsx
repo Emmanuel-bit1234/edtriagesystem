@@ -48,7 +48,7 @@ export const EventGroup = () => {
     }
 
     return (
-        <div className="card  p-align-stretch vertical-container">
+        <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
             <div className="">
                 <Toolbar
                     className="mb-4"
@@ -90,17 +90,17 @@ export const EventGroup = () => {
                 resizableColumns
                 columnResizeMode="expand"
             >
-                <Column field="Name" header="Name" ></Column>
+                <Column field="Name" header="Name"></Column>
 
                 <Column
                     field="active"
                     header="Status"
                     body={(e) =>
-                        parseInt (e.Status) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        parseInt(e.Status) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                     // body={(e) =>
-                    // <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> 
-                    
+                    // <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" />
+
                     // }
                     sortable
                 ></Column>
@@ -109,13 +109,14 @@ export const EventGroup = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            {parseInt (e.Status) == 1 ? (
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
+
+                            {parseInt(e.Status) == 1 ? (
                                 <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
                                 <Button onClick={(a) => activateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
-
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" />
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
 
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
