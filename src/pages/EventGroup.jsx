@@ -78,7 +78,7 @@ export const EventGroup = () => {
                 value={data}
                 dataKey="id"
                 paginator
-                rows={10}
+                rows={5}
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
