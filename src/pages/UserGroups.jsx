@@ -1,61 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-import DropDown from "../componets/DropDown";
-import { Sidebar } from "primereact/sidebar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Toolbar } from "primereact/toolbar";
-import { TabPanel, TabView } from "primereact/tabview";
-import { Checkbox } from "primereact//checkbox";
-
-import { FileUpload } from "primereact/fileupload";
-import TextInput from "../componets/TextInput";
-import { Carousel } from "primereact/carousel";
-import { Dialog } from "primereact/dialog";
-import { Image } from "primereact/image";
-import AddEdit from "../componets/AddEdit";
 import { InputText } from "primereact/inputtext";
-import AddUsers from "../componets/AddUsers";
-
-import { MultiSelect } from "primereact/multiselect";
-// import 'react-multiple-select-dropdown-lite/dist/index.css'
+import AddUserGroup from "../componets/AddUserGroup";
+import SysGroupService from "../service/SysGroupService";
 
 export const UserGroups = () => {
-    const [value, setvalue] = useState("");
-
-    const handleOnchange = (val) => {
-        setvalue(val);
-    };
-
-    const options = [
-        { label: "Option 1", value: "option_1" },
-        { label: "Option 2", value: "option_2" },
-        { label: "Option 3", value: "option_3" },
-        { label: "Option 4", value: "option_4" },
-    ];
-
-    const [showAddUserForm, setShowAddUserForm] = useState(false);
+    const [showAddUserGroupForm, setShowAddUserGroupForm] = useState(false);
 
     let [data, setData] = useState([
         {
-            "first name": "Mark",
+            email: "Mark",
             "last name": " Blue",
             actions: (
                 <>
                     <Button icon={"pi pi-check-square"} className="p-button-info p-button-rounded mr-2" tooltip="Click to Select" />
+                    <Button icon={"pi pi-pencil"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Delete" />
                     <Button icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltip="Click to Delete" />
                 </>
             ),
         },
     ]);
 
-    const [selectedUsers, setSelectedUsers] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Users</h5>
+            <h5 className="m-0">User Groups</h5>
         </div>
     );
+
+    var usersGroupService = new SysGroupService();
+    useEffect(() => {
+        usersGroupService.getAllSysGroup().then((data) => {
+            console.log(data);
+            setData(data);
+        });
+    }, []);
 
     return (
         <div className="card  p-align-stretch vertical-container">
@@ -64,7 +47,7 @@ export const UserGroups = () => {
                     className="mb-4"
                     left={
                         <div>
-                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add User" onClick={(e) => setShowAddUserForm(true)} />
+                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add User Group" onClick={(e) => setShowAddUserGroupForm(true)} />
                         </div>
                     }
                     right={
@@ -78,18 +61,12 @@ export const UserGroups = () => {
                 ></Toolbar>
             </div>
 
-            {/* add candidate */}
-            <Dialog header="Add Users" visible={showAddUserForm} onHide={(e) => setShowAddUserForm(false)} style={{ width: "95%", height: "90%" }}>
-                <div className="preview-values">
-                    <h4>Values</h4>
-                    {value}
-                </div>
-
-                <AddUsers buttonName="Add User" buttonIcon="pi pi-plus" />
-            </Dialog>
+            {/* add users */}
+            <AddUserGroup show={showAddUserGroupForm} setShow={setShowAddUserGroupForm} />
             {/* end */}
 
             <DataTable
+                size="small"
                 scrollable={true}
                 value={data}
                 dataKey="id"
@@ -97,17 +74,28 @@ export const UserGroups = () => {
                 rows={10}
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
-                emptyMessage="No groups found."
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+                emptyMessage="No users found."
                 header={header}
                 responsiveLayout="scroll"
-                selection={selectedUsers}
-                onSelectionChange={(e) => setSelectedUsers(e.value)}
+                selection={selectedGroup}
+                onSelectionChange={(e) => selectedGroup(e.value)}
+                resizableColumns
+                columnResizeMode="expand"
             >
                 <Column field="name" header="Name" sortable></Column>
-                <Column field="description" header="Description" sortable></Column>
-                <Column field="created date" header="Created Date" sortable></Column>
-                <Column field="actions" header="Actions"></Column>
+                <Column field="description" header="Description"></Column>
+                <Column
+                    field="actions"
+                    header="Actions"
+                    body={(e) => (
+                        <>
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltipOptions={{ position: "top" }} tooltip="Click to Edit" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} className="p-button-primary p-button-rounded mr-2 " tooltipOptions={{ position: "top" }} tooltip="Click to View" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-trash"} className="p-button-danger p-button-rounded" tooltipOptions={{ position: "top" }} tooltip="Click to Delete" />
+                        </>
+                    )}
+                ></Column>
             </DataTable>
         </div>
     );

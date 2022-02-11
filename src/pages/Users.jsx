@@ -5,12 +5,12 @@ import { Column } from "primereact/column";
 import { Toolbar } from "primereact/toolbar";
 import { InputText } from "primereact/inputtext";
 import AddUsers from "../componets/AddUsers";
+import EditUser from "../componets/EditUser";
 import UsersService from "../service/UsersService";
-
 
 export const Users = () => {
     const [showAddUserForm, setShowAddUserForm] = useState(false);
-    // const [addUserFooter,setAddUserFooter]
+    const [showEditUserForm, setShowEditUserForm] = useState(false);
 
     let [data, setData] = useState([]);
 
@@ -25,6 +25,7 @@ export const Users = () => {
     var usersService = new UsersService();
     useEffect(() => {
         usersService.getAllUsers().then((data) => {
+            console.log("Users --------->");
             console.log(data);
             setData(data);
         });
@@ -49,7 +50,7 @@ export const Users = () => {
     }
 
     return (
-        <div className="card  p-align-stretch vertical-container">
+        <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
             <div className="">
                 <Toolbar
                     className="mb-4"
@@ -71,6 +72,7 @@ export const Users = () => {
 
             {/* add users */}
             <AddUsers show={showAddUserForm} setShow={setShowAddUserForm} />
+            <EditUser show={showEditUserForm} setShow={setShowEditUserForm} />
             {/* end */}
 
             <DataTable
@@ -91,16 +93,16 @@ export const Users = () => {
                 resizableColumns
                 columnResizeMode="expand"
             >
-                <Column field="email" header="Email" sortable body={(e) => e.sysUser?.email}></Column>
-                <Column field="username" header="Username" body={(e) => e.sysUser?.username}></Column>
+                <Column field="email" header="Email" sortable body={(e) => e.user?.email}></Column>
+                <Column field="username" header="Username" body={(e) => e.user?.username}></Column>
 
-                <Column header="Surname - Name" body={(e) => e.appointment?.surname + ", " + e.appointment?.firstName}></Column>
+                <Column header="Name & Surname " body={(e) => e.firstName + "  " + e.surname}></Column>
 
                 <Column
                     field="active"
                     header="Status"
                     body={(e) =>
-                        e.sysUser.active === "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        e.user.active === "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                     sortable
                 ></Column>
@@ -109,18 +111,17 @@ export const Users = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            {e.sysUser?.active ===
-                             "Y" ? (
-                                <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
+                            <Button onClick={(a) => setShowEditUserForm(!showEditUserForm)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Edit" />
+                            <Button onClick={(a) => setShowEditUserForm(!showEditUserForm)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" />
+                            {e.user?.active === "Y" ? (
+                                <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to De-Activate" />
                             ) : (
-                                <Button onClick={(a) => activateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
+                                <Button onClick={(a) => activateHandler(e.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-success p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to Activate" />
                             )}
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" />
                         </>
                     )}
                 ></Column>
             </DataTable>
-            
         </div>
     );
 };

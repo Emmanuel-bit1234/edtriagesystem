@@ -16,7 +16,7 @@ import UsersService from "../service/UsersService";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
 import DelimitationServices from "../service/DelimitationServices";
-export default function AddUsers({ show = false, setShow }) {
+export default function EditUser({ show = false, setShow }) {
     const toast = useRef(null);
 
     var sysGroupService = new SysGroupService();
@@ -57,7 +57,6 @@ export default function AddUsers({ show = false, setShow }) {
             setCentre(data);
         });
         sysGroupService.getAllSysGroup().then((data) => {
-            // console.log(data);
             setGroup(data);
         });
     }, []);
@@ -83,7 +82,6 @@ export default function AddUsers({ show = false, setShow }) {
         sysGroupIds: [],
         auditUser: "auditUser",
         staffPositionID: "",
-        // staffTypeID: "",
         physicalAddress: "",
         signatureImage: "signatureImage",
         appointmentDate: "",
@@ -93,7 +91,6 @@ export default function AddUsers({ show = false, setShow }) {
         district: "district",
         districtId: 1,
         otherName: "",
-        physicalAddress: "",
         residentialAddress: "",
         idNumber: "",
         dateOfBirth: "",
@@ -116,10 +113,10 @@ export default function AddUsers({ show = false, setShow }) {
         var groupIDs = [];
         var centerIDS = [];
 
-        if (selectedGroups != null && Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
+        if (selectedGroups != null && Array.isArray(selectedGroups) === true) selectedGroups.map((group) => groupIDs.push(group.id));
         else groupIDs.push(selectedGroups.id);
 
-        if (selectedCentre != null && Array.isArray(selectedCentre) == true) selectedCentre.map((centre) => centerIDS.push(centre.id));
+        if (selectedCentre != null && Array.isArray(selectedCentre) === true) selectedCentre.map((centre) => centerIDS.push(centre.id));
 
         var newForm = {};
 
@@ -141,13 +138,10 @@ export default function AddUsers({ show = false, setShow }) {
             }
         });
 
-        if (error == true) {
+        if (error === true) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
         }
-
-        // console.log(newForm);
-        // return false;
 
         var usersService = new UsersService();
         usersService
@@ -170,7 +164,7 @@ export default function AddUsers({ show = false, setShow }) {
             header="Add User"
             footer={
                 <>
-                    {pageIndex == 0 ? (
+                    {pageIndex === 0 ? (
                         <>
                             <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
                         </>
@@ -178,7 +172,16 @@ export default function AddUsers({ show = false, setShow }) {
                         ""
                     )}
 
-                    {pageIndex == 1 ? (
+                    {pageIndex === 1 ? (
+                        <>
+                            <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
+                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
+                        </>
+                    ) : (
+                        ""
+                    )}
+
+                    {pageIndex === 2 ? (
                         <>
                             <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
                             <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
@@ -197,7 +200,7 @@ export default function AddUsers({ show = false, setShow }) {
                 <div className="col-12 lg:col-12">
                     <form method="post">
                         <TabView onTabChange={(e) => (e.index = pageIndex)} activeIndex={pageIndex}>
-                            <TabPanel header="Personal Details" disabled={pageIndex == 0 ? false : true}>
+                            <TabPanel header="Personal Details" disabled={pageIndex === 0 ? false : true}>
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
                                         <TextInput label="User Name" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
@@ -245,8 +248,21 @@ export default function AddUsers({ show = false, setShow }) {
                                     </div>
                                 </div>
                             </TabPanel>
+                            <TabPanel header="Appointment Details" disabled={pageIndex === 1 ? false : true} activeIndex={pageIndex}>
+                                <div className="grid">
+                                    <div className="col-12  lg:col-4">
+                                        <DropDown value={form.staffPositionID} onChange={(e) => setForm({ ...form, staffPositionID: e.value })} options={staffPosition} label="Position" optionLabel="description" optionValue="id" />
+                                    </div>
 
-                            <TabPanel header="Access Allocation" disabled={pageIndex == 2 ? false : true} activeIndex={pageIndex}>
+                                    {/* <div className="col-12  lg:col-4">
+                                        <DropDown value={form.staffTypeID} onChange={(e) => setForm({ ...form, staffTypeID: e.value })} options={staffType} label="Staff Type" optionLabel="description" optionValue="id" />
+                                    </div> */}
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput type="Calendar" label="Date Employed" value={form.appointmentDate} onChange={(e) => setForm({ ...form, appointmentDate: e.target.value })} />
+                                    </div>
+                                </div>
+                            </TabPanel>
+                            <TabPanel header="Access Allocation" disabled={pageIndex === 2 ? false : true} activeIndex={pageIndex}>
                                 <div className="flex">
                                     <div className="grid" style={{ flex: 1 }}>
                                         <div className="col-12 lg:col-12">
