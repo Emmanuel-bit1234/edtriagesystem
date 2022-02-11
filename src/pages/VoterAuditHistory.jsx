@@ -9,6 +9,7 @@ import VoterAuditHistoryServices from '../service/VoterAuditHistoryServices'
 import { TabPanel, TabView } from 'primereact/tabview'
 import { Toolbar } from 'primereact/toolbar'
 import { Toast } from 'primereact/toast'
+import ObjectionsService from '../service/ObjectionsService'
 
 export const VoterAuditHistory = () => {
   const [showDialog, setShowDialog] = useState(false)
@@ -17,6 +18,7 @@ export const VoterAuditHistory = () => {
   const toast = useRef(null)
 
   let [data, setData] = useState([])
+  let [objection, setObjection] = useState([])
   var [selectedUser, setSelectedUser] = useState([])
 
   const [idNumber, setIdNumber] = useState('')
@@ -62,6 +64,16 @@ export const VoterAuditHistory = () => {
   )
 
   function VoterDetails() {
+    var objectionsService = new ObjectionsService()
+    if (selectedUser?.RegistrationNumber) {
+      objectionsService
+        .getObjectionsByID(selectedUser.RegistrationNumber)
+        .then((e) => {
+          console.log(e)
+          setObjection(e)
+        })
+    }
+
     var gender = JSON?.parse(localStorage.getItem('genders'))?.filter(
       (e) => e.id === selectedUser?.Gender,
     )[0]?.description
@@ -106,7 +118,7 @@ export const VoterAuditHistory = () => {
       },
       {
         name: 'Registration Number:',
-        value: selectedUser?.Surname,
+        value: selectedUser?.RegistrationNumber,
       },
       {
         name: 'Date of Issue:',
@@ -204,12 +216,38 @@ export const VoterAuditHistory = () => {
                 </DataTable>
               </TabPanel>
               <TabPanel header="Anomalies">No Content</TabPanel>
-              <TabPanel header="Objections">No Content</TabPanel>
+              <TabPanel header="Objections">
+                <DataTable
+                  size="small"
+                  scrollable={true}
+                  value={objection}
+                  dataKey="id"
+                  paginator
+                  rows={10}
+                  rowsPerPageOptions={[5, 10, 25]}
+                  className="datatable-responsive"
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
+                  emptyMessage="No voter audit history."
+                  responsiveLayout="scroll"
+                  resizableColumns
+                  columnResizeMode="expand"
+                  filterDisplay="menu"
+                >
+                  <Column
+                    filterField="Name"
+                    field="Name"
+                    header="Name"
+                    sortable
+                  ></Column>
+                  <Column  header="RegistrationNumber" body={ selectedUser?.RegistrationNumber}></Column>
+                  <Column field="DateLodged" header="DateLodged"></Column>
+                </DataTable>
+              </TabPanel>
             </TabView>
           </Dialog>
 
           <DataTable
-          loading={loading}
+            loading={loading}
             size="small"
             scrollable={true}
             value={data}
@@ -236,6 +274,26 @@ export const VoterAuditHistory = () => {
               sortable
             ></Column>
             <Column field="IDNumber" header="IDNumber"></Column>
+            <Column
+              field="active"
+              header="Status"
+              body={(e) =>
+                e?.RegistrationNumber ? (
+                  <Button
+                    label="Active"
+                    style={{ textAlign: 'center', height: '30px' }}
+                    className="p-button-success p-button-rounded"
+                  />
+                ) : (
+                  <Button
+                    label="Not Active"
+                    style={{ textAlign: 'center', height: '30px' }}
+                    className="p-button-danger p-button-rounded"
+                  />
+                )
+              }
+              sortable
+            ></Column>
             <Column
               field="action"
               header="Action"
