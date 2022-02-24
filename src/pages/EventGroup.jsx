@@ -1,3 +1,4 @@
+import { FilterMatchMode, FilterOperator } from "primereact/api";
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -28,6 +29,21 @@ export const EventGroup = () => {
             setData(data);
         });
     }, []);
+    const [globalFilterValue, setGlobalFilterValue] = useState("");
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: {
+            operator: FilterOperator.AND,
+            constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+        },
+    });
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters1 = { ...filters };
+        _filters1["global"].value = value;
+        setFilters(_filters1);
+        setGlobalFilterValue(value);
+    };
 
     function activateHandler(id) {
         eventGroupService.activateEventGroup(id).then((res) => {
@@ -61,7 +77,7 @@ export const EventGroup = () => {
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText type="search" placeholder="Search..." />
+                                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search By EventGroup Name" />
                             </span>
                         </div>
                     }
@@ -89,6 +105,9 @@ export const EventGroup = () => {
                 onSelectionChange={(e) => setSelectedEventGroup(e.value)}
                 resizableColumns
                 columnResizeMode="expand"
+                filters={filters}
+                filterDisplay="Name"
+                globalFilterFields={["Name"]}
             >
                 <Column field="Name" header="Name"></Column>
 
