@@ -7,15 +7,33 @@ import { Toolbar } from "primereact/toolbar";
 import { InputText } from "primereact/inputtext";
 import AddEventGroup from "../componets/AddEventGroup";
 import EventGroupService from "../service/EventGroupService";
+import { Dialog } from "primereact/dialog";
+import { TabPanel, TabView } from 'primereact/tabview'
 
 export const EventGroup = () => {
     const [showAddEventGroupForm, setShowAddEventGroupForm] = useState(false);
-    // const [addUserFooter,setAddUserFooter]
-
+    const [showDialog, setShowDialog] = useState(false);
+    const [loading, setLoading] = useState(false);
     let [data, setData] = useState([]);
 
     const [selectedEventGroup, setSelectedEventGroup] = useState(null);
 
+    function EventGroupDetails() {
+        return [
+            {
+                name: "EventGroup Name:",
+                value: selectedEventGroup?.Name,
+            },
+            {
+                name: "EventGroup Description:",
+                value: selectedEventGroup?.Description,
+            },
+            {
+                name: "Status reason:",
+                value: selectedEventGroup?.StatusReason,
+            },
+        ];
+    }
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">EventGroups</h5>
@@ -83,6 +101,24 @@ export const EventGroup = () => {
                     }
                 ></Toolbar>
             </div>
+            <Dialog
+                header="EventGroup Details"
+                visible={showDialog}
+                style={{ width: "50%", height: "50%" }}
+                modal
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="EventGroup Details">
+                        <DataTable size="small" scrollable={true} value={EventGroupDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                            <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
+                            <Column field="value"></Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+            </Dialog>
 
             {/* add users */}
             <AddEventGroup show={showAddEventGroupForm} setShow={setShowAddEventGroupForm} />
@@ -109,7 +145,7 @@ export const EventGroup = () => {
                 filterDisplay="Name"
                 globalFilterFields={["Name"]}
             >
-                <Column field="Name" header="Name"></Column>
+                <Column field="Name" header="Name" sortable></Column>
 
                 <Column
                     field="active"
@@ -135,7 +171,12 @@ export const EventGroup = () => {
                             ) : (
                                 <Button onClick={(a) => activateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" 
+                            onClick={(a) => {
+                                setShowDialog(true)
+                                setSelectedEventGroup(e)
+                              }}
+                            />
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
 
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />

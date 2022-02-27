@@ -10,9 +10,12 @@ import { InputText } from "primereact/inputtext";
 import DropDown from "../componets/DropDown";
 import EventService from "../service/EventServices";
 import AddEvent from "../componets/AddEvent";
+import { Dialog } from "primereact/dialog";
+import { TabPanel, TabView } from "primereact/tabview";
 
 export const Events = () => {
     const [showAddEventForn, setshowAddEventForn] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
     const eventGroupOptions = [
@@ -41,7 +44,20 @@ export const Events = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
-    const [selectedObjections, setSelectedObjections] = useState(null);
+    const [selectedEvents, setSelectedEvents] = useState(null);
+
+    function EventDetails() {
+        return [
+            {
+                name: "Event Name:",
+                value: selectedEvents?.Text,
+            },
+            {
+                name: "Status:",
+                value: selectedEvents?.Value,
+            },
+        ];
+    }
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -92,7 +108,7 @@ export const Events = () => {
                     left={
                         <div>
                             <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Event" onClick={(e) => setshowAddEventForn(true)} />
-                        </div>                      
+                        </div>
                     }
                     right={
                         <div>
@@ -104,6 +120,24 @@ export const Events = () => {
                     }
                 ></Toolbar>
             </div>
+            <Dialog
+                header="Event Details"
+                visible={showDialog}
+                style={{ width: "50%", height: "50%" }}
+                modal
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="Event Details">
+                        <DataTable size="small" scrollable={true} value={EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                            <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
+                            <Column field="value"></Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+            </Dialog>
 
             {/* add users */}
             {/* <AddUsers show={showAddEventForn} setShow={setshowAddEventForn} /> */}
@@ -120,18 +154,18 @@ export const Events = () => {
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
-                emptyMessage="No Objections found."
+                emptyMessage="No Events found."
                 header={header}
                 responsiveLayout="scroll"
-                selection={selectedObjections}
-                onSelectionChange={(e) => setSelectedObjections(e.value)}
+                selection={selectedEvents}
+                onSelectionChange={(e) => setSelectedEvents(e.value)}
                 resizableColumns
                 columnResizeMode="expand"
                 filters={filters}
                 filterDisplay="Text"
                 globalFilterFields={["Text"]}
             >
-                <Column field="Text" header="text" sortable></Column>
+                <Column field="Text" header="Name" sortable></Column>
                 <Column
                     field="active"
                     header="Status"
@@ -156,7 +190,17 @@ export const Events = () => {
                             ) : (
                                 <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" />
+                            <Button
+                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                icon={"pi pi-eye"}
+                                tooltipOptions={{ position: "top" }}
+                                className="p-button-primary p-button-rounded mr-2"
+                                tooltip="Click to View"
+                                onClick={(a) => {
+                                    setShowDialog(true);
+                                    setSelectedEvents(e);
+                                }}
+                            />
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
 
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
