@@ -2,6 +2,11 @@ import axios from "axios";
 import { NET_IP } from "../config/Config";
 
 export default function EventGroupService() {
+    
+  this.deActivateEventGroup  = (id, reason) => {
+    var url = `${NET_IP}/EventManagement/DeleteEventGroup?id=${id}&StatusReason=${reason}`
+    return axios.get(url).then((response) => response.data)
+  }
     this.getAllEventGroups = () => {
         var url = `${NET_IP}/EventManagement/EventGroupIndex`;
         return axios.get(url).then((response) => response.data.EventGroups);
