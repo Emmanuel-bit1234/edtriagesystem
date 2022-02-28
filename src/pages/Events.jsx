@@ -114,7 +114,7 @@ export const Events = () => {
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search By Event Name" />
+                                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search Event Name" />
                             </span>
                         </div>
                     }
