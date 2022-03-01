@@ -1,6 +1,7 @@
 import axios from "axios";
 import { NET_IP } from "../config/Config";
 
+
 export default function EventGroupService() {
     
   this.deActivateEventGroup  = (id, reason) => {
