@@ -12,20 +12,26 @@ import EventService from "../service/EventServices";
 import AddEvent from "../componets/AddEvent";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
+import EventGroupService from "../service/EventGroupService";
 
 export const Events = () => {
     const [showAddEventForn, setshowAddEventForn] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
-    const eventGroupOptions = [
-        { key: "NAME1", name: "NAME1", label: "EventGroup1" },
-        { key: "NAME2", name: "NAME2", label: "EventGroup2" },
-        { key: "NAME3", name: "NAME3", label: "EventGroup3" },
-    ];
     var [form, setForm] = useState({
-        eventGroup: "SELECT AN OPTION",
+        eventGroup: "SELECT AN EVENT GROUP",
     });
+    var eventGroupService = new EventGroupService();
+    var [eventGroup, setEventGroup] = useState([]);
+
+    useEffect(() => {
+        eventGroupService.getAllEventGroups().then((data) => {
+            setEventGroup(data);
+            console.log(data)
+        });
+    }, []);
+
     var getInput = (key, ev) => {
         setForm({ ...form, [key]: ev.value });
     };
@@ -66,12 +72,15 @@ export const Events = () => {
     );
 
     var eventService = new EventService();
-    useEffect(() => {
-        eventService.getAllEvents().then((data) => {
-            console.log(data);
+    function eventHandler(e){
+        setForm({ ...form, eventGroup: e.value })
+        console.log(e.value)
+        var id=e.value?.EventGroupID?e.value.EventGroupID:null;
+        if(id==null)  return setData([]);
+        eventService.getAllEvents(id).then((data) => {
             setData(data);
-        });
-    }, []);
+        });  
+    }
     // function activateHandler(id) {
     //     eventService.activateEvent(id).then((res) => {
     //         eventGroupService.getAllEvents().then((data) => {
@@ -98,7 +107,7 @@ export const Events = () => {
                     left={
                         <div>
                             <div className="">
-                                <DropDown label={"Event Group"} options={eventGroupOptions} value={form.eventGroup} onChange={(e) => getInput("eventGroup", e)} />
+                                <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup}  />
                             </div>
                         </div>
                     }
@@ -156,6 +165,7 @@ export const Events = () => {
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
                 emptyMessage="No Events found."
                 header={header}
+                eventGroup=""
                 responsiveLayout="scroll"
                 selection={selectedEvents}
                 onSelectionChange={(e) => setSelectedEvents(e.value)}
@@ -198,7 +208,7 @@ export const Events = () => {
                              {parseInt(e.Value) == 1 ? (
                                 <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
-                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-success p-button-rounded mr-2" tooltip="Click to Activate" />
+                                <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
                             {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
 

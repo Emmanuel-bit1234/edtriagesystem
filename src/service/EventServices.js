@@ -2,8 +2,8 @@ import axios from "axios";
 import { NET_IP } from "../config/Config";
 
 export default function EventService() {
-    this.getAllEvents = () => {
-        var url = `${NET_IP}/EventManagement/GetEventType?id=1`;
+    this.getAllEvents = (id) => {
+        var url = `${NET_IP}/EventManagement/GetEventType?id=${id}`;
         return axios.get(url).then((response) => response.data);
     };
     this.createEvent = (data) => {
