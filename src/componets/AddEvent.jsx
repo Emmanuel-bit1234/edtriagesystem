@@ -98,7 +98,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                     <>
                         {pageIndex == 0 ? (
                             <>
-                                <Button label="Submit Event" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
+                                <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
                                 <Button onClick={forwardPage} label="By-Election" icon="pi pi-forward" />
                             </>
                         ) : (
@@ -108,7 +108,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                         {pageIndex == 1 ? (
                             <>
                                 <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
-                                <Button label="Submit By-Election" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
+                                <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
                             </>
                         ) : (
                             ""

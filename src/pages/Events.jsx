@@ -55,12 +55,12 @@ export const Events = () => {
     function EventDetails() {
         return [
             {
-                name: "Event Name:",
-                value: selectedEvents?.Text,
+                name: "Name",
+                value: selectedEvents?.Name,
             },
             {
-                name: "Status:",
-                value: selectedEvents?.Value,
+                name: "Description",
+                value: selectedEvents?.Description,
             },
         ];
     }
@@ -74,7 +74,6 @@ export const Events = () => {
     var eventService = new EventService();
     function eventHandler(e){
         setForm({ ...form, eventGroup: e.value })
-        console.log(e.value)
         var id=e.value?.EventGroupID?e.value.EventGroupID:null;
         if(id==null)  return setData([]);
         eventService.getAllEvents(id).then((data) => {
@@ -141,8 +140,8 @@ export const Events = () => {
                 <TabView>
                     <TabPanel header="Event Details">
                         <DataTable size="small" scrollable={true} value={EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
-                            <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
-                            <Column field="value"></Column>
+                            <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
+                            <Column field="Description" field="value"></Column>
                         </DataTable>
                     </TabPanel>
                 </TabView>
@@ -175,12 +174,12 @@ export const Events = () => {
                 filterDisplay="Text"
                 globalFilterFields={["Text"]}
             >
-                <Column field="Text" header="Name" sortable></Column>
+                <Column field="Name" header="Name" sortable></Column>
                 <Column
                     field="active"
                     header="Status"
                     body={(e) =>
-                        parseInt(e.Value) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        parseInt(e.IsActive) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                     // body={(e) =>
                     // <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" />
@@ -203,6 +202,7 @@ export const Events = () => {
                                 onClick={(a) => {
                                     setShowDialog(true);
                                     setSelectedEvents(e);
+                                    console.log(e)                                
                                 }}
                             />
                              {parseInt(e.Value) == 1 ? (

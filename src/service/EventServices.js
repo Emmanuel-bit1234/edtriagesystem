@@ -3,8 +3,8 @@ import { NET_IP } from "../config/Config";
 
 export default function EventService() {
     this.getAllEvents = (id) => {
-        var url = `${NET_IP}/EventManagement/GetEventType?id=${id}`;
-        return axios.get(url).then((response) => response.data);
+        var url = `${NET_IP}/EventManagement/GetEventsData?EventGroupID=${id}`;
+        return axios.get(url).then((response) => response.data.Events);
     };
     this.createEvent = (data) => {
         var url = `${NET_IP}/EventManagement/InsertEventGroup`;
