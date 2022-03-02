@@ -83,11 +83,11 @@ export const VoterAuditHistory = () => {
       },
       {
         name: 'Date of birth:',
-        value: selectedUser?.DayBirth,
+        value: selectedUser?.DateOfBirth,
       },
       {
         name: 'Address:',
-        value: selectedUser?.Address,
+        value: selectedUser?.Address===null?"N/A":selectedUser?.Address,
       },
       {
         name: 'Email:',
@@ -110,22 +110,22 @@ export const VoterAuditHistory = () => {
         name: 'Registration Number:',
         value: selectedUser?.RegistrationNumber,
       },
-      {
-        name: 'Date of Issue:',
-        value: selectedUser?.DateOfIssue,
-      },
-      {
-        name: 'Date of Expiry:',
-        value: selectedUser?.DateOfExpiry,
-      },
-      {
-        name: 'Date Registered',
-        value: selectedUser?.DateRegistered,
-      },
-      {
-        name: 'Place of Issue',
-        value: selectedUser?.PlaceOfIssue,
-      },
+      // {
+      //   name: 'Date of Issue:',
+      //   value: selectedUser?.DateOfIssue,
+      // },
+      // {
+      //   name: 'Date of Expiry:',
+      //   value: selectedUser?.DateOfExpiry,
+      // },
+      // {
+      //   name: 'Date Registered',
+      //   value: selectedUser?.DateRegistered,
+      // },
+      // {
+      //   name: 'Place of Issue',
+      //   value: selectedUser?.PlaceOfIssue,
+      // },
     ]
   }
 
@@ -187,7 +187,7 @@ export const VoterAuditHistory = () => {
                   <Column field="value"></Column>
                 </DataTable>
               </TabPanel>
-              <TabPanel header="Images">No Content</TabPanel>
+              <TabPanel header="Communication">No Content</TabPanel>
               <TabPanel header="Registration Details">
                 <DataTable
                   size="small"
