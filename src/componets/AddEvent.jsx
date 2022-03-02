@@ -6,6 +6,8 @@ import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 import EventGroupService from "../service/EventGroupService";
 import { Dropdown } from "primereact/dropdown";
+import EventTypeService from "../service/EventTypeService";
+
 export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     var [pageIndex, setPageIndex] = useState(0);
     const toast = useRef(null);
@@ -17,15 +19,24 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         StatusReason: null,
         Events: null,
     });
+    var [selectedType, setSelected] = useState(null);
+    function eventHandler(e) {
+        setSelected(e.value);
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        // if (id == null) return setData([]);
+        // eventService.getAllEvents(id).then((data) => {
+        //     setData(data);
+        // });
+    }
+    var [eventType, setEventType] = useState([]);
     var [pageIndex, setPageIndex] = useState(0);
-    var backWardPage = () => {
-        pageIndex--;
-        setPageIndex(pageIndex);
-    };
-    var forwardPage = () => {
-        pageIndex++;
-        setPageIndex(pageIndex);
-    };
+    var eventTypeService = new EventTypeService();
+    useEffect(() => {
+        eventTypeService.getAllEventTypes().then((data) => {
+            setEventType(data);
+            console.log(data);
+        });
+    }, []);
 
     function formatDate(date) {
         var d = new Date(date),
@@ -139,7 +150,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                         <Dropdown placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Event Type" style={{ width: "100%" }} />
+                                        <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
                                     </div>
                                 </div>
                             </TabPanel>
@@ -155,7 +166,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                         <TextInput label="Event Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                     </div>
 
-                                    <div className="col-12  lg:col-4">  
+                                    <div className="col-12  lg:col-4">
                                         <Dropdown placeholder="Event" style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">

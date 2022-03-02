@@ -30,8 +30,7 @@ export const Events = () => {
 
     function deActivateHandler(e) {
         eventService.deActivateEvent(e.EventID).then((e) => {
-
-            var id = form.eventGroup?.EventGroupID ?form.eventGroup.EventGroupID : null;
+            var id = form.eventGroup?.EventGroupID ? form.eventGroup?.EventGroupID : null;
             if (id == null) return setData([]);
             eventService.getAllEvents(id).then((data) => {
                 setData(data);
