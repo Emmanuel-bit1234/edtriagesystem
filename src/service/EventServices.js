@@ -11,11 +11,7 @@ export default function EventService() {
         return axios.post(url, data).then((response) => response.data);
     };
     this.deActivateEvent = (id) => {
-        var url = `${NET_IP}/EventManagement/GetEventType/${id}`;
-        return axios.get(url).then((response) => response.data);
-    };
-    this.activateEvent = (id) => {
-        var url = `${NET_IP}/EventManagement/GetEventTypex/${id}`;
-        return axios.get(url).then((response) => response.data);
+        var url = `${NET_IP}/EventManagement/DeleteEvent?id=${id}`;
+        return axios.post(url).then((response) => response.data);
     };
 }

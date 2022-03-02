@@ -99,7 +99,6 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                         {pageIndex == 0 ? (
                             <>
                                 <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
-                                <Button onClick={forwardPage} label="By-Election" icon="pi pi-forward" />
                             </>
                         ) : (
                             ""
@@ -107,7 +106,6 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
 
                         {pageIndex == 1 ? (
                             <>
-                                <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
                                 <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
                             </>
                         ) : (
@@ -124,7 +122,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                 <div className="col-12 lg:col-12">
                     <Toast ref={toast} />
                     <form method="post">
-                        <TabView onTabChange={(e) => (e.index = pageIndex)} activeIndex={pageIndex}>
+                        <TabView activeIndex={pageIndex}>
                             <TabPanel header="Event Details" disabled={pageIndex == 0 ? false : true}>
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
@@ -145,7 +143,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                     </div>
                                 </div>
                             </TabPanel>
-                            <TabPanel header="By-Election Details" disabled={pageIndex == 1 ? false : true}>
+                            <TabPanel header="By-Election Details">
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="Event Date" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />

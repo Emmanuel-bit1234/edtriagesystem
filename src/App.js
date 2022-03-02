@@ -258,14 +258,14 @@ const App = () => {
                     icon: "pi pi-fw pi-clone",
                     items: [
                         {
-                            label: "Event",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/event",
-                        },
-                        {
                             label: "Event Group",
                             icon: "pi pi-fw pi-bookmark",
                             to: "/event-group",
+                        },
+                        {
+                            label: "Event",
+                            icon: "pi pi-fw pi-bookmark",
+                            to: "/event",
                         },
                     ],
                 },

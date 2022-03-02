@@ -1,6 +1,6 @@
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -13,8 +13,10 @@ import AddEvent from "../componets/AddEvent";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import EventGroupService from "../service/EventGroupService";
+import { Toast } from "primereact/toast";
 
 export const Events = () => {
+    const toast = useRef(null);
     const [showAddEventForn, setshowAddEventForn] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
@@ -24,11 +26,23 @@ export const Events = () => {
     });
     var eventGroupService = new EventGroupService();
     var [eventGroup, setEventGroup] = useState([]);
+    const [showEditForm, setShowEditForm] = useState(false);
+
+    function deActivateHandler(e) {
+        eventService.deActivateEvent(e.EventID).then((e) => {
+
+            var id = form.eventGroup?.EventGroupID ?form.eventGroup.EventGroupID : null;
+            if (id == null) return setData([]);
+            eventService.getAllEvents(id).then((data) => {
+                setData(data);
+            });
+        });
+    }
 
     useEffect(() => {
         eventGroupService.getAllEventGroups().then((data) => {
             setEventGroup(data);
-            console.log(data)
+            console.log(data);
         });
     }, []);
 
@@ -72,13 +86,13 @@ export const Events = () => {
     );
 
     var eventService = new EventService();
-    function eventHandler(e){
-        setForm({ ...form, eventGroup: e.value })
-        var id=e.value?.EventGroupID?e.value.EventGroupID:null;
-        if(id==null)  return setData([]);
+    function eventHandler(e) {
+        setForm({ ...form, eventGroup: e.value });
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        if (id == null) return setData([]);
         eventService.getAllEvents(id).then((data) => {
             setData(data);
-        });  
+        });
     }
     // function activateHandler(id) {
     //     eventService.activateEvent(id).then((res) => {
@@ -106,18 +120,14 @@ export const Events = () => {
                     left={
                         <div>
                             <div className="">
-                                <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup}  />
+                                <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} />
                             </div>
                         </div>
                     }
                 ></Toolbar>
                 <Toolbar
                     className="mb-4"
-                    left={
-                        <div>
-                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Event" onClick={(e) => setshowAddEventForn(true)} />
-                        </div>
-                    }
+                    left={<div>{form?.eventGroup?.Status == 1 ? <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Event" onClick={(e) => setshowAddEventForn(true)} /> : <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Event" disabled />}</div>}
                     right={
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
@@ -202,11 +212,11 @@ export const Events = () => {
                                 onClick={(a) => {
                                     setShowDialog(true);
                                     setSelectedEvents(e);
-                                    console.log(e)                                
+                                    console.log(e);
                                 }}
                             />
-                             {parseInt(e.IsActive)  == 1 ? (
-                                <Button  style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
+                            {parseInt(e.IsActive) == 1 ? (
+                                <Button onClick={(aa) => deActivateHandler(e)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
                                 <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
