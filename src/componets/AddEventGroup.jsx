@@ -59,13 +59,9 @@ export default function AddEventGroup({
       })
       return false
     }
-    var data = new FormData()
-    Object.keys(newForm).map((key) => {
-      data.append(key, newForm[key])
-    })
     var eventGroupService = new EventGroupService()
     eventGroupService
-      .createEventGroup(data)
+      .createEventGroup(newForm)
       .then((res) => {
         setTimeout(() => {
           window.location.reload()

@@ -7,6 +7,8 @@ import { Toast } from "primereact/toast";
 import EventGroupService from "../service/EventGroupService";
 import { Dropdown } from "primereact/dropdown";
 import EventTypeService from "../service/EventTypeService";
+import EventCategoryService from "../service/EventCategoryService";
+import EventService from "../service/EventServices";
 
 export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     var [pageIndex, setPageIndex] = useState(0);
@@ -20,6 +22,16 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         Events: null,
     });
     var [selectedType, setSelected] = useState(null);
+    var [selectedCategory, setSelectedCategory] = useState(null);
+    var [selectedEvent, setSelectedEvent] = useState(null);
+    function ByEventHandler(e) {
+        setSelectedEvent(e.value);
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        // if (id == null) return setData([]);
+        // eventService.getAllEvents(id).then((data) => {
+        //     setData(data);
+        // });
+    }
     function eventHandler(e) {
         setSelected(e.value);
         var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
@@ -28,13 +40,33 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         //     setData(data);
         // });
     }
+    function categoryHandler(e) {
+        setSelectedCategory(e.value);
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        // if (id == null) return setData([]);
+        // eventService.getAllEvents(id).then((data) => {
+        //     setData(data);
+        // });
+    }
     var [eventType, setEventType] = useState([]);
+    var [event, setEvent] = useState([]);
+    var [eventCategory, setEventCategory] = useState([]);
     var [pageIndex, setPageIndex] = useState(0);
     var eventTypeService = new EventTypeService();
+    var eventCategoryService =  new EventCategoryService();
+    var eventService = new EventService();
     useEffect(() => {
         eventTypeService.getAllEventTypes().then((data) => {
             setEventType(data);
             console.log(data);
+        });
+        eventCategoryService.getAllEventCategories().then((data) => {
+            setEventCategory(data);
+            // console.log(data);
+        });
+        eventService.getAllEvents(1).then((data) => {
+            setEvent(data);
+            console.log(JSON.stringify(data))
         });
     }, []);
 
@@ -147,7 +179,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                         <TextInput type="Calendar" label="Event Date" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Event Category" style={{ width: "100%" }} />
+                                        <Dropdown optionLabel="Text" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
@@ -167,14 +199,14 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                     </div>
 
                                     <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Event" style={{ width: "100%" }} />
+                                        <Dropdown optionLabel="Name" onChange={(e) => ByEventHandler(e)} options={event} value={selectedEvent} placeholder="Event" style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
                                         <Dropdown placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
 
                                     <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Event Type" style={{ width: "100%" }} />
+                                        <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
                                     </div>
                                 </div>
                             </TabPanel>
