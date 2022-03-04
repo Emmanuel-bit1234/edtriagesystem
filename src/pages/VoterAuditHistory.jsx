@@ -10,9 +10,13 @@ import { TabPanel, TabView } from 'primereact/tabview'
 import { Toolbar } from 'primereact/toolbar'
 import { Toast } from 'primereact/toast'
 import ObjectionsService from '../service/ObjectionsService'
-
+import { Dropdown } from 'primereact/dropdown'
+import { Divider } from 'primereact/divider'
+import { Timeline } from 'primereact/timeline'
 export const VoterAuditHistory = () => {
   const [showDialog, setShowDialog] = useState(false)
+  const [showHistroyDialog, setShowHistroyDialog] = useState(false)
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const toast = useRef(null)
@@ -33,15 +37,6 @@ export const VoterAuditHistory = () => {
   }
 
   const submitForm = () => {
-    if (isNaN(idNumber.trim())) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error Message',
-        detail: 'please fill the required field',
-        life: 3000,
-      })
-      return false
-    }
     setLoading(true)
     voterAuditHistory
       .getAuditHistoryByID(idNumber)
@@ -49,6 +44,23 @@ export const VoterAuditHistory = () => {
         console.log(e)
         setData(e?.AHVoters ? e.AHVoters : [])
         setLoading(false)
+
+        var res = e?.AHVoters ? e.AHVoters : []
+        if (res.length > 0) {
+          if (res.length == 1) {
+            setShowDialog(true)
+            setSelectedUser(res[0])
+          } else {
+            setShowDialog(true)
+          }
+        } else {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error Message',
+            detail: 'No voter Found with the specified details.',
+            life: 3000,
+          })
+        }
       })
       .catch((e) => setLoading(false))
   }
@@ -70,32 +82,28 @@ export const VoterAuditHistory = () => {
 
     return [
       {
-        name: 'Firstname:',
-        value: selectedUser?.Firstname,
+        col1: 'Firstname:',
+        col2: selectedUser?.Firstname,
+        col3: 'Surname:',
+        col4: selectedUser?.Surname,
       },
       {
-        name: 'Surname:',
-        value: selectedUser?.Surname,
+        col1: 'Gender:',
+        col2: gender,
+        col3: 'Date of birth:',
+        col4: selectedUser?.DateOfBirth,
       },
       {
-        name: 'Gender:',
-        value: gender,
+        col1: 'Email:',
+        col2: selectedUser?.Email_address,
+        col3: 'Contact Number:',
+        col4: selectedUser?.Contact_Number,
       },
       {
-        name: 'Date of birth:',
-        value: selectedUser?.DateOfBirth,
-      },
-      {
-        name: 'Address:',
-        value: selectedUser?.Address===null?"N/A":selectedUser?.Address,
-      },
-      {
-        name: 'Email:',
-        value: selectedUser?.Email_address,
-      },
-      {
-        name: 'Contact Number:',
-        value: selectedUser?.Contact_Number,
+        col1: 'ID Number:',
+        col2: selectedUser?.IDNumber,
+        col3: 'Status:',
+        col4: 'Elgble',
       },
     ]
   }
@@ -103,30 +111,158 @@ export const VoterAuditHistory = () => {
   function RegistrationDetails() {
     return [
       {
-        name: 'ID Number:',
-        value: selectedUser?.IDNumber,
+        col1: 'Registration Number:',
+        col2: selectedUser?.RegistrationNUmber,
       },
       {
-        name: 'Registration Number:',
-        value: selectedUser?.RegistrationNumber,
+        col1: 'Registration Channel:',
+        col2: 'Assisted',
       },
-      // {
-      //   name: 'Date of Issue:',
-      //   value: selectedUser?.DateOfIssue,
-      // },
-      // {
-      //   name: 'Date of Expiry:',
-      //   value: selectedUser?.DateOfExpiry,
-      // },
-      // {
-      //   name: 'Date Registered',
-      //   value: selectedUser?.DateRegistered,
-      // },
-      // {
-      //   name: 'Place of Issue',
-      //   value: selectedUser?.PlaceOfIssue,
-      // },
+      {
+        col1: "",
+        col2:  "",
+      },
+      {
+        col1: 'District:',
+        col2: 'N/A',
+      },
+      {
+        col1: 'Constituency:',
+        col2: selectedUser?.RegistrationNumber,
+      },
+      {
+        col1: 'Registration Centre:',
+        col2: 'N/A',
+      },
+      {
+        col1: 'Village:',
+        col2: 'N/A',
+      },
     ]
+  }
+
+  function CommunicationDetails() {
+    return [
+      {
+        col1: 'Message Channel:',
+        col2: 'Email',
+      },
+      {
+        col1: 'Message:',
+        col2: 'Your application has been recieved',
+      },
+      {
+        col1: 'Date Sent:',
+        col2: '20 jan 2022',
+      },
+      {
+        col1: 'Send Status:',
+        col2: 'failed',
+      },
+    ]
+  }
+
+  function VoterHeadingDetails() {
+    return [
+      {
+        col1: 'Name:',
+        col2: selectedUser?.Firstname,
+        col3: 'Surname:',
+        col4: selectedUser?.Surname,
+        col5: 'ID Number:',
+        col6: selectedUser?.IDNumber,
+      },
+    ]
+  }
+
+  var searchCriteria = [
+    {
+      name: 'Search By Id Number',
+      value: 0,
+    },
+    {
+      name: 'Search By Registration Number',
+      value: 1,
+    },
+  ]
+  var [selectedCriteria, setSelectedCriteria] = useState(searchCriteria[0])
+
+  function VotersDetailsTable({ data = [] }) {
+    return (
+      <DataTable
+        size="small"
+        scrollable={true}
+        value={data}
+        dataKey="id"
+        responsiveLayout="scroll"
+        style={{ width: '100%' }}
+      >
+        <Column
+          // style={{ width: '100px' }}
+          field="col1"
+          body={(e) => <b>{e.col1}</b>}
+        ></Column>
+        <Column field="col2"></Column>
+        <Column
+          // style={{ width: '100px' }}
+          field="col3"
+          body={(e) => <b>{e.col3}</b>}
+        ></Column>
+        <Column field="col4"></Column>
+      </DataTable>
+    )
+  }
+
+  function VotersHeadingTable({ data = [] }) {
+    return (
+      <DataTable
+        size="small"
+        scrollable={true}
+        value={data}
+        dataKey="id"
+        responsiveLayout="scroll"
+        style={{ width: '100%' }}
+      >
+        <Column
+          // style={{ width: '100px' }}
+          field="col1"
+          body={(e) => <b>{e.col1}</b>}
+        ></Column>
+        <Column field="col2"></Column>
+        <Column
+          // style={{ width: '100px' }}
+          field="col3"
+          body={(e) => <b>{e.col3}</b>}
+        ></Column>
+        <Column field="col4"></Column>
+        <Column
+          // style={{ width: '100px' }}
+          field="col5"
+          body={(e) => <b>{e.col5}</b>}
+        ></Column>
+        <Column field="col6"></Column>
+      </DataTable>
+    )
+  }
+
+  function InlineTable({ data = [] }) {
+    return (
+      <DataTable
+        size="small"
+        scrollable={true}
+        value={data}
+        dataKey="id"
+        responsiveLayout="scroll"
+        style={{ width: '100%' }}
+      >
+        <Column
+          // style={{ width: '100px' }}
+          field="col1"
+          body={(e) => <b>{e.col1}</b>}
+        ></Column>
+        <Column field="col2"></Column>
+      </DataTable>
+    )
   }
 
   return (
@@ -142,10 +278,18 @@ export const VoterAuditHistory = () => {
                   <i className="pi pi-search" />
                   <InputText
                     type="search"
-                    placeholder="Search by ID Number"
+                    placeholder={selectedCriteria.name}
                     value={idNumber}
                     onInput={(e) => setIdNumber(e.target.value)}
                   />
+                  <Dropdown
+                    className="ml-4"
+                    optionLabel="name"
+                    onChange={(e) => setSelectedCriteria(e.value)}
+                    options={searchCriteria}
+                    value={selectedCriteria}
+                  />
+
                   <Button
                     className="p-button-success ml-4"
                     label="Search"
@@ -161,50 +305,35 @@ export const VoterAuditHistory = () => {
           style={{ height: 'calc(100vh - 9rem)' }}
         >
           <Dialog
-            header="Voter Audit History"
+            header="Voter Details"
+            footer={
+              <>
+                <Button
+                  label="Messaging History"
+                  className="ml-3"
+                  onClick={(e) => setShowCommunicationDialog(true)}
+                />
+                <Button
+                  label="Voter History"
+                  onClick={(e) => setShowHistroyDialog(true)}
+                />
+              </>
+            }
             visible={showDialog}
-            style={{ width: '50%', height: '100vh' }}
+            style={{ width: '60%', height: '95%' }}
             modal
             onHide={(e) => {
               setShowDialog(false)
             }}
           >
             <TabView>
-              <TabPanel header="Voters Details">
-                <DataTable
-                  size="small"
-                  scrollable={true}
-                  value={VoterDetails()}
-                  dataKey="id"
-                  responsiveLayout="scroll"
-                  resizableColumns
-                >
-                  <Column
-                    style={{ width: '100px' }}
-                    field="name"
-                    body={(e) => <b>{e.name}</b>}
-                  ></Column>
-                  <Column field="value"></Column>
-                </DataTable>
+              <TabPanel header="Voter Details">
+                <VotersDetailsTable data={VoterDetails()} />
               </TabPanel>
-              <TabPanel header="Communication">No Content</TabPanel>
               <TabPanel header="Registration Details">
-                <DataTable
-                  size="small"
-                  scrollable={true}
-                  value={RegistrationDetails()}
-                  dataKey="id"
-                  responsiveLayout="scroll"
-                  resizableColumns
-                >
-                  <Column
-                    style={{ width: '100px' }}
-                    field="name"
-                    body={(e) => <b>{e.name}</b>}
-                  ></Column>
-                  <Column field="value"></Column>
-                </DataTable>
+                <InlineTable data={RegistrationDetails()} />
               </TabPanel>
+
               <TabPanel header="Anomalies">No Content</TabPanel>
               <TabPanel header="Objections">
                 <DataTable
@@ -236,87 +365,177 @@ export const VoterAuditHistory = () => {
                   <Column field="DateLodged" header="DateLodged"></Column>
                 </DataTable>
               </TabPanel>
+              {/* <TabPanel header="History" visible={false}>
+                <DataTable
+                  loading={loading}
+                  size="small"
+                  scrollable={true}
+                  value={data}
+                  dataKey="id"
+                  paginator
+                  rows={10}
+                  rowsPerPageOptions={[5, 10, 25]}
+                  className="datatable-responsive"
+                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
+                  emptyMessage="No voter audit history."
+                  header={header}
+                  responsiveLayout="scroll"
+                  resizableColumns
+                  columnResizeMode="expand"
+                  filters={filters}
+                  filterDisplay="menu"
+                  globalFilterFields={['name', 'Firstname', 'IDNumber']}
+                >
+                  <Column
+                    field="Firstname"
+                    header="Firstname"
+                    sortable
+                  ></Column>
+                  <Column
+                    filterField="Surname"
+                    field="Surname"
+                    header="Surname"
+                    sortable
+                  ></Column>
+                  <Column
+                    field="RegistrationNumber"
+                    header="Registration Number"
+                    sortable
+                  ></Column>
+                  <Column field="IDNumber" header="ID Number"></Column>
+                  <Column
+                    field="active"
+                    header="Status"
+                    body={(e) =>
+                      e?.RegistrationNumber ? (
+                        <Button
+                          label="Active"
+                          style={{ textAlign: 'center', height: '30px' }}
+                          className="p-button-success p-button-rounded"
+                        />
+                      ) : (
+                        <Button
+                          label="Not Active"
+                          style={{ textAlign: 'center', height: '30px' }}
+                          className="p-button-danger p-button-rounded"
+                        />
+                      )
+                    }
+                    sortable
+                  ></Column>
+                  <Column
+                    field="action"
+                    header="Action"
+                    body={(item) => (
+                      <>
+                        <Button
+                          onClick={(e) => {
+                            setShowDialog(true)
+                            setSelectedUser(item)
+
+                            var objectionsService = new ObjectionsService()
+                            if (selectedUser?.RegistrationNumber) {
+                              objectionsService
+                                .getObjectionsByID(
+                                  selectedUser.RegistrationNumber,
+                                )
+                                .then((e) => {
+                                  console.log(e)
+                                  setObjection(e)
+                                })
+                            }
+                          }}
+                          tooltip="Click to View"
+                          icon={'pi pi-eye'}
+                          tooltipOptions={{ position: 'top' }}
+                          className=" p-button-rounded mr-2"
+                        />
+                      </>
+                    )}
+                  ></Column>
+                </DataTable>
+              </TabPanel> */}
             </TabView>
           </Dialog>
 
-          <DataTable
-            loading={loading}
-            size="small"
-            scrollable={true}
-            value={data}
-            dataKey="id"
-            paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25]}
-            className="datatable-responsive"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
-            emptyMessage="No voter audit history."
-            header={header}
-            responsiveLayout="scroll"
-            resizableColumns
-            columnResizeMode="expand"
-            filters={filters}
-            filterDisplay="menu"
-            globalFilterFields={['name', 'Firstname', 'IDNumber']}
+          <Dialog
+            header="Voter Audit History"
+            visible={showHistroyDialog}
+            style={{ width: '95%', height: '95%' }}
+            modal
+            onHide={(e) => {
+              setShowHistroyDialog(false)
+            }}
           >
-            <Column field="Firstname" header="Firstname" sortable></Column>
-            <Column
-              filterField="Surname"
-              field="Surname"
-              header="Surname"
-              sortable
-            ></Column>
-            <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
-            <Column field="IDNumber" header="ID Number"></Column>
-            <Column
-              field="active"
-              header="Status"
-              body={(e) =>
-                e?.RegistrationNumber ? (
-                  <Button
-                    label="Active"
-                    style={{ textAlign: 'center', height: '30px' }}
-                    className="p-button-success p-button-rounded"
-                  />
-                ) : (
-                  <Button
-                    label="Not Active"
-                    style={{ textAlign: 'center', height: '30px' }}
-                    className="p-button-danger p-button-rounded"
-                  />
-                )
-              }
-              sortable
-            ></Column>
-            <Column
-              field="action"
-              header="Action"
-              body={(item) => (
-                <>
-                  <Button
-                    onClick={(e) => {
-                      setShowDialog(true)
-                      setSelectedUser(item)
+            <div className="flex">
+              <div style={{ flex: '2' }}>
+                <h6>
+                  <b>Number of Records(3)</b>
+                </h6>
+                <ul className="p-orderlist-list" style={{ height: '90vh' }}>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 name surname
+                  </li>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 name surname
+                  </li>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 name surname
+                  </li>
+                </ul>
+              </div>
+              <Divider layout="vertical" />
+              <div style={{ flex: '4.5' }}>
+                <VotersHeadingTable data={VoterHeadingDetails()} />
+                <TabView>
+                  <TabPanel header="Voter Details">
+                    <VotersDetailsTable data={VoterDetails()} />
+                  </TabPanel>
+                  <TabPanel header="Registration Details">
+                    <InlineTable data={RegistrationDetails()} />
+                  </TabPanel>
+                  {/* <TabPanel header="Communication" className="flex"></TabPanel> */}
+                </TabView>
+              </div>
+            </div>
+          </Dialog>
 
-                      var objectionsService = new ObjectionsService()
-                      if (selectedUser?.RegistrationNumber) {
-                        objectionsService
-                          .getObjectionsByID(selectedUser.RegistrationNumber)
-                          .then((e) => {
-                            console.log(e)
-                            setObjection(e)
-                          })
-                      }
-                    }}
-                    tooltip="Click to View"
-                    icon={'pi pi-eye'}
-                    tooltipOptions={{ position: 'top' }}
-                    className=" p-button-rounded mr-2"
-                  />
-                </>
-              )}
-            ></Column>
-          </DataTable>
+          <Dialog
+            header="Voter Communication History"
+            visible={showCommunicationDialog}
+            style={{ width: '95%', height: '95%' }}
+            modal
+            onHide={(e) => {
+              setShowCommunicationDialog(false)
+            }}
+          >
+            <div className="flex">
+              <div style={{ flex: '2' }}>
+                <h6>
+                  <b>Number of Records(3)</b>
+                </h6>
+                <ul className="p-orderlist-list" style={{ height: '90vh' }}>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 email
+                  </li>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 sms
+                  </li>
+                  <li className="p-orderlist-item card" style={{ padding: 8 }}>
+                    15/10/2020 16:15 email
+                  </li>
+                </ul>
+              </div>
+              <Divider layout="vertical" />
+              <div style={{ flex: '4.5' }}>
+                <TabView>
+                  <TabPanel header="Message Details">
+                    <VotersDetailsTable data={CommunicationDetails()} />
+                  </TabPanel>
+                </TabView>
+              </div>
+            </div>
+          </Dialog>
         </div>
       </div>
     </div>

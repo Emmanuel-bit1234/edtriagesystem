@@ -20,6 +20,6 @@ export default function EventGroupService() {
       },
     }
     var url = `${NET_IP}/EventManagement/InsertEventGroup`
-    return axios.post(url, data,config).then((response) => response.data)
+    return axios.post(url, data).then((response) => response.data)
   }
 }
