@@ -206,6 +206,7 @@ export const EventGroup = () => {
                     header="Actions"
                     body={(e) => (
                         <>
+                        {parseInt(e.Status) == 1 ? (
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-pencil"}
@@ -216,7 +217,15 @@ export const EventGroup = () => {
                                 //   setSelectedEventGroup(e)
                                 // }}
                             />
-
+                        ): (
+                            <Button
+                                disabled
+                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                icon={"pi pi-pencil"}
+                                className="p-button-primary p-button-rounded mr-2 "
+                                tooltip="Click to Edit"
+                            />
+                        )}
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-eye"}

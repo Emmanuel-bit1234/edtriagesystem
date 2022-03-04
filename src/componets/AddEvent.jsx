@@ -213,12 +213,6 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Name" onChange={(e) => ByEventHandler(e)} options={event} value={selectedEvent} placeholder="Event" style={{ width: "100%" }} />
                                     </div>
-                                    {/* <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Name" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
-                                    </div> */}
                                     <div className="col-12  lg:col-4">
                                         <Dropdown placeholder="District" style={{ width: "100%" }} />
                                     </div>
