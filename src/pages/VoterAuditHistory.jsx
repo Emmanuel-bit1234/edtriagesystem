@@ -102,8 +102,26 @@ export const VoterAuditHistory = () => {
       {
         col1: 'ID Number:',
         col2: selectedUser?.IDNumber,
-        col3: 'Status:',
-        col4: 'Elgble',
+        col3: 'EligibleStatus:',
+        col4: 'Eligible',
+      },
+      {
+        col1: 'Registration Number:',
+        col2: selectedUser?.RegistrationNUmber,
+        col3: 'Registration Channel:',
+        col4: 'Assisted',
+      },
+      {
+        col1: 'District:',
+        col2: 'N/A',
+        col3: 'Constituency:',
+        col4: "N/A",
+      },
+      {
+        col1: 'Registration Centre:',
+        col2: 'N/A',
+        col3: 'Village:',
+        col4: 'N/A',
       },
     ]
   }
@@ -128,7 +146,7 @@ export const VoterAuditHistory = () => {
       },
       {
         col1: 'Constituency:',
-        col2: selectedUser?.RegistrationNumber,
+        col2: "N/A",
       },
       {
         col1: 'Registration Centre:',
@@ -305,7 +323,7 @@ export const VoterAuditHistory = () => {
           style={{ height: 'calc(100vh - 9rem)' }}
         >
           <Dialog
-            header="Voter Details"
+            header={`Voter Details -  ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}
             footer={
               <>
                 <Button
@@ -320,7 +338,7 @@ export const VoterAuditHistory = () => {
               </>
             }
             visible={showDialog}
-            style={{ width: '60%', height: '95%' }}
+            style={{ width: '65%', height: '95%' }}
             modal
             onHide={(e) => {
               setShowDialog(false)
@@ -330,9 +348,9 @@ export const VoterAuditHistory = () => {
               <TabPanel header="Voter Details">
                 <VotersDetailsTable data={VoterDetails()} />
               </TabPanel>
-              <TabPanel header="Registration Details">
+              {/* <TabPanel header="Registration Details">
                 <InlineTable data={RegistrationDetails()} />
-              </TabPanel>
+              </TabPanel> */}
 
               <TabPanel header="Anomalies">No Content</TabPanel>
               <TabPanel header="Objections">
@@ -459,7 +477,7 @@ export const VoterAuditHistory = () => {
           </Dialog>
 
           <Dialog
-            header="Voter Audit History"
+            header={`Voter Audit History - ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}
             visible={showHistroyDialog}
             style={{ width: '95%', height: '95%' }}
             modal
@@ -486,22 +504,17 @@ export const VoterAuditHistory = () => {
               </div>
               <Divider layout="vertical" />
               <div style={{ flex: '4.5' }}>
-                <VotersHeadingTable data={VoterHeadingDetails()} />
                 <TabView>
                   <TabPanel header="Voter Details">
                     <VotersDetailsTable data={VoterDetails()} />
                   </TabPanel>
-                  <TabPanel header="Registration Details">
-                    <InlineTable data={RegistrationDetails()} />
-                  </TabPanel>
-                  {/* <TabPanel header="Communication" className="flex"></TabPanel> */}
                 </TabView>
               </div>
             </div>
           </Dialog>
 
           <Dialog
-            header="Voter Communication History"
+            header={`Voter Communication History - ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}
             visible={showCommunicationDialog}
             style={{ width: '95%', height: '95%' }}
             modal
