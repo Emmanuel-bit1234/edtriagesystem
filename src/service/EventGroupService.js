@@ -22,12 +22,4 @@ export default function EventGroupService() {
     var url = `${NET_IP}/EventManagement/InsertEventGroup`
     return axios.post(url, data,config).then((response) => response.data)
   }
-  // this.deActivateEventGroup = (id) => {
-  //     var url = `${NET_IP}/EventManagement/EventGroupIndex/${id}`;
-  //     return axios.get(url).then((response) => response.data);
-  // };
-  // this.activateEventGroup = (id) => {
-  //     var url = `${NET_IP}/EventManagement/EventGroupIndex/${id}`;
-  //     return axios.get(url).then((response) => response.data);
-  // };
 }

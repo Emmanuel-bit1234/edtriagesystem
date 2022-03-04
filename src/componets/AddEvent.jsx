@@ -21,6 +21,14 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         StatusReason: null,
         Events: null,
     });
+    var [form2, setForm2] = useState({
+        Name: "",
+        Description: "",
+        EventDate: "",
+        Status: 1,
+        StatusReason: null,
+        Events: null,
+    });
     var [selectedType, setSelected] = useState(null);
     var [selectedCategory, setSelectedCategory] = useState(null);
     var [selectedEvent, setSelectedEvent] = useState(null);
@@ -42,11 +50,12 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
     }
     function categoryHandler(e) {
         setSelectedCategory(e.value);
-        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
-        // if (id == null) return setData([]);
-        // eventService.getAllEvents(id).then((data) => {
-        //     setData(data);
-        // });
+        var id = e.value?.EventCategoryID ? e.value.EventCategoryID : null;
+        eventTypeService.getAllEventTypes(id).then((data) => {
+            setEventType(data);
+            setSelected(null);
+            console.log(data);
+        });
     }
     var [eventType, setEventType] = useState([]);
     var [event, setEvent] = useState([]);
@@ -179,34 +188,42 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                         <TextInput type="Calendar" label="Event Date" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Text" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
+                                        <Dropdown optionLabel="Name" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
+                                    {
+                                        selectedCategory !== null ? 
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
-                                    </div>
+                                    </div> : ""
+                                    }
                                 </div>
                             </TabPanel>
                             <TabPanel header="By-Election Details">
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
-                                        <TextInput type="Calendar" label="Event Date" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
+                                        <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
+                                        <TextInput label="Description" value={form2.Description} onChange={(e) => setForm2({ ...form2, Description: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Event Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
+                                        <TextInput label="Event Name" value={form2.Name} onChange={(e) => setForm2({ ...form2, Name: e.target.value })} />
                                     </div>
 
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Name" onChange={(e) => ByEventHandler(e)} options={event} value={selectedEvent} placeholder="Event" style={{ width: "100%" }} />
                                     </div>
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Event Category" style={{ width: "100%" }} />
+                                    {/* <div className="col-12  lg:col-4">
+                                        <Dropdown optionLabel="Name" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
-
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
+                                    </div> */}
+                                    <div className="col-12  lg:col-4">
+                                        <Dropdown placeholder="District" style={{ width: "100%" }} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <Dropdown placeholder="Constituency" style={{ width: "100%" }} />
                                     </div>
                                 </div>
                             </TabPanel>
