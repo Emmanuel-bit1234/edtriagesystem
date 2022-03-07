@@ -10,6 +10,10 @@ export default function EventGroupService() {
     var url = `${NET_IP}/EventManagement/EventGroupIndex`
     return axios.get(url).then((response) => response.data.EventGroups)
   }
+  this.updateEventGroup = (data) =>{
+    var url = `${NET_IP}/EventManagement/UpdateEventGroup` 
+    return axios.post(url, data).then((response) => response.data)
+  }
   this.createEventGroup = (data) => {
     let config = {
       headers: {

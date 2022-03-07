@@ -66,12 +66,12 @@ export default function AddEventGroup({
         setTimeout(() => {
           window.location.reload()
           submittedForm = true
-        }, 2000)
+        }, 1500)
         return toast.current.show({
           severity: 'success',
           summary: 'Success Message',
-          detail: 'User was added successfully',
-          life: 2000,
+          detail: 'Eventgroup was added successfully',
+          life: 1500,
         })
       })
       .catch((e) => {
@@ -80,7 +80,7 @@ export default function AddEventGroup({
           severity: 'error',
           summary: 'Error Message',
           detail: 'Ooops, The is a technical problem,Please Try Again',
-          life: 3000,
+          life: 2000,
         })
       })
   }

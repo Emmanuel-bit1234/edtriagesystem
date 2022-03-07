@@ -73,7 +73,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
             setEventCategory(data);
             // console.log(data);
         });
-        eventService.getAllEvents(1).then((data) => {
+        eventService.getAllParentEvents().then((data) => {
             setEvent(data);
             console.log(JSON.stringify(data))
         });
@@ -111,15 +111,15 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
         }
-        var eventGroupService = new EventGroupService();
-        eventGroupService
-            .createEventGroup(newForm)
+        var eventService = new EventService();
+        eventService
+            .createEvent(newForm)
             .then((res) => {
                 setTimeout(() => {
                     window.location.reload();
                     submittedForm = true;
                 }, 2000);
-                return toast.current.show({ severity: "success", summary: "Success Message", detail: "User was added successfully", life: 2000 });
+                return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
             })
             .catch((e) => {
                 submittedForm = false;

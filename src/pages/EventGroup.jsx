@@ -11,17 +11,20 @@ import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
+import TextInput from "../componets/TextInput";
 
 export const EventGroup = () => {
     const toast = useRef(null);
     const [showAddEventGroupForm, setShowAddEventGroupForm] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [editDialog, seEditDialog] = useState(false);
     const [loading, setLoading] = useState(false);
     let [data, setData] = useState([]);
 
     const [selectedEventGroup, setSelectedEventGroup] = useState(null);
 
     const [showEditForm, setShowEditForm] = useState(false);
+    const [showEditEventGroup, setshowEditEventGroup] = useState(false);
     const [editInput, setEditInput] = useState("");
 
     function EventGroupDetails() {
@@ -38,6 +41,22 @@ export const EventGroup = () => {
                 name: "Status reason:",
                 value: selectedEventGroup?.StatusReason,
             },
+        ];
+    }
+    function EventGroupEditDetails() {
+        return [
+            {
+                name: "EventGroup Name:",
+                value: selectedEventGroup?.Name,
+            },
+            {
+                name: "EventGroup Description:",
+                value: "",
+            },
+            // {
+            //     name: "Status reason:",
+            //     value: selectedEventGroup?.StatusReason,
+            // },
         ];
     }
     const header = (
@@ -69,6 +88,23 @@ export const EventGroup = () => {
         setGlobalFilterValue(value);
     };
 
+    function onEditHandler()
+    {
+        eventGroupService.updateEventGroup(selectedEventGroup).then((response) => {
+            console.log(response)
+            eventGroupService.getAllEventGroups().then((data) => {
+                console.log(data);
+                setData(data);
+                setshowEditEventGroup(false);
+                return toast.current.show({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: "Event Group was updated successfully",
+                    life: 2000,
+                });
+            });
+        })
+    }
     function activateHandler(id) {
         eventGroupService.activateEventGroup(id).then((res) => {
             eventGroupService.getAllEventGroups().then((data) => {
@@ -165,6 +201,30 @@ export const EventGroup = () => {
                     </div>
                 </div>
             </Dialog>
+            <Dialog
+                header="Edit EventGroup"
+                footer={
+                    <>
+                        <Button
+                            label="Submit"
+                            onClick={onEditHandler}
+                            className="p-button-success"
+                            icon="pi pi-plus"
+                            type="submit"
+                        />
+                    </>
+                }
+                visible={showEditEventGroup}
+                style={{ width: "50%", height: "60%" }}
+                modal
+                onHide={(e) => {
+                    setshowEditEventGroup(false);
+                }}
+            >
+            <TextInput label="Name" value={selectedEventGroup?.Name} disabled ={true}/><br/>
+            <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} /><br/>
+            <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} />
+            </Dialog>
 
             {/* add users */}
             <AddEventGroup show={showAddEventGroupForm} setShow={setShowAddEventGroupForm} />
@@ -206,26 +266,20 @@ export const EventGroup = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                        {parseInt(e.Status) == 1 ? (
-                            <Button
-                                style={{ textAlign: "center", width: "30px", height: "30px" }}
-                                icon={"pi pi-pencil"}
-                                className="p-button-primary p-button-rounded mr-2 "
-                                tooltip="Click to Edit"
-                                // onClick={(a) => {
-                                //   setShowEditForm(true)
-                                //   setSelectedEventGroup(e)
-                                // }}
-                            />
-                        ): (
-                            <Button
-                                disabled
-                                style={{ textAlign: "center", width: "30px", height: "30px" }}
-                                icon={"pi pi-pencil"}
-                                className="p-button-primary p-button-rounded mr-2 "
-                                tooltip="Click to Edit"
-                            />
-                        )}
+                            {parseInt(e.Status) == 1 ? (
+                                <Button
+                                    style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                    icon={"pi pi-pencil"}
+                                    className="p-button-primary p-button-rounded mr-2 "
+                                    tooltip="Click to Edit"
+                                    onClick={(a) => {
+                                        setshowEditEventGroup(true);
+                                        setSelectedEventGroup(e);
+                                    }}
+                                />
+                            ) : (
+                                <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
+                            )}
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-eye"}
