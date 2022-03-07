@@ -73,7 +73,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
             setEventCategory(data);
             // console.log(data);
         });
-        eventService.getAllEvents(1).then((data) => {
+        eventService.getAllParentEvents().then((data) => {
             setEvent(data);
             console.log(JSON.stringify(data))
         });
@@ -111,15 +111,15 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
         }
-        var eventGroupService = new EventGroupService();
-        eventGroupService
-            .createEventGroup(newForm)
+        var eventService = new EventService();
+        eventService
+            .createEvent(newForm)
             .then((res) => {
                 setTimeout(() => {
                     window.location.reload();
                     submittedForm = true;
                 }, 2000);
-                return toast.current.show({ severity: "success", summary: "Success Message", detail: "User was added successfully", life: 2000 });
+                return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
             })
             .catch((e) => {
                 submittedForm = false;
@@ -213,12 +213,6 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Name" onChange={(e) => ByEventHandler(e)} options={event} value={selectedEvent} placeholder="Event" style={{ width: "100%" }} />
                                     </div>
-                                    {/* <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Name" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
-                                    </div> */}
                                     <div className="col-12  lg:col-4">
                                         <Dropdown placeholder="District" style={{ width: "100%" }} />
                                     </div>

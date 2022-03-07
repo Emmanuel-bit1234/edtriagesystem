@@ -180,8 +180,8 @@ export const Events = () => {
                 resizableColumns
                 columnResizeMode="expand"
                 filters={filters}
-                filterDisplay="Text"
-                globalFilterFields={["Text"]}
+                filterDisplay="Name"
+                globalFilterFields={["Name"]}
             >
                 <Column field="Name" header="Name" sortable></Column>
                 <Column
