@@ -48,10 +48,10 @@ export const VoterAuditHistory = () => {
         var res = e?.AHVoters ? e.AHVoters : []
         if (res.length > 0) {
           if (res.length == 1) {
-            setShowDialog(true)
+            // setShowDialog(true)
             setSelectedUser(res[0])
           } else {
-            setShowDialog(true)
+            // setShowDialog(true)
           }
         } else {
           toast.current.show({
@@ -82,12 +82,6 @@ export const VoterAuditHistory = () => {
 
     return [
       {
-        col1: 'Firstname:',
-        col2: selectedUser?.Firstname,
-        col3: 'Surname:',
-        col4: selectedUser?.Surname,
-      },
-      {
         col1: 'Gender:',
         col2: gender,
         col3: 'Date of birth:',
@@ -100,28 +94,25 @@ export const VoterAuditHistory = () => {
         col4: selectedUser?.Contact_Number,
       },
       {
-        col1: 'ID Number:',
-        col2: selectedUser?.IDNumber,
-        col3: 'EligibleStatus:',
-        col4: 'Eligible',
+        col1:"Disability:",
+        col2:"N/A",
+        col3: 'Registration Number:',
+        col4: selectedUser?.RegistrationNUmber,
+      },
+    ]
+  }
+
+  function ChannelDetails() {
+    return [
+      {
+        col1: 'Channel:',
+        col2: 'Assisted',
+        col3: 'Centre:',
+        col4: 'Butha Butha',
       },
       {
-        col1: 'Registration Number:',
-        col2: selectedUser?.RegistrationNUmber,
-        col3: 'Registration Channel:',
-        col4: 'Assisted',
-      },
-      {
-        col1: 'District:',
-        col2: 'N/A',
-        col3: 'Constituency:',
-        col4: "N/A",
-      },
-      {
-        col1: 'Registration Centre:',
-        col2: 'N/A',
-        col3: 'Village:',
-        col4: 'N/A',
+        col1: 'Created Date:',
+        col2: selectedUser?.DateRegistered,
       },
     ]
   }
@@ -129,32 +120,16 @@ export const VoterAuditHistory = () => {
   function RegistrationDetails() {
     return [
       {
-        col1: 'Registration Number:',
-        col2: selectedUser?.RegistrationNUmber,
-      },
-      {
-        col1: 'Registration Channel:',
-        col2: 'Assisted',
-      },
-      {
-        col1: "",
-        col2:  "",
-      },
-      {
         col1: 'District:',
         col2: 'N/A',
-      },
-      {
-        col1: 'Constituency:',
-        col2: "N/A",
+        col3: 'Constituency:',
+        col4: 'N/A',
       },
       {
         col1: 'Registration Centre:',
         col2: 'N/A',
-      },
-      {
-        col1: 'Village:',
-        col2: 'N/A',
+        col3: 'Village:',
+        col4: 'N/A',
       },
     ]
   }
@@ -180,18 +155,7 @@ export const VoterAuditHistory = () => {
     ]
   }
 
-  function VoterHeadingDetails() {
-    return [
-      {
-        col1: 'Name:',
-        col2: selectedUser?.Firstname,
-        col3: 'Surname:',
-        col4: selectedUser?.Surname,
-        col5: 'ID Number:',
-        col6: selectedUser?.IDNumber,
-      },
-    ]
-  }
+
 
   var searchCriteria = [
     {
@@ -205,9 +169,10 @@ export const VoterAuditHistory = () => {
   ]
   var [selectedCriteria, setSelectedCriteria] = useState(searchCriteria[0])
 
-  function VotersDetailsTable({ data = [] }) {
+  function VotersDetailsTable({ data = [], header = '' }) {
     return (
       <DataTable
+        header={header}
         size="small"
         scrollable={true}
         value={data}
@@ -263,9 +228,10 @@ export const VoterAuditHistory = () => {
     )
   }
 
-  function InlineTable({ data = [] }) {
+  function InlineTable({ data = [], header = '' }) {
     return (
       <DataTable
+        header={header}
         size="small"
         scrollable={true}
         value={data}
@@ -322,157 +288,181 @@ export const VoterAuditHistory = () => {
           className="card  p-align-stretch vertical-container"
           style={{ height: 'calc(100vh - 9rem)' }}
         >
+          <DataTable
+            loading={loading}
+            size="small"
+            scrollable={true}
+            value={data}
+            dataKey="id"
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25]}
+            className="datatable-responsive"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
+            emptyMessage="No voter audit history."
+            header={header}
+            responsiveLayout="scroll"
+            resizableColumns
+            columnResizeMode="expand"
+            filters={filters}
+            filterDisplay="menu"
+            globalFilterFields={['name', 'Firstname', 'IDNumber']}
+          >
+            <Column
+              filterField="Surname"
+              field="Surname"
+              header="Surname"
+              sortable
+            ></Column>
+            <Column field="Firstname" header="Firstname" sortable></Column>
+
+            <Column field="Village" header="Village" sortable></Column>
+            <Column field="CreatedDate" header="Created Date"></Column>
+            <Column
+              field="active"
+              header="Status"
+              body={(e) =>
+                e?.RegistrationNUmber ? (
+                  <Button
+                    label="Active"
+                    style={{ textAlign: 'center', height: '30px' }}
+                    className="p-button-success p-button-rounded"
+                  />
+                ) : (
+                  <Button
+                    label="Not Active"
+                    style={{ textAlign: 'center', height: '30px' }}
+                    className="p-button-danger p-button-rounded"
+                  />
+                )
+              }
+              sortable
+            ></Column>
+            <Column
+              field="action"
+              header="Action"
+              body={(item) => (
+                <>
+                  <Button
+                    onClick={(e) => {
+                      setShowDialog(true)
+                      setSelectedUser(item)
+
+                      var objectionsService = new ObjectionsService()
+                      if (selectedUser?.RegistrationNumber) {
+                        objectionsService
+                          .getObjectionsByID(selectedUser.RegistrationNumber)
+                          .then((e) => {
+                            console.log(e)
+                            setObjection(e)
+                          })
+                      }
+                    }}
+                    tooltip="Click to View"
+                    icon={'pi pi-eye'}
+                    tooltipOptions={{ position: 'top' }}
+                    className=" p-button-rounded mr-2"
+                  />
+                </>
+              )}
+            ></Column>
+          </DataTable>
+
           <Dialog
-            header={`Voter Details -  ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}
-            footer={
-              <>
-                <Button
-                  label="Messaging History"
-                  className="ml-3"
-                  onClick={(e) => setShowCommunicationDialog(true)}
-                />
-                <Button
-                  label="Voter History"
-                  onClick={(e) => setShowHistroyDialog(true)}
-                />
-              </>
-            }
+            header={<h6>{`Voter Details -  ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}</h6>}
+            // footer={
+            //   <>
+            //     <Button
+            //       label="Messaging History"
+            //       className="ml-3"
+            //       onClick={(e) => setShowCommunicationDialog(true)}
+            //     />
+            //     <Button
+            //       label="Voter History"
+            //       onClick={(e) => setShowHistroyDialog(true)}
+            //     />
+            //   </>
+            // }
             visible={showDialog}
-            style={{ width: '65%', height: '95%' }}
+            style={{ width: '73%', height: '98vh' }}
             modal
             onHide={(e) => {
               setShowDialog(false)
             }}
           >
             <TabView>
-              <TabPanel header="Voter Details">
-                <VotersDetailsTable data={VoterDetails()} />
+              <TabPanel header="Voter Record">
+                <VotersDetailsTable
+                  header={
+                    <h6>
+                      {' '}
+                      <b>Voter Details</b>
+                    </h6>
+                  }
+                  data={VoterDetails()}
+                />
+                <br />
+                <VotersDetailsTable
+                  header={
+                    <h6>
+                      {' '}
+                      <b> Delimitation</b>
+                    </h6>
+                  }
+                  data={RegistrationDetails()}
+                />
+                <br />
+                <VotersDetailsTable
+                  header={
+                    <h6>
+                      {' '}
+                      <b>Registration Channel</b>
+                    </h6>
+                  }
+                  data={ChannelDetails()}
+                />
               </TabPanel>
-              {/* <TabPanel header="Registration Details">
-                <InlineTable data={RegistrationDetails()} />
-              </TabPanel> */}
 
-              <TabPanel header="Anomalies">No Content</TabPanel>
-              <TabPanel header="Objections">
-                <DataTable
-                  size="small"
-                  scrollable={true}
-                  value={objection}
-                  dataKey="id"
-                  paginator
-                  rows={10}
-                  rowsPerPageOptions={[5, 10, 25]}
-                  className="datatable-responsive"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Objections"
-                  emptyMessage="No Objections."
-                  responsiveLayout="scroll"
-                  resizableColumns
-                  columnResizeMode="expand"
-                  filterDisplay="menu"
-                >
-                  <Column
-                    filterField="Name"
-                    field="Name"
-                    header="Name"
-                    sortable
-                  ></Column>
-                  <Column
-                    header="RegistrationNumber"
-                    body={selectedUser?.RegistrationNumber}
-                  ></Column>
-                  <Column field="DateLodged" header="DateLodged"></Column>
-                </DataTable>
-              </TabPanel>
-              {/* <TabPanel header="History" visible={false}>
-                <DataTable
-                  loading={loading}
-                  size="small"
-                  scrollable={true}
-                  value={data}
-                  dataKey="id"
-                  paginator
-                  rows={10}
-                  rowsPerPageOptions={[5, 10, 25]}
-                  className="datatable-responsive"
-                  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
-                  emptyMessage="No voter audit history."
-                  header={header}
-                  responsiveLayout="scroll"
-                  resizableColumns
-                  columnResizeMode="expand"
-                  filters={filters}
-                  filterDisplay="menu"
-                  globalFilterFields={['name', 'Firstname', 'IDNumber']}
-                >
-                  <Column
-                    field="Firstname"
-                    header="Firstname"
-                    sortable
-                  ></Column>
-                  <Column
-                    filterField="Surname"
-                    field="Surname"
-                    header="Surname"
-                    sortable
-                  ></Column>
-                  <Column
-                    field="RegistrationNumber"
-                    header="Registration Number"
-                    sortable
-                  ></Column>
-                  <Column field="IDNumber" header="ID Number"></Column>
-                  <Column
-                    field="active"
-                    header="Status"
-                    body={(e) =>
-                      e?.RegistrationNumber ? (
-                        <Button
-                          label="Active"
-                          style={{ textAlign: 'center', height: '30px' }}
-                          className="p-button-success p-button-rounded"
-                        />
-                      ) : (
-                        <Button
-                          label="Not Active"
-                          style={{ textAlign: 'center', height: '30px' }}
-                          className="p-button-danger p-button-rounded"
-                        />
-                      )
-                    }
-                    sortable
-                  ></Column>
-                  <Column
-                    field="action"
-                    header="Action"
-                    body={(item) => (
-                      <>
-                        <Button
-                          onClick={(e) => {
-                            setShowDialog(true)
-                            setSelectedUser(item)
-
-                            var objectionsService = new ObjectionsService()
-                            if (selectedUser?.RegistrationNumber) {
-                              objectionsService
-                                .getObjectionsByID(
-                                  selectedUser.RegistrationNumber,
-                                )
-                                .then((e) => {
-                                  console.log(e)
-                                  setObjection(e)
-                                })
-                            }
-                          }}
-                          tooltip="Click to View"
-                          icon={'pi pi-eye'}
-                          tooltipOptions={{ position: 'top' }}
-                          className=" p-button-rounded mr-2"
-                        />
-                      </>
-                    )}
-                  ></Column>
-                </DataTable>
-              </TabPanel> */}
+              {selectedUser?.status !== null ? (
+                <TabPanel header="Anomalies">No Content</TabPanel>
+              ) : (
+                ''
+              )}
+ 
+              {selectedUser?.status !== null ? (
+                <TabPanel header="Objections">
+                  <DataTable
+                    size="small"
+                    scrollable={true}
+                    value={objection}
+                    dataKey="id"
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 25]}
+                    className="datatable-responsive"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Objections"
+                    emptyMessage="No Objections."
+                    responsiveLayout="scroll"
+                    resizableColumns
+                    columnResizeMode="expand"
+                    filterDisplay="menu"
+                  >
+                    <Column
+                      filterField="Name"
+                      field="Name"
+                      header="Name"
+                      sortable
+                    ></Column>
+                    <Column
+                      header="RegistrationNumber"
+                      body={selectedUser?.RegistrationNumber}
+                    ></Column>
+                    <Column field="DateLodged" header="DateLodged"></Column>
+                  </DataTable>
+                </TabPanel>
+              ) : (
+                ''
+              )}
             </TabView>
           </Dialog>
 
