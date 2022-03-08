@@ -43,22 +43,6 @@ export const EventGroup = () => {
             },
         ];
     }
-    function EventGroupEditDetails() {
-        return [
-            {
-                name: "EventGroup Name:",
-                value: selectedEventGroup?.Name,
-            },
-            {
-                name: "EventGroup Description:",
-                value: "",
-            },
-            // {
-            //     name: "Status reason:",
-            //     value: selectedEventGroup?.StatusReason,
-            // },
-        ];
-    }
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">EventGroups</h5>
@@ -215,7 +199,7 @@ export const EventGroup = () => {
                     </>
                 }
                 visible={showEditEventGroup}
-                style={{ width: "50%", height: "60%" }}
+                style={{ width: "50%", height: "50%" }}
                 modal
                 onHide={(e) => {
                     setshowEditEventGroup(false);
@@ -223,7 +207,7 @@ export const EventGroup = () => {
             >
             <TextInput label="Name" value={selectedEventGroup?.Name} disabled ={true}/><br/>
             <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} /><br/>
-            <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} />
+            {/* <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} /> */}
             </Dialog>
 
             {/* add users */}

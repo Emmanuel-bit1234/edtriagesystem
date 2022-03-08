@@ -18,6 +18,7 @@ import { Toast } from "primereact/toast";
 export const Events = () => {
     const toast = useRef(null);
     const [showAddEventForn, setshowAddEventForn] = useState(false);
+    const [showEditEvent, setshowEditEvent] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
@@ -93,23 +94,6 @@ export const Events = () => {
             setData(data);
         });
     }
-    // function activateHandler(id) {
-    //     eventService.activateEvent(id).then((res) => {
-    //         eventGroupService.getAllEvents().then((data) => {
-    //             console.log(data);
-    //             setData(data);
-    //         });
-    //     });
-    // }
-
-    // function deActivateHandler(id) {
-    //     eventService.deActivateEvent(id).then((res) => {
-    //         eventGroupService.getAllEvents().then((data) => {
-    //             console.log(data);
-    //             setData(data);
-    //         });
-    //     });
-    // }
 
     return (
         <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
@@ -139,6 +123,30 @@ export const Events = () => {
             </div>
             <Dialog
                 header="Event Details"
+                footer={
+                    <>
+                        <Button
+                            label="Submit"
+                            // onClick={onEditHandler}
+                            className="p-button-success"
+                            icon="pi pi-plus"
+                            type="submit"
+                        />
+                    </>
+                }
+                visible={showEditEvent}
+                style={{ width: "50%", height: "50%" }}
+                modal
+                onHide={(e) => {
+                    setshowEditEvent(false);
+                }}
+            >
+            <TextInput label="Name" value={selectedEvents?.Name} disabled ={true}/><br/>
+            <TextInput label="Description" value={selectedEvents?.Description} onChange={(e) => setSelectedEvents({ ...selectedEvents, Description: e.target.value })} />
+            </Dialog>
+
+            <Dialog
+                header="Event Details"
                 visible={showDialog}
                 style={{ width: "50%", height: "50%" }}
                 modal
@@ -156,8 +164,7 @@ export const Events = () => {
                 </TabView>
             </Dialog>
 
-            {/* add users */}
-            {/* <AddUsers show={showAddEventForn} setShow={setshowAddEventForn} /> */}
+            {/* add event */}
             <AddEvent show={showAddEventForn} setShow={setshowAddEventForn} />
             {/* end */}
 
@@ -201,7 +208,20 @@ export const Events = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
+                         {parseInt(e.IsActive) == 1 ? (
+                            <Button style={{ textAlign: "center", 
+                            width: "30px", height: "30px" }} 
+                            icon={"pi pi-pencil"} 
+                            className="p-button-primary p-button-rounded mr-2 " 
+                            tooltip="Click to Edit" 
+                            onClick={(a) => {
+                                setshowEditEvent(true);
+                                setSelectedEvents(e);
+                            }}
+                            />
+                            ) : (
+                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
+                            )}
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-eye"}
