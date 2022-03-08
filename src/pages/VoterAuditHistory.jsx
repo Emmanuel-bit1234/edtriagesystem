@@ -24,6 +24,7 @@ export const VoterAuditHistory = () => {
     let [data, setData] = useState([]);
     let [objection, setObjection] = useState([]);
     var [selectedUser, setSelectedUser] = useState([]);
+    var [activeUser, setActiveUser] = useState(null);
 
     const [idNumber, setIdNumber] = useState("");
     var voterAuditHistory = new VoterAuditHistoryServices();
@@ -46,13 +47,10 @@ export const VoterAuditHistory = () => {
                 setLoading(false);
 
                 var res = e?.AHVoters ? e.AHVoters : [];
+                
                 if (res.length > 0) {
-                    if (res.length == 1) {
-                        // setShowDialog(true)
-                        setSelectedUser(res[0]);
-                    } else {
-                        // setShowDialog(true)
-                    }
+                    setSelectedUser(res[0]);
+                    setActiveUser(res[0])
                 } else {
                     toast.current.show({
                         severity: "error",
@@ -249,7 +247,7 @@ export const VoterAuditHistory = () => {
                             field="active"
                             header="Status"
                             body={(e) =>
-                                e?.RegistrationNUmber ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                                e?.Status===true ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                             }
                             sortable
                         ></Column>
@@ -282,7 +280,7 @@ export const VoterAuditHistory = () => {
                     </DataTable>
 
                     <Dialog
-                        header={<h6>{`Voter Details -  ${selectedUser?.Surname}, ${selectedUser?.Firstname}  (${selectedUser?.IDNumber})`}</h6>}
+                        header={<h6>{`Voter Details -  ${activeUser?.Surname}, ${activeUser?.Firstname}  (${activeUser?.IDNumber})`}</h6>}
                         // footer={
                         //   <>
                         //     <Button
@@ -336,7 +334,7 @@ export const VoterAuditHistory = () => {
                                 />
                             </TabPanel>
 
-                            {selectedUser?.status !== null ? (
+                            {selectedUser?.Status  ===true ? (
                                 <TabPanel header="Comunication">
                                     <DataTable size="small" scrollable={true} value={CommunicationDetails()} dataKey="id" responsiveLayout="scroll" style={{ width: "100%" }}>
                                         <Column field="Date" header="Date"></Column>
@@ -350,9 +348,9 @@ export const VoterAuditHistory = () => {
                                 ""
                             )}
 
-                            {selectedUser?.status !== null ? <TabPanel header="Anomalies">No Content</TabPanel> : ""}
+                            {selectedUser?.Status ===true ? <TabPanel header="Anomalies">No Content</TabPanel> : ""}
 
-                            {selectedUser?.status !== null ? (
+                            {selectedUser?.Status  ===true ? (
                                 <TabPanel header="Objections">
                                     <DataTable
                                         size="small"
