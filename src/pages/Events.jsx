@@ -158,14 +158,14 @@ export const Events = () => {
                     <TabPanel header="Event Details">
                         <DataTable size="small" scrollable={true} value={EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
-                            <Column field="Description" field="value"></Column>
+                            <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
                 </TabView>
             </Dialog>
 
             {/* add event */}
-            <AddEvent show={showAddEventForn} setShow={setshowAddEventForn} />
+            <AddEvent show={showAddEventForn} setShow={setshowAddEventForn} setData={setData} eventGroup={form.eventGroup}  />
             {/* end */}
 
             <DataTable
