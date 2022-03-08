@@ -196,37 +196,7 @@ export const VoterAuditHistory = () => {
     )
   }
 
-  function VotersHeadingTable({ data = [] }) {
-    return (
-      <DataTable
-        size="small"
-        scrollable={true}
-        value={data}
-        dataKey="id"
-        responsiveLayout="scroll"
-        style={{ width: '100%' }}
-      >
-        <Column
-          // style={{ width: '100px' }}
-          field="col1"
-          body={(e) => <b>{e.col1}</b>}
-        ></Column>
-        <Column field="col2"></Column>
-        <Column
-          // style={{ width: '100px' }}
-          field="col3"
-          body={(e) => <b>{e.col3}</b>}
-        ></Column>
-        <Column field="col4"></Column>
-        <Column
-          // style={{ width: '100px' }}
-          field="col5"
-          body={(e) => <b>{e.col5}</b>}
-        ></Column>
-        <Column field="col6"></Column>
-      </DataTable>
-    )
-  }
+
 
   function InlineTable({ data = [], header = '' }) {
     return (
@@ -424,6 +394,20 @@ export const VoterAuditHistory = () => {
               </TabPanel>
 
               {selectedUser?.status !== null ? (
+                <TabPanel header="Anomalies">
+                
+                </TabPanel>
+              ) : (
+                ''
+              )}
+
+              {selectedUser?.status !== null ? (
+                <TabPanel header="Anomalies">No Content</TabPanel>
+              ) : (
+                ''
+              )}
+
+               {selectedUser?.status !== null ? (
                 <TabPanel header="Anomalies">No Content</TabPanel>
               ) : (
                 ''
