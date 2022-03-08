@@ -160,7 +160,7 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
             }
             visible={show}
             onHide={(e) => setShow(false)}
-            style={{ width: "75%", height: "75%" }}
+            style={{ width: "75%", height: "55%" }}
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
