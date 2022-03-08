@@ -10,16 +10,18 @@ import EventTypeService from "../service/EventTypeService";
 import EventCategoryService from "../service/EventCategoryService";
 import EventService from "../service/EventServices";
 
-export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
+export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "pi pi-save", show = false, setShow }) {
+
     var [pageIndex, setPageIndex] = useState(0);
     const toast = useRef(null);
     var [form, setForm] = useState({
         Name: "",
         Description: "",
         EventDate: "",
-        Status: 1,
-        StatusReason: null,
-        Events: null,
+        EventTypeNC: "NewEvent",
+        EventGroupID: null,
+        SelectedEventCategory: null,
+        SelectedEventType: null,
     });
     var [form2, setForm2] = useState({
         Name: "",
@@ -29,6 +31,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         StatusReason: null,
         Events: null,
     });
+    var [selectedEventGroup, setSelectedEventGroup] = useState(null);
     var [selectedType, setSelected] = useState(null);
     var [selectedCategory, setSelectedCategory] = useState(null);
     var [selectedEvent, setSelectedEvent] = useState(null);
@@ -62,7 +65,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
     var [eventCategory, setEventCategory] = useState([]);
     var [pageIndex, setPageIndex] = useState(0);
     var eventTypeService = new EventTypeService();
-    var eventCategoryService =  new EventCategoryService();
+    var eventCategoryService = new EventCategoryService();
     var eventService = new EventService();
     useEffect(() => {
         eventTypeService.getAllEventTypes().then((data) => {
@@ -75,7 +78,7 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         });
         eventService.getAllParentEvents().then((data) => {
             setEvent(data);
-            console.log(JSON.stringify(data))
+            console.log(JSON.stringify(data));
         });
     }, []);
 
@@ -94,6 +97,9 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
     var submittedForm = false;
 
     function SubmitForm() {
+        form.EventGroupID = eventGroup.EventGroupID
+        form.SelectedEventCategory = selectedCategory.EventCategoryID
+        form.SelectedEventType = selectedType.Value
         var newForm = {};
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
@@ -115,39 +121,26 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
         eventService
             .createEvent(newForm)
             .then((res) => {
-                setTimeout(() => {
-                    window.location.reload();
                     submittedForm = true;
-                }, 2000);
+                    eventService.getAllEvents(form.EventGroupID).then((data) => {
+                        setData(data);
+                        setShow(false)
+                    });
+
                 return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
+                
             })
             .catch((e) => {
                 submittedForm = false;
                 return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
             });
+            
     }
     return (
         <Dialog
             header="Add Event"
             footer={
                 <>
-                    {/* {pageIndex == 0 ? (
-                        <>
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )}
-
-                    {pageIndex == 1 ? (
-                        <>
-                            <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )} */}
-                    <>
                         {pageIndex == 0 ? (
                             <>
                                 <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
@@ -163,12 +156,11 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                         ) : (
                             ""
                         )}
-                    </>
                 </>
             }
             visible={show}
             onHide={(e) => setShow(false)}
-            style={{ width: "75%", height: "75%" }}
+            style={{ width: "75%", height: "55%" }}
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
@@ -190,12 +182,13 @@ export default function AddEvent({ buttonName = "Save", buttonIcon = "pi pi-save
                                     <div className="col-12  lg:col-4">
                                         <Dropdown optionLabel="Name" onChange={(e) => categoryHandler(e)} options={eventCategory} value={selectedCategory} placeholder="Event Category" style={{ width: "100%" }} />
                                     </div>
-                                    {
-                                        selectedCategory !== null ? 
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
-                                    </div> : ""
-                                    }
+                                    {selectedCategory !== null ? (
+                                        <div className="col-12  lg:col-4">
+                                            <Dropdown optionLabel="Text" onChange={(e) => eventHandler(e)} options={eventType} value={selectedType} placeholder="Event Type" style={{ width: "100%" }} />
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
                                 </div>
                             </TabPanel>
                             <TabPanel header="By-Election Details">

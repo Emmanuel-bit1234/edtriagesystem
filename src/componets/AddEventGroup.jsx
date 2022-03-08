@@ -89,26 +89,8 @@ export default function AddEventGroup({
       header="Add EventGroup"
       footer={
         <>
-          {/* {pageIndex == 0 ? (
-                        <>
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )}
-
-                    {pageIndex == 1 ? (
-                        <>
-                            <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )} */}
-
           {pageIndex == 0 ? (
             <>
-              {/* <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" /> */}
               <Button
                 label="Submit"
                 onClick={SubmitForm}
@@ -124,7 +106,7 @@ export default function AddEventGroup({
       }
       visible={show}
       onHide={(e) => setShow(false)}
-      style={{ width: '50%', height: '50%' }}
+      style={{ width: '75%', height: '50%' }}
     >
       <div className="grid">
         <div className="col-12 lg:col-12">

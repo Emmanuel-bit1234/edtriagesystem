@@ -11,7 +11,7 @@ export default function EventService() {
         return axios.get(url).then((response) => response.data);
     };
     this.createEvent = (data) => {
-        var url = `${NET_IP}/EventManagement/InsertEventGroup`;
+        var url = `${NET_IP}/EventManagement/InsertEvent`;
         return axios.post(url, data).then((response) => response.data);
     };
     this.deActivateEvent = (id) => {
