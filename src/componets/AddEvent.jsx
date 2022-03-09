@@ -28,8 +28,6 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
         Description: "",
         EventDate: "",
         Status: 1,
-        StatusReason: null,
-        Events: null,
     });
     var [selectedEventGroup, setSelectedEventGroup] = useState(null);
     var [selectedType, setSelected] = useState(null);
@@ -74,7 +72,6 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
         });
         eventCategoryService.getAllEventCategories().then((data) => {
             setEventCategory(data);
-            // console.log(data);
         });
         eventService.getAllParentEvents().then((data) => {
             setEvent(data);
