@@ -296,7 +296,7 @@ const App = () => {
 
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
-            {isLoggedIn === true ? (
+            {isLoggedIn === false ? (
                 <Route path="/" component={Login} />
             ) : (
                 <>
