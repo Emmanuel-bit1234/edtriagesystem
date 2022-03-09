@@ -10,8 +10,7 @@ import EventTypeService from "../service/EventTypeService";
 import EventCategoryService from "../service/EventCategoryService";
 import EventService from "../service/EventServices";
 
-export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "pi pi-save", show = false, setShow }) {
-
+export default function AddEvent({ eventGroup = null, setData = [], buttonIcon = "pi pi-save", show = false, setShow }) {
     var [pageIndex, setPageIndex] = useState(0);
     const toast = useRef(null);
     var [form, setForm] = useState({
@@ -94,9 +93,9 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
     var submittedForm = false;
 
     function SubmitForm() {
-        form.EventGroupID = eventGroup.EventGroupID
-        form.SelectedEventCategory = selectedCategory.EventCategoryID
-        form.SelectedEventType = selectedType.Value
+        form.EventGroupID = eventGroup.EventGroupID;
+        form.SelectedEventCategory = selectedCategory.EventCategoryID;
+        form.SelectedEventType = selectedType.Value;
         var newForm = {};
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
@@ -118,41 +117,27 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
         eventService
             .createEvent(newForm)
             .then((res) => {
-                    submittedForm = true;
-                    eventService.getAllEvents(form.EventGroupID).then((data) => {
-                        setData(data);
-                        setShow(false)
-                    });
+                submittedForm = true;
+                eventService.getAllEvents(form.EventGroupID).then((data) => {
+                    setData(data);
+                    setShow(false);
+                    setSelectedCategory(null);
+                    setForm(" ");
+                });
 
                 return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
-                
             })
             .catch((e) => {
                 submittedForm = false;
                 return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
             });
-            
     }
     return (
         <Dialog
             header="Add Event"
             footer={
                 <>
-                        {pageIndex == 0 ? (
-                            <>
-                                <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
-                            </>
-                        ) : (
-                            ""
-                        )}
-
-                        {pageIndex == 1 ? (
-                            <>
-                                <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
-                            </>
-                        ) : (
-                            ""
-                        )}
+                    <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
                 </>
             }
             visible={show}
@@ -186,29 +171,6 @@ export default function AddEvent({ eventGroup = null, setData=[], buttonIcon = "
                                     ) : (
                                         ""
                                     )}
-                                </div>
-                            </TabPanel>
-                            <TabPanel header="By-Election Details">
-                                <div className="grid">
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput label="Description" value={form2.Description} onChange={(e) => setForm2({ ...form2, Description: e.target.value })} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput label="Event Name" value={form2.Name} onChange={(e) => setForm2({ ...form2, Name: e.target.value })} />
-                                    </div>
-
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown optionLabel="Name" onChange={(e) => ByEventHandler(e)} options={event} value={selectedEvent} placeholder="Event" style={{ width: "100%" }} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="District" style={{ width: "100%" }} />
-                                    </div>
-                                    <div className="col-12  lg:col-4">
-                                        <Dropdown placeholder="Constituency" style={{ width: "100%" }} />
-                                    </div>
                                 </div>
                             </TabPanel>
                         </TabView>

@@ -14,6 +14,7 @@ import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import EventGroupService from "../service/EventGroupService";
 import { Toast } from "primereact/toast";
+import { Dropdown } from "primereact/dropdown";
 
 export const Events = () => {
     const toast = useRef(null);
@@ -22,11 +23,17 @@ export const Events = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
+    let [ByElecData, setByElecData] = useState([]);
     var [form, setForm] = useState({
         eventGroup: "SELECT AN EVENT GROUP",
     });
     var eventGroupService = new EventGroupService();
     var [eventGroup, setEventGroup] = useState([]);
+    var [form2, setForm2] = useState({
+        Name: "",
+        Description: "",
+        EventDate: "",
+    });
     const [showEditForm, setShowEditForm] = useState(false);
 
     function deActivateHandler(e) {
@@ -38,7 +45,35 @@ export const Events = () => {
             });
         });
     }
+    function formatDate(date) {
+        var d = new Date(date),
+            month = "" + (d.getMonth() + 1),
+            day = "" + d.getDate(),
+            year = d.getFullYear();
 
+        if (month.length < 2) month = "0" + month;
+        if (day.length < 2) day = "0" + day;
+
+        return [year, month, day].join("-");
+    }
+    function submitByElection() {
+        var newForm = {};
+        Object.keys(form2).map((key) => {
+            newForm[key] = form2[key];
+        });
+        newForm["EventDate"] = formatDate(form2.EventDate) + " 00:00";
+        var error = false;
+        Object.keys(newForm).map((key) => {
+            var value = newForm[key];
+            if (value === "") {
+                error = true;
+            }
+        });
+        if (error == true) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            return false;
+        }
+    }
     useEffect(() => {
         eventGroupService.getAllEventGroups().then((data) => {
             setEventGroup(data);
@@ -65,6 +100,7 @@ export const Events = () => {
         setGlobalFilterValue(value);
     };
     const [selectedEvents, setSelectedEvents] = useState(null);
+    const [selectedByElection, setSelectedByElection] = useState(null);
 
     function EventDetails() {
         return [
@@ -123,8 +159,18 @@ export const Events = () => {
             </div>
             <Dialog
                 header="Event Details"
-                footer={
-                    <>
+                footer={<></>}
+                visible={showEditEvent}
+                style={{ width: "50%", height: "60%" }}
+                modal
+                onHide={(e) => {
+                    setshowEditEvent(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="Edit Event">
+                        <TextInput label="Name" value={selectedEvents?.Name} disabled={true} /> <br />
+                        <TextInput label="Description" value={selectedEvents?.Description} onChange={(e) => setSelectedEvents({ ...selectedEvents, Description: e.target.value })} /> <br />
                         <Button
                             label="Submit"
                             // onClick={onEditHandler}
@@ -132,23 +178,29 @@ export const Events = () => {
                             icon="pi pi-plus"
                             type="submit"
                         />
-                    </>
-                }
-                visible={showEditEvent}
-                style={{ width: "50%", height: "50%" }}
-                modal
-                onHide={(e) => {
-                    setshowEditEvent(false);
-                }}
-            >
-            <TextInput label="Name" value={selectedEvents?.Name} disabled ={true}/><br/>
-            <TextInput label="Description" value={selectedEvents?.Description} onChange={(e) => setSelectedEvents({ ...selectedEvents, Description: e.target.value })} />
+                    </TabPanel>
+                    <TabPanel header="Add By-Election">
+                        <div className="grid">
+                            <div className="col-12  lg:col-4">
+                                <TextInput label="Event Name" value={form2.Name} onChange={(e) => setForm2({ ...form2, Name: e.target.value })} />
+                            </div>
+                            <div className="col-12  lg:col-4">
+                                <TextInput label="Description" value={form2.Description} onChange={(e) => setForm2({ ...form2, Description: e.target.value })} />
+                            </div>
+                            <div className="col-12  lg:col-4">
+                                <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
+                            </div>
+                        </div>
+                        <br />
+                        <Button label="Submit" onClick={submitByElection} className="p-button-success" icon="pi pi-plus" type="submit" />
+                    </TabPanel>
+                </TabView>
             </Dialog>
 
             <Dialog
                 header="Event Details"
                 visible={showDialog}
-                style={{ width: "50%", height: "50%" }}
+                style={{ width: "70%", height: "70%" }}
                 modal
                 onHide={(e) => {
                     setShowDialog(false);
@@ -161,11 +213,87 @@ export const Events = () => {
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
+                    <TabPanel header="By-Elections">
+                        <DataTable
+                            size="small"
+                            scrollable={true}
+                            value={ByElecData}
+                            dataKey="id"
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className="datatable-responsive"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} By-Elections"
+                            emptyMessage="No By-Election found."
+                            eventGroup=""
+                            responsiveLayout="scroll"
+                            selection={selectedByElection}
+                            onSelectionChange={(e) => setSelectedByElection(e.value)}
+                            resizableColumns
+                            columnResizeMode="expand"
+                            filters={filters}
+                            filterDisplay="Name"
+                            globalFilterFields={["Name"]}
+                        >
+                            <Column field="Name" header="Name" sortable></Column>
+                            <Column
+                                field="active"
+                                header="Status"
+                                body={(e) =>
+                                    parseInt(e.IsActive) == 1 ? (
+                                        <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" />
+                                    ) : (
+                                        <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                                    )
+                                }
+                                sortable
+                            ></Column>
+                            <Column
+                                field="actions"
+                                header="Actions"
+                                body={(e) => (
+                                    <>
+                                        {parseInt(e.IsActive) == 1 ? (
+                                            <Button
+                                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                                icon={"pi pi-pencil"}
+                                                className="p-button-primary p-button-rounded mr-2 "
+                                                tooltip="Click to Edit"
+                                                onClick={(a) => {
+                                                    setshowEditEvent(true);
+                                                    setSelectedEvents(e);
+                                                }}
+                                            />
+                                        ) : (
+                                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
+                                        )}
+                                        <Button
+                                            style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                            icon={"pi pi-eye"}
+                                            tooltipOptions={{ position: "top" }}
+                                            className="p-button-primary p-button-rounded mr-2"
+                                            tooltip="Click to View"
+                                            onClick={(a) => {
+                                                setShowDialog(true);
+                                                setSelectedEvents(e);
+                                                console.log(e);
+                                            }}
+                                        />
+                                        {parseInt(e.IsActive) == 1 ? (
+                                            <Button onClick={(aa) => deActivateHandler(e)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
+                                        ) : (
+                                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
+                                        )}
+                                    </>
+                                )}
+                            ></Column>
+                        </DataTable>
+                    </TabPanel>
                 </TabView>
             </Dialog>
 
             {/* add event */}
-            <AddEvent show={showAddEventForn} setShow={setshowAddEventForn} setData={setData} eventGroup={form.eventGroup}  />
+            <AddEvent show={showAddEventForn} setShow={setshowAddEventForn} setData={setData} eventGroup={form.eventGroup} />
             {/* end */}
 
             <DataTable
@@ -177,7 +305,7 @@ export const Events = () => {
                 rows={5}
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Events"
                 emptyMessage="No Events found."
                 header={header}
                 eventGroup=""
@@ -197,10 +325,6 @@ export const Events = () => {
                     body={(e) =>
                         parseInt(e.IsActive) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
-                    // body={(e) =>
-                    // <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" />
-
-                    // }
                     sortable
                 ></Column>
                 <Column
@@ -208,19 +332,19 @@ export const Events = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                         {parseInt(e.IsActive) == 1 ? (
-                            <Button style={{ textAlign: "center", 
-                            width: "30px", height: "30px" }} 
-                            icon={"pi pi-pencil"} 
-                            className="p-button-primary p-button-rounded mr-2 " 
-                            tooltip="Click to Edit" 
-                            onClick={(a) => {
-                                setshowEditEvent(true);
-                                setSelectedEvents(e);
-                            }}
-                            />
+                            {parseInt(e.IsActive) == 1 ? (
+                                <Button
+                                    style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                    icon={"pi pi-pencil"}
+                                    className="p-button-primary p-button-rounded mr-2 "
+                                    tooltip="Click to Edit"
+                                    onClick={(a) => {
+                                        setshowEditEvent(true);
+                                        setSelectedEvents(e);
+                                    }}
+                                />
                             ) : (
-                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
+                                <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
                             )}
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
@@ -239,11 +363,6 @@ export const Events = () => {
                             ) : (
                                 <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
                             )}
-                            {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to De-Activate" />
-
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-primary p-button-rounded mr-2" tooltip="Click to Activate" />
-
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-success p-button-rounded mr-2 " tooltip="Click to Edit" /> */}
                         </>
                     )}
                 ></Column>
