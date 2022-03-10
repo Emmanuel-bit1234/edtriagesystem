@@ -63,7 +63,7 @@ export const VoterAuditHistory = () => {
 
   const submitForm = () => {
     setLoading(true)
-    data=[]
+    data = []
     setData(data)
     voterAuditHistory
       .getAuditHistoryByID(idNumber)
@@ -75,21 +75,26 @@ export const VoterAuditHistory = () => {
         var res = e?.AHVoters ? e.AHVoters : []
 
         if (res.length > 0) {
-         
-            setSelectedUser(res[0])
-            setActiveUser(res[0])
+          setSelectedUser(res[0])
+          setActiveUser(res[0])
 
-            var d = res.map((item,i) => {
-              new VillageService().getVillage(item?.VillageID).then(vil=>{
-                var v = { ...item, ...vil }
-                v["DateOfBirth"]= new Date(getDateFromAspNetFormat(v["DateOfBirth"])).toDateString().toString() 
-                v["DateRegistered"]= new Date(getDateFromAspNetFormat(v["DateRegistered"])).toDateString().toString() 
-                data[i]=v 
-                setData([...data])
-              })
+          var d = res.map((item, i) => {
+            new VillageService().getVillage(item?.VillageID).then((vil) => {
+              var v = { ...item, ...vil }
+              v['DateOfBirth'] = new Date(
+                getDateFromAspNetFormat(v['DateOfBirth']),
+              )
+                .toDateString()
+                .toString()
+              v['DateRegistered'] = new Date(
+                getDateFromAspNetFormat(v['DateRegistered']),
+              )
+                .toDateString()
+                .toString()
+              data[i] = v
+              setData([...data])
             })
-           
-       
+          })
         } else {
           toast.current.show({
             severity: 'error',
@@ -193,16 +198,16 @@ export const VoterAuditHistory = () => {
     ]
   }
 
-  var searchCriteria = [
+  var [searchCriteria, setSearchCriteria] = useState([
     {
       name: 'Search By Id Number',
-      value: 0,
+      val: 0,
     },
     {
       name: 'Search By Registration Number',
-      value: 1,
+      val: 1,
     },
-  ]
+  ])
   var [selectedCriteria, setSelectedCriteria] = useState(searchCriteria[0])
 
   function VotersDetailsTable({ data = [], header = '' }) {
@@ -273,9 +278,12 @@ export const VoterAuditHistory = () => {
                   <Dropdown
                     className="ml-4"
                     optionLabel="name"
-                    onChange={(e) => setSelectedCriteria(e.value)}
+                    onChange={(e) => {
+                      setSelectedCriteria(e.value)
+                    }}
                     options={searchCriteria}
                     value={selectedCriteria}
+                    style={{ width: '280px' }}
                   />
 
                   <Button
