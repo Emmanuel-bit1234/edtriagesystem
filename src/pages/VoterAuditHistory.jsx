@@ -13,6 +13,7 @@ import ObjectionsService from '../service/ObjectionsService'
 import { Dropdown } from 'primereact/dropdown'
 import { Divider } from 'primereact/divider'
 import { Timeline } from 'primereact/timeline'
+import VillageService from '../service/VillageService'
 
 /**
  * Converts the old ASP.NET JSON date format to milliseconds
@@ -24,7 +25,7 @@ function getDateFromAspNetFormat(date) {
     const m = re.exec(date)
     return parseInt(m[0], 10)
   } catch (error) {
-    return 0
+    return ''
   }
 }
 
@@ -40,6 +41,7 @@ export const VoterAuditHistory = () => {
   let [objection, setObjection] = useState([])
   var [selectedUser, setSelectedUser] = useState([])
   var [activeUser, setActiveUser] = useState(null)
+  var [delimitationDetails, setDelimitationDetails] = useState(null)
 
   const [idNumber, setIdNumber] = useState('')
   var voterAuditHistory = new VoterAuditHistoryServices()
@@ -52,20 +54,42 @@ export const VoterAuditHistory = () => {
     },
   }
 
+  function DelimitationHandler(id) {
+    var delim = new VillageService()
+    delim.getVillage(id).then((res) => {
+      setSelectedUser({ ...selectedUser, res })
+    })
+  }
+
   const submitForm = () => {
     setLoading(true)
+    data=[]
+    setData(data)
     voterAuditHistory
       .getAuditHistoryByID(idNumber)
       .then((e) => {
         console.log(e)
-        setData(e?.AHVoters ? e.AHVoters : [])
+
         setLoading(false)
 
         var res = e?.AHVoters ? e.AHVoters : []
 
         if (res.length > 0) {
-          setSelectedUser(res[0])
-          setActiveUser(res[0])
+         
+            setSelectedUser(res[0])
+            setActiveUser(res[0])
+
+            var d = res.map((item,i) => {
+              new VillageService().getVillage(item?.VillageID).then(vil=>{
+                var v = { ...item, ...vil }
+                v["DateOfBirth"]= new Date(getDateFromAspNetFormat(v["DateOfBirth"])).toDateString().toString() 
+                v["DateRegistered"]= new Date(getDateFromAspNetFormat(v["DateRegistered"])).toDateString().toString() 
+                data[i]=v 
+                setData([...data])
+              })
+            })
+           
+       
         } else {
           toast.current.show({
             severity: 'error',
@@ -97,7 +121,7 @@ export const VoterAuditHistory = () => {
         col1: 'Gender:',
         col2: gender,
         col3: 'Date of birth:',
-        col4:  new Date(getDateFromAspNetFormat(selectedUser?.DateOfBirth)).toDateString(),
+        col4: selectedUser?.DateOfBirth,
       },
       {
         col1: 'Email:',
@@ -124,7 +148,7 @@ export const VoterAuditHistory = () => {
       },
       {
         col1: 'Created Date:',
-        col2: new Date(getDateFromAspNetFormat(selectedUser?.DateRegistered)).toDateString() ,
+        col2: selectedUser?.DateRegistered,
       },
     ]
   }
@@ -133,15 +157,15 @@ export const VoterAuditHistory = () => {
     return [
       {
         col1: 'District:',
-        col2: 'N/A',
+        col2: selectedUser?.district,
         col3: 'Constituency:',
-        col4: 'N/A',
+        col4: selectedUser?.constituency,
       },
       {
         col1: 'Registration Centre:',
-        col2: 'N/A',
+        col2: selectedUser?.regCentre,
         col3: 'Village:',
-        col4: 'N/A',
+        col4: selectedUser?.village,
       },
     ]
   }
@@ -296,8 +320,8 @@ export const VoterAuditHistory = () => {
             ></Column>
             <Column field="Firstname" header="Firstname" sortable></Column>
 
-            <Column field="Village" header="Village" sortable></Column>
-            <Column field="CreatedDate" header="Created Date"></Column>
+            <Column field="village" header="Village" sortable></Column>
+            <Column field="DateRegistered" header="Created Date"></Column>
             <Column
               field="active"
               header="Status"
@@ -327,11 +351,12 @@ export const VoterAuditHistory = () => {
                     onClick={(e) => {
                       setShowDialog(true)
                       setSelectedUser(item)
+                      console.log(item)
 
                       var objectionsService = new ObjectionsService()
-                      if (selectedUser?.RegistrationNumber) {
+                      if (selectedUser?.RegistrationNUmber) {
                         objectionsService
-                          .getObjectionsByID(selectedUser.RegistrationNumber)
+                          .getObjectionsByID(selectedUser.RegistrationNUmber)
                           .then((e) => {
                             console.log(e)
                             setObjection(e)
@@ -450,17 +475,15 @@ export const VoterAuditHistory = () => {
                     columnResizeMode="expand"
                     filterDisplay="menu"
                   >
+                    <Column field="Name" header="Type"></Column>
+                    <Column field="ObjectionReason" header="Reason"></Column>
+                    <Column field="ObjectionStatus" header="Status"></Column>
+                    <Column field="DateLodged" header="Date Lodged"></Column>
+                    <Column field="LodgedBy" header="Lodged By"></Column>
                     <Column
-                      filterField="Name"
-                      field="Name"
-                      header="Name"
-                      sortable
+                      field="DateRegistered"
+                      header="Date Registered"
                     ></Column>
-                    <Column
-                      header="RegistrationNumber"
-                      body={selectedUser?.RegistrationNumber}
-                    ></Column>
-                    <Column field="DateLodged" header="DateLodged"></Column>
                   </DataTable>
                 </TabPanel>
               ) : (
