@@ -33,6 +33,10 @@ export const Events = () => {
         Name: "",
         Description: "",
         EventDate: "",
+        EventGroupID: null,
+        SelectedEventCategory: null,
+        SelectedEventType: null,
+        SelectedParentEvent: null,
     });
     const [showEditForm, setShowEditForm] = useState(false);
 
@@ -56,7 +60,10 @@ export const Events = () => {
 
         return [year, month, day].join("-");
     }
+    var submittedForm = false;
     function submitByElection() {
+        form2.EventGroupID = form.eventGroup.EventGroupID;
+        form2.SelectedParentEvent = selectedEvents?.EventID;
         var newForm = {};
         Object.keys(form2).map((key) => {
             newForm[key] = form2[key];
@@ -69,10 +76,28 @@ export const Events = () => {
                 error = true;
             }
         });
+        console.log(newForm);
         if (error == true) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
         }
+        var eventService = new EventService();
+        eventService
+            .createEvent(newForm)
+            .then((res) => {
+                submittedForm = true;
+                eventService.getAllEvents(form.EventGroupID).then((data) => {
+                    setData(data);
+                    setshowEditEvent(false);
+                    setForm2(" ");
+                });
+
+                return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
+            })
+            .catch((e) => {
+                submittedForm = false;
+                return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
+            });
     }
     useEffect(() => {
         eventGroupService.getAllEventGroups().then((data) => {

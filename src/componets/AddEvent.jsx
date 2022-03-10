@@ -17,16 +17,10 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
         Name: "",
         Description: "",
         EventDate: "",
-        EventTypeNC: "NewEvent",
         EventGroupID: null,
         SelectedEventCategory: null,
         SelectedEventType: null,
-    });
-    var [form2, setForm2] = useState({
-        Name: "",
-        Description: "",
-        EventDate: "",
-        Status: 1,
+        SelectedParentEvent: null,
     });
     var [selectedEventGroup, setSelectedEventGroup] = useState(null);
     var [selectedType, setSelected] = useState(null);
