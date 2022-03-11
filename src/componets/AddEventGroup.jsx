@@ -70,7 +70,7 @@ export default function AddEventGroup({
         return toast.current.show({
           severity: 'success',
           summary: 'Success Message',
-          detail: 'Eventgroup was added successfully',
+          detail: 'Event group was added successfully',
           life: 1500,
         })
       })
@@ -86,7 +86,7 @@ export default function AddEventGroup({
   }
   return (
     <Dialog
-      header="Add EventGroup"
+      header="Add Event Group"
       footer={
         <>
           {pageIndex == 0 ? (
@@ -117,13 +117,13 @@ export default function AddEventGroup({
               activeIndex={pageIndex}
             >
               <TabPanel
-                header="EventGroup Details"
+                header="Event Group Details"
                 disabled={pageIndex == 0 ? false : true}
               >
                 <div className="grid">
                   <div className="col-12  lg:col-4">
                     <TextInput
-                      label="EventGroup Name"
+                      label="Event Group Name"
                       value={form.Name}
                       onChange={(e) =>
                         setForm({ ...form, Name: e.target.value })

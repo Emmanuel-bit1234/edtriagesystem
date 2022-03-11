@@ -118,9 +118,8 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
                     setSelectedCategory(null);
                     setForm(" ");
                 });
-
                 return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
-            })
+            }, 2000)
             .catch((e) => {
                 submittedForm = false;
                 return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });

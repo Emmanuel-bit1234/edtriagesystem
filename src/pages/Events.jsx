@@ -72,13 +72,18 @@ export const Events = () => {
         var error = false;
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
-            if (value === "") {
+            if (value === '') {
                 error = true;
             }
         });
         console.log(newForm);
         if (error == true) {
-            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            toast.current.show({ 
+            severity: 'error', 
+            summary: 'Error Message', 
+            detail: 'please fill the required fields', 
+            life: 2000 
+        });
             return false;
         }
         var eventService = new EventService();
@@ -86,17 +91,25 @@ export const Events = () => {
             .createEvent(newForm)
             .then((res) => {
                 submittedForm = true;
-                eventService.getAllEvents(form.EventGroupID).then((data) => {
+                eventService.getAllEvents(form.eventGroup.EventGroupID).then((data) => {
                     setData(data);
                     setshowEditEvent(false);
                     setForm2(" ");
                 });
-
-                return toast.current.show({ severity: "success", summary: "Success Message", detail: "Event was added successfully", life: 2000 });
+                return toast.current.show({ 
+                    severity: "success", 
+                    summary: "Success Message", 
+                    detail: "By-election was added successfully", 
+                    life: 2000 });
             })
             .catch((e) => {
                 submittedForm = false;
-                return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
+                // return toast.current.show({ 
+                //     severity: "error", 
+                //     summary: "Error Message", 
+                //     detail: "Ooops, The is a technical problem,Please Try Again", 
+                //     life: 3000 
+                // });
             });
     }
     useEffect(() => {
@@ -105,6 +118,11 @@ export const Events = () => {
             console.log(data);
         });
     }, []);
+    function byElectionHandler() {
+        eventService.getByElections(selectedEvents.EventID).then((data) => {
+            setByElecData(data);
+        });
+    }
 
     var getInput = (key, ev) => {
         setForm({ ...form, [key]: ev.value });
@@ -155,7 +173,6 @@ export const Events = () => {
             setData(data);
         });
     }
-
     return (
         <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
             <div className="">
@@ -183,11 +200,14 @@ export const Events = () => {
                 ></Toolbar>
             </div>
             <Dialog
-                header="Event Details"
+                header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
                 footer={<></>}
                 visible={showEditEvent}
                 style={{ width: "50%", height: "60%" }}
                 modal
+                onShow={() => {
+                    byElectionHandler();
+                }}
                 onHide={(e) => {
                     setshowEditEvent(false);
                 }}
@@ -204,29 +224,70 @@ export const Events = () => {
                             type="submit"
                         />
                     </TabPanel>
-                    <TabPanel header="Add By-Election">
-                        <div className="grid">
-                            <div className="col-12  lg:col-4">
-                                <TextInput label="Event Name" value={form2.Name} onChange={(e) => setForm2({ ...form2, Name: e.target.value })} />
+                    <TabPanel header="By-Elections">
+                        {ByElecData != null ? (
+                            <DataTable
+                                size="small"
+                                scrollable={true}
+                                value={ByElecData}
+                                dataKey="id"
+                                // paginator
+                                rows={5}
+                                // rowsPerPageOptions={[5, 10, 25]}
+                                className="datatable-responsive"
+                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} By-Elections"
+                                emptyMessage="No By-Election found."
+                                eventGroup=""
+                                responsiveLayout="scroll"
+                                selection={selectedByElection}
+                                onSelectionChange={(e) => setSelectedByElection(e.value)}
+                                resizableColumns
+                                columnResizeMode="expand"
+                                filters={filters}
+                                filterDisplay="Name"
+                                globalFilterFields={["Name"]}
+                            >
+                                <Column field="Name" header="Name" sortable></Column>
+                                <Column
+                                    field="active"
+                                    header="Status"
+                                    body={(e) =>
+                                        parseInt(e.IsActive) == 1 ? (
+                                            <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" />
+                                        ) : (
+                                            <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                                        )
+                                    }
+                                    sortable
+                                ></Column>
+                            </DataTable>
+                        ) : (
+                            <div className="grid">
+                                <div className="col-12  lg:col-4">
+                                    <TextInput label="Event Name" value={form2.Name} onChange={(e) => setForm2({ ...form2, Name: e.target.value })} />
+                                </div>
+                                <div className="col-12  lg:col-4">
+                                    <TextInput label="Description" value={form2.Description} onChange={(e) => setForm2({ ...form2, Description: e.target.value })} />
+                                </div>
+                                <div className="col-12  lg:col-4">
+                                    <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
+                                </div>
+                                <br />
+                        <Button label="Add By-Election" onClick={submitByElection} className="p-button-success" icon="pi pi-plus" type="submit" />
                             </div>
-                            <div className="col-12  lg:col-4">
-                                <TextInput label="Description" value={form2.Description} onChange={(e) => setForm2({ ...form2, Description: e.target.value })} />
-                            </div>
-                            <div className="col-12  lg:col-4">
-                                <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
-                            </div>
-                        </div>
-                        <br />
-                        <Button label="Submit" onClick={submitByElection} className="p-button-success" icon="pi pi-plus" type="submit" />
+                        )}
                     </TabPanel>
                 </TabView>
             </Dialog>
 
             <Dialog
-                header="Event Details"
+                header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
                 visible={showDialog}
                 style={{ width: "70%", height: "70%" }}
                 modal
+                onShow={() => {
+                    byElectionHandler();
+                }}
                 onHide={(e) => {
                     setShowDialog(false);
                 }}
@@ -272,45 +333,6 @@ export const Events = () => {
                                     )
                                 }
                                 sortable
-                            ></Column>
-                            <Column
-                                field="actions"
-                                header="Actions"
-                                body={(e) => (
-                                    <>
-                                        {parseInt(e.IsActive) == 1 ? (
-                                            <Button
-                                                style={{ textAlign: "center", width: "30px", height: "30px" }}
-                                                icon={"pi pi-pencil"}
-                                                className="p-button-primary p-button-rounded mr-2 "
-                                                tooltip="Click to Edit"
-                                                onClick={(a) => {
-                                                    setshowEditEvent(true);
-                                                    setSelectedEvents(e);
-                                                }}
-                                            />
-                                        ) : (
-                                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-pencil"} className="p-button-primary p-button-rounded mr-2 " tooltip="Click to Edit" />
-                                        )}
-                                        <Button
-                                            style={{ textAlign: "center", width: "30px", height: "30px" }}
-                                            icon={"pi pi-eye"}
-                                            tooltipOptions={{ position: "top" }}
-                                            className="p-button-primary p-button-rounded mr-2"
-                                            tooltip="Click to View"
-                                            onClick={(a) => {
-                                                setShowDialog(true);
-                                                setSelectedEvents(e);
-                                                console.log(e);
-                                            }}
-                                        />
-                                        {parseInt(e.IsActive) == 1 ? (
-                                            <Button onClick={(aa) => deActivateHandler(e)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
-                                        ) : (
-                                            <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
-                                        )}
-                                    </>
-                                )}
                             ></Column>
                         </DataTable>
                     </TabPanel>
@@ -380,7 +402,7 @@ export const Events = () => {
                                 onClick={(a) => {
                                     setShowDialog(true);
                                     setSelectedEvents(e);
-                                    console.log(e);
+                                    console.log(e.EventID);
                                 }}
                             />
                             {parseInt(e.IsActive) == 1 ? (
