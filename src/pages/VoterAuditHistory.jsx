@@ -14,6 +14,7 @@ import { Dropdown } from 'primereact/dropdown'
 import { Divider } from 'primereact/divider'
 import { Timeline } from 'primereact/timeline'
 import VillageService from '../service/VillageService'
+import './voterAudit/audit.scss'
 
 /**
  * Converts the old ASP.NET JSON date format to milliseconds
@@ -107,9 +108,9 @@ export const VoterAuditHistory = () => {
       .catch((e) => setLoading(false))
   }
 
-  const header = (
+  const header = (name) => (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0">Voter Audit History</h5>
+      <h5 className="m-0"><b>{name}</b></h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         {/* <i className="pi pi-search" /> */}
         {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
@@ -213,6 +214,7 @@ export const VoterAuditHistory = () => {
   function VotersDetailsTable({ data = [], header = '' }) {
     return (
       <DataTable
+      className='remove-border'
         header={header}
         size="small"
         scrollable={true}
@@ -274,6 +276,7 @@ export const VoterAuditHistory = () => {
                     placeholder={selectedCriteria.name}
                     value={idNumber}
                     onInput={(e) => setIdNumber(e.target.value)}
+                    style={{ width: '280px' }}
                   />
                   <Dropdown
                     className="ml-4"
@@ -312,7 +315,7 @@ export const VoterAuditHistory = () => {
             className="datatable-responsive"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} voter audit history"
             emptyMessage="No voter audit history."
-            header={header}
+            header={header('Voter Audit History')}
             responsiveLayout="scroll"
             resizableColumns
             columnResizeMode="expand"
@@ -326,10 +329,10 @@ export const VoterAuditHistory = () => {
               header="Surname"
               sortable
             ></Column>
-            <Column field="Firstname" header="Firstname" sortable></Column>
+            <Column field="Firstname" header="First name" sortable></Column>
 
             <Column field="village" header="Village" sortable></Column>
-            <Column field="DateRegistered" header="Created Date"></Column>
+            <Column field="DateRegistered" header="Captured Date"></Column>
             <Column
               field="active"
               header="Status"
@@ -408,32 +411,17 @@ export const VoterAuditHistory = () => {
             <TabView>
               <TabPanel header="Voter Record">
                 <VotersDetailsTable
-                  header={
-                    <h6>
-                      {' '}
-                      <b>Voter Details</b>
-                    </h6>
-                  }
+                  header={header('Voter Details')}
                   data={VoterDetails()}
                 />
                 <br />
                 <VotersDetailsTable
-                  header={
-                    <h6>
-                      {' '}
-                      <b> Delimitation</b>
-                    </h6>
-                  }
+                  header={header('Delimitation')}
                   data={RegistrationDetails()}
                 />
                 <br />
                 <VotersDetailsTable
-                  header={
-                    <h6>
-                      {' '}
-                      <b>Registration Channel</b>
-                    </h6>
-                  }
+                  header={header('Registration Channel')}
                   data={ChannelDetails()}
                 />
               </TabPanel>
