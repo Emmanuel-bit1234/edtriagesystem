@@ -1,0 +1,11 @@
+.remove-border {
+    th[role="columnheader"] {
+        background-color: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .p-datatable-header{
+      background-color: rgb(219, 218, 219) !important;
+    }
+}
