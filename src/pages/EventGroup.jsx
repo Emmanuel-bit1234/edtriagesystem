@@ -72,10 +72,9 @@ export const EventGroup = () => {
         setGlobalFilterValue(value);
     };
 
-    function onEditHandler()
-    {
+    function onEditHandler() {
         eventGroupService.updateEventGroup(selectedEventGroup).then((response) => {
-            console.log(response)
+            console.log(response);
             eventGroupService.getAllEventGroups().then((data) => {
                 console.log(data);
                 setData(data);
@@ -87,7 +86,7 @@ export const EventGroup = () => {
                     life: 2000,
                 });
             });
-        })
+        });
     }
     function activateHandler(id) {
         eventGroupService.activateEventGroup(id).then((res) => {
@@ -189,13 +188,7 @@ export const EventGroup = () => {
                 header="Edit Event Group"
                 footer={
                     <>
-                        <Button
-                            label="Submit"
-                            onClick={onEditHandler}
-                            className="p-button-success"
-                            icon="pi pi-plus"
-                            type="submit"
-                        />
+                        <Button label="Submit" onClick={onEditHandler} className="p-button-success" icon="pi pi-plus" type="submit" />
                     </>
                 }
                 visible={showEditEventGroup}
@@ -205,9 +198,15 @@ export const EventGroup = () => {
                     setshowEditEventGroup(false);
                 }}
             >
-            <TextInput label="Name" value={selectedEventGroup?.Name} disabled ={true}/><br/>
-            <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} /><br/>
-            {/* <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} /> */}
+                <div className="grid">
+                    <div className="col-12  lg:col-6">
+                        <TextInput label="Name" value={selectedEventGroup?.Name} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-6">
+                        <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} />
+                    </div>
+                </div>
+                {/* <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} /> */}
             </Dialog>
 
             {/* add users */}

@@ -72,18 +72,18 @@ export const Events = () => {
         var error = false;
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
-            if (value === '') {
+            if (value === "") {
                 error = true;
             }
         });
         console.log(newForm);
         if (error == true) {
-            toast.current.show({ 
-            severity: 'error', 
-            summary: 'Error Message', 
-            detail: 'please fill the required fields', 
-            life: 2000 
-        });
+            toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "please fill the required fields",
+                life: 2000,
+            });
             return false;
         }
         var eventService = new EventService();
@@ -95,21 +95,22 @@ export const Events = () => {
                     setData(data);
                     setshowEditEvent(false);
                     setForm2(" ");
+                    return toast.current.show({
+                        severity: "success",
+                        summary: "Success Message",
+                        detail: "By-election was added successfully",
+                        life: 2000,
+                    });
                 });
-                return toast.current.show({ 
-                    severity: "success", 
-                    summary: "Success Message", 
-                    detail: "By-election was added successfully", 
-                    life: 2000 });
             })
             .catch((e) => {
                 submittedForm = false;
-                // return toast.current.show({ 
-                //     severity: "error", 
-                //     summary: "Error Message", 
-                //     detail: "Ooops, The is a technical problem,Please Try Again", 
-                //     life: 3000 
-                // });
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error Message",
+                    detail: "Ooops, The is a technical problem,Please Try Again",
+                    life: 3000
+                });
             });
     }
     useEffect(() => {
@@ -175,6 +176,7 @@ export const Events = () => {
     }
     return (
         <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
+            <Toast ref={toast} />
             <div className="">
                 <Toolbar
                     className="mb-4"
@@ -203,7 +205,7 @@ export const Events = () => {
                 header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
                 footer={<></>}
                 visible={showEditEvent}
-                style={{ width: "50%", height: "60%" }}
+                style={{ width: "95%", height: "95%" }}
                 modal
                 onShow={() => {
                     byElectionHandler();
@@ -214,8 +216,14 @@ export const Events = () => {
             >
                 <TabView>
                     <TabPanel header="Edit Event">
-                        <TextInput label="Name" value={selectedEvents?.Name} disabled={true} /> <br />
-                        <TextInput label="Description" value={selectedEvents?.Description} onChange={(e) => setSelectedEvents({ ...selectedEvents, Description: e.target.value })} /> <br />
+                        <div className="grid">
+                            <div className="col-12  lg:col-6">
+                                <TextInput label="Name" value={selectedEvents?.Name} disabled={true} />
+                            </div>
+                            <div className="col-12  lg:col-6">
+                                <TextInput label="Description" value={selectedEvents?.Description} onChange={(e) => setSelectedEvents({ ...selectedEvents, Description: e.target.value })} />
+                            </div>
+                        </div>
                         <Button
                             label="Submit"
                             // onClick={onEditHandler}
@@ -225,15 +233,13 @@ export const Events = () => {
                         />
                     </TabPanel>
                     <TabPanel header="By-Elections">
-                        {ByElecData != null ? (
+                        {ByElecData?.length>0 && ByElecData[0]?.IsActive == 1 ? (
                             <DataTable
                                 size="small"
                                 scrollable={true}
                                 value={ByElecData}
                                 dataKey="id"
-                                // paginator
                                 rows={5}
-                                // rowsPerPageOptions={[5, 10, 25]}
                                 className="datatable-responsive"
                                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} By-Elections"
                                 emptyMessage="No By-Election found."
@@ -248,6 +254,8 @@ export const Events = () => {
                                 globalFilterFields={["Name"]}
                             >
                                 <Column field="Name" header="Name" sortable></Column>
+                                <Column field="Description" header="Description"></Column>
+                                <Column field="EventDate" header="Date"></Column>
                                 <Column
                                     field="active"
                                     header="Status"
@@ -258,7 +266,23 @@ export const Events = () => {
                                             <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                                         )
                                     }
-                                    sortable
+                                ></Column>
+                                <Column
+                                    field="actions"
+                                    header="Actions"
+                                    body={(e) => (
+                                        <>
+                                            <Button
+                                                onClick={(a) => {
+                                                    //OnClick
+                                                }}
+                                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                                icon={"pi pi-times"}
+                                                className="p-button-danger p-button-rounded mr-2"
+                                                tooltip="Click to De-Activate"
+                                            />
+                                        </>
+                                    )}
                                 ></Column>
                             </DataTable>
                         ) : (
@@ -273,7 +297,7 @@ export const Events = () => {
                                     <TextInput type="Calendar" label="Event Date" value={form2.EventDate} onChange={(e) => setForm2({ ...form2, EventDate: e.target.value })} />
                                 </div>
                                 <br />
-                        <Button label="Add By-Election" onClick={submitByElection} className="p-button-success" icon="pi pi-plus" type="submit" />
+                                <Button label="Add By-Election" onClick={submitByElection} className="p-button-success" icon="pi pi-plus" type="submit" />
                             </div>
                         )}
                     </TabPanel>
@@ -283,7 +307,7 @@ export const Events = () => {
             <Dialog
                 header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
                 visible={showDialog}
-                style={{ width: "70%", height: "70%" }}
+                style={{ width: "95%", height: "95%" }}
                 modal
                 onShow={() => {
                     byElectionHandler();
@@ -305,7 +329,6 @@ export const Events = () => {
                             scrollable={true}
                             value={ByElecData}
                             dataKey="id"
-                            paginator
                             rows={5}
                             rowsPerPageOptions={[5, 10, 25]}
                             className="datatable-responsive"
