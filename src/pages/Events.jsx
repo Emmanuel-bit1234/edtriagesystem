@@ -49,6 +49,13 @@ export const Events = () => {
             });
         });
     }
+    function deActivateByelectionHandler(){
+        eventService.deActivateByElection(ByElecData[0]?.EventID).then((e) => {
+            eventService.getByElections(selectedEvents.EventID).then((data) => {
+                setByElecData(data);
+            });
+        })
+    }
     function formatDate(date) {
         var d = new Date(date),
             month = "" + (d.getMonth() + 1),
@@ -164,7 +171,6 @@ export const Events = () => {
             <h5 className="m-0">Events</h5>
         </div>
     );
-
     var eventService = new EventService();
     function eventHandler(e) {
         setForm({ ...form, eventGroup: e.value });
@@ -274,7 +280,7 @@ export const Events = () => {
                                         <>
                                             <Button
                                                 onClick={(a) => {
-                                                    //OnClick
+                                                    deActivateByelectionHandler()
                                                 }}
                                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                                 icon={"pi pi-times"}
@@ -428,11 +434,11 @@ export const Events = () => {
                                     console.log(e.EventID);
                                 }}
                             />
-                            {parseInt(e.IsActive) == 1 ? (
+                            {/* {parseInt(e.IsActive) == 1 ? (
                                 <Button onClick={(aa) => deActivateHandler(e)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to De-Activate" />
                             ) : (
                                 <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
-                            )}
+                            )} */}
                         </>
                     )}
                 ></Column>

@@ -22,4 +22,8 @@ export default function EventService() {
         var url = `${NET_IP}/EventManagement/DeleteEvent?id=${id}`;
         return axios.post(url).then((response) => response.data);
     };
+    this.deActivateByElection = (id) => {
+        var url = `${NET_IP}/EventManagement/DeleteByElectionEvent?id=${id}`;
+        return axios.post(url).then((response) => response.data);
+    };
 }
