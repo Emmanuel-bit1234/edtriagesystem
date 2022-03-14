@@ -351,6 +351,8 @@ export const Events = () => {
                             globalFilterFields={["Name"]}
                         >
                             <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Description" header="Description"></Column>
+                            <Column field="EventDate" header="Date"></Column>
                             <Column
                                 field="active"
                                 header="Status"
