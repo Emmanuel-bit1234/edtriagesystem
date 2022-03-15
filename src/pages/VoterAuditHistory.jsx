@@ -55,13 +55,6 @@ export const VoterAuditHistory = () => {
     },
   }
 
-  function DelimitationHandler(id) {
-    var delim = new VillageService()
-    delim.getVillage(id).then((res) => {
-      setSelectedUser({ ...selectedUser, res })
-    })
-  }
-
   const submitForm = () => {
     setLoading(true)
     data = []
@@ -70,8 +63,6 @@ export const VoterAuditHistory = () => {
       .getAuditHistoryByID(idNumber)
       .then((e) => {
         console.log(e)
-
-        setLoading(false)
 
         var res = e?.AHVoters ? e.AHVoters : []
 
@@ -94,8 +85,26 @@ export const VoterAuditHistory = () => {
                 .toString()
               data[i] = v
               setData([...data])
+
+              var DisabilityId = item?.DisabilityID
+              var VoterRecordSourceID = item?.VoterRecordSourceID
+              var RegistrationSiteID = item?.RegistrationSiteID
+              voterAuditHistory
+                .getChannelData(
+                  DisabilityId,
+                  VoterRecordSourceID,
+                  RegistrationSiteID,
+                )
+                .then((channelData) => {
+                  data[i] = { ...data[i], channel: channelData }
+                  console.log(data)
+                  setData(data)
+                })
             })
           })
+         setTimeout(() => {
+          setLoading(false)
+         }, 3000);
         } else {
           toast.current.show({
             severity: 'error',
@@ -110,7 +119,9 @@ export const VoterAuditHistory = () => {
 
   const header = (name) => (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0"><b>{name}</b></h5>
+      <h5 className="m-0">
+        <b>{name}</b>
+      </h5>
       <span className="block mt-2 md:mt-0 p-input-icon-left">
         {/* <i className="pi pi-search" /> */}
         {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
@@ -127,7 +138,7 @@ export const VoterAuditHistory = () => {
         col1: 'Gender:',
         col2: gender,
         col3: 'Date of birth:',
-        col4: selectedUser?.DateOfBirth,
+        col4: selectedUser?.DateOfBirth_s,
       },
       {
         col1: 'Email:',
@@ -137,7 +148,9 @@ export const VoterAuditHistory = () => {
       },
       {
         col1: 'Disability:',
-        col2: 'N/A',
+        col2: selectedUser?.channel?.DisabilityName
+          ? selectedUser.channel.DisabilityName
+          : 'N/A',
         col3: 'Registration Number:',
         col4: selectedUser?.RegistrationNUmber,
       },
@@ -148,13 +161,17 @@ export const VoterAuditHistory = () => {
     return [
       {
         col1: 'Channel:',
-        col2: 'Assisted',
-        col3: 'Centre:',
-        col4: 'Butha Butha',
+        col2: selectedUser?.channel?.ChannelName
+          ? selectedUser.channel.ChannelName
+          : 'N/A',
+        col3: 'Registrationn Site:',
+        col4: selectedUser?.channel?.RegistrationSiteName
+          ? selectedUser.channel.RegistrationSiteName
+          : 'N/A',
       },
       {
         col1: 'Created Date:',
-        col2: selectedUser?.DateRegistered,
+        col2: selectedUser?.DateRegistered_s,
       },
     ]
   }
@@ -214,7 +231,7 @@ export const VoterAuditHistory = () => {
   function VotersDetailsTable({ data = [], header = '' }) {
     return (
       <DataTable
-      className='remove-border'
+        className="remove-border"
         header={header}
         size="small"
         scrollable={true}
@@ -235,27 +252,6 @@ export const VoterAuditHistory = () => {
           body={(e) => <b>{e.col3}</b>}
         ></Column>
         <Column field="col4"></Column>
-      </DataTable>
-    )
-  }
-
-  function InlineTable({ data = [], header = '' }) {
-    return (
-      <DataTable
-        header={header}
-        size="small"
-        scrollable={true}
-        value={data}
-        dataKey="id"
-        responsiveLayout="scroll"
-        style={{ width: '100%' }}
-      >
-        <Column
-          // style={{ width: '100px' }}
-          field="col1"
-          body={(e) => <b>{e.col1}</b>}
-        ></Column>
-        <Column field="col2"></Column>
       </DataTable>
     )
   }
@@ -332,7 +328,7 @@ export const VoterAuditHistory = () => {
             <Column field="Firstname" header="First name" sortable></Column>
 
             <Column field="village" header="Village" sortable></Column>
-            <Column field="DateRegistered" header="Captured Date"></Column>
+            <Column field="DateRegistered_s" header="Captured Date"></Column>
             <Column
               field="active"
               header="Status"
