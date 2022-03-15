@@ -45,7 +45,7 @@ export const EventGroup = () => {
     }
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">EventGroups</h5>
+            <h5 className="m-0">Event Groups</h5>
         </div>
     );
 
@@ -72,10 +72,9 @@ export const EventGroup = () => {
         setGlobalFilterValue(value);
     };
 
-    function onEditHandler()
-    {
+    function onEditHandler() {
         eventGroupService.updateEventGroup(selectedEventGroup).then((response) => {
-            console.log(response)
+            console.log(response);
             eventGroupService.getAllEventGroups().then((data) => {
                 console.log(data);
                 setData(data);
@@ -87,7 +86,7 @@ export const EventGroup = () => {
                     life: 2000,
                 });
             });
-        })
+        });
     }
     function activateHandler(id) {
         eventGroupService.activateEventGroup(id).then((res) => {
@@ -144,7 +143,7 @@ export const EventGroup = () => {
                 ></Toolbar>
             </div>
             <Dialog
-                header="EventGroup Details"
+                header="Event Group Details"
                 visible={showDialog}
                 style={{ width: "50%", height: "50%" }}
                 modal
@@ -153,7 +152,7 @@ export const EventGroup = () => {
                 }}
             >
                 <TabView>
-                    <TabPanel header="EventGroup Details">
+                    <TabPanel header="Event Group Details">
                         <DataTable size="small" scrollable={true} value={EventGroupDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} field="name" body={(e) => <b>{e.name}</b>}></Column>
                             <Column field="value"></Column>
@@ -163,7 +162,7 @@ export const EventGroup = () => {
             </Dialog>
 
             <Dialog
-                header="EventGroup Details"
+                header="Event Group Details"
                 visible={showEditForm}
                 style={{ width: "50%", height: "50%" }}
                 modal
@@ -186,16 +185,10 @@ export const EventGroup = () => {
                 </div>
             </Dialog>
             <Dialog
-                header="Edit EventGroup"
+                header="Edit Event Group"
                 footer={
                     <>
-                        <Button
-                            label="Submit"
-                            onClick={onEditHandler}
-                            className="p-button-success"
-                            icon="pi pi-plus"
-                            type="submit"
-                        />
+                        <Button label="Submit" onClick={onEditHandler} className="p-button-success" icon="pi pi-plus" type="submit" />
                     </>
                 }
                 visible={showEditEventGroup}
@@ -205,9 +198,15 @@ export const EventGroup = () => {
                     setshowEditEventGroup(false);
                 }}
             >
-            <TextInput label="Name" value={selectedEventGroup?.Name} disabled ={true}/><br/>
-            <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} /><br/>
-            {/* <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} /> */}
+                <div className="grid">
+                    <div className="col-12  lg:col-6">
+                        <TextInput label="Name" value={selectedEventGroup?.Name} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-6">
+                        <TextInput label="Description" value={selectedEventGroup?.Description} onChange={(e) => setSelectedEventGroup({ ...selectedEventGroup, Description: e.target.value })} />
+                    </div>
+                </div>
+                {/* <TextInput label="Reason" value={selectedEventGroup?.StatusReason} disabled ={true} /> */}
             </Dialog>
 
             {/* add users */}
@@ -224,7 +223,7 @@ export const EventGroup = () => {
                 rowsPerPageOptions={[5, 10, 25]}
                 className="datatable-responsive"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
-                emptyMessage="No eventgroup found."
+                emptyMessage="No event group found."
                 header={header}
                 responsiveLayout="scroll"
                 selection={selectedEventGroup}
