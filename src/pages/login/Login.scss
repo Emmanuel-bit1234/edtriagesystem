@@ -1,0 +1,51 @@
+.p-sidebar-right {
+    top: 0;
+    right: 0;
+    width: 40%;
+    height: 100%;
+}
+.p-sidebar-header .p-sidebar-icon {
+    width: 2rem;
+    height: 2rem;
+    color: #fff !important;
+    border: 0 none;
+    background: transparent;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.box {
+    padding: 10px;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+   
+    // height: 100vh;
+}
+
+.card-size {
+  background: rgb(255, 255, 255);
+    .logo {
+        width: 400px;
+    }
+    display: flex !important;
+    align-items: center;
+    height: 100vh;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .box {
+        flex-direction: column;
+        max-width: 400px;
+    }
+    .hide-small{
+      display: none;
+    }
+    .card-size {
+        margin: auto;
+        .logo {
+            max-width: 90%;
+            margin: auto;
+         
+        }
+    }
+}
