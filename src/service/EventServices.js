@@ -24,6 +24,6 @@ export default function EventService() {
     };
     this.deActivateByElection = (id) => {
         var url = `${NET_IP}/EventManagement/DeleteByElectionEvent?id=${id}`;
-        return axios.post(url).then((response) => response.data);
+        return axios.get(url).then((response) => response.data);
     };
 }

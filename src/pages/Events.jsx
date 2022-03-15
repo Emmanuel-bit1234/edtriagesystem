@@ -53,6 +53,12 @@ export const Events = () => {
         eventService.deActivateByElection(ByElecData[0]?.EventID).then((e) => {
             eventService.getByElections(selectedEvents.EventID).then((data) => {
                 setByElecData(data);
+                return toast.current.show({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: "The By-election was de-activated successfully",
+                    life: 2000,
+                });
             });
         })
     }
