@@ -12,7 +12,6 @@ import { Toast } from 'primereact/toast'
 import ObjectionsService from '../service/ObjectionsService'
 import { Dropdown } from 'primereact/dropdown'
 import { Divider } from 'primereact/divider'
-import { Timeline } from 'primereact/timeline'
 import VillageService from '../service/VillageService'
 import './voterAudit/audit.scss'
 
@@ -31,21 +30,18 @@ function getDateFromAspNetFormat(date) {
 }
 
 export const VoterAuditHistory = () => {
+  const toast = useRef(null)
   const [showDialog, setShowDialog] = useState(false)
   const [showHistroyDialog, setShowHistroyDialog] = useState(false)
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const toast = useRef(null)
-
-  let [data, setData] = useState([])
-  let [objection, setObjection] = useState([])
+  var [data, setData] = useState([])
+  var [objection, setObjection] = useState([])
   var [selectedUser, setSelectedUser] = useState([])
   var [activeUser, setActiveUser] = useState(null)
-  var [delimitationDetails, setDelimitationDetails] = useState(null)
-
-  const [idNumber, setIdNumber] = useState('')
-  var voterAuditHistory = new VoterAuditHistoryServices()
+  var [idNumber, setIdNumber] = useState('')
+ 
 
   const filters = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -55,14 +51,8 @@ export const VoterAuditHistory = () => {
     },
   }
 
-  function DelimitationHandler(id) {
-    var delim = new VillageService()
-    delim.getVillage(id).then((res) => {
-      setSelectedUser({ ...selectedUser, res })
-    })
-  }
-
   const submitForm = () => {
+    var voterAuditHistory = new VoterAuditHistoryServices()
     setLoading(true)
     data = []
     setData(data)
@@ -70,8 +60,6 @@ export const VoterAuditHistory = () => {
       .getAuditHistoryByID(idNumber)
       .then((e) => {
         console.log(e)
-
-        setLoading(false)
 
         var res = e?.AHVoters ? e.AHVoters : []
 
@@ -94,9 +82,29 @@ export const VoterAuditHistory = () => {
                 .toString()
               data[i] = v
               setData([...data])
+
+              var DisabilityId = item?.DisabilityID
+              var VoterRecordSourceID = item?.VoterRecordSourceID
+              var RegistrationSiteID = item?.RegistrationSiteID
+
+              voterAuditHistory
+                .getChannelData(
+                  DisabilityId,
+                  VoterRecordSourceID,
+                  RegistrationSiteID,
+                )
+                .then((channelData) => {
+                  data[i] = { ...data[i], channel: channelData }
+                  console.log(data)
+                  setData(data)
+                })
             })
           })
+          setTimeout(() => {
+            setLoading(false)
+          }, 1000)
         } else {
+          setLoading(false)
           toast.current.show({
             severity: 'error',
             summary: 'Error Message',
@@ -110,11 +118,9 @@ export const VoterAuditHistory = () => {
 
   const header = (name) => (
     <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-      <h5 className="m-0"><b>{name}</b></h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        {/* <i className="pi pi-search" /> */}
-        {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
-      </span>
+      <h5 className="m-0">
+        <b>{name}</b>
+      </h5>
     </div>
   )
 
@@ -127,7 +133,7 @@ export const VoterAuditHistory = () => {
         col1: 'Gender:',
         col2: gender,
         col3: 'Date of birth:',
-        col4: selectedUser?.DateOfBirth,
+        col4: selectedUser?.DateOfBirth_s,
       },
       {
         col1: 'Email:',
@@ -137,7 +143,9 @@ export const VoterAuditHistory = () => {
       },
       {
         col1: 'Disability:',
-        col2: 'N/A',
+        col2: selectedUser?.channel?.DisabilityName
+          ? selectedUser.channel.DisabilityName
+          : 'N/A',
         col3: 'Registration Number:',
         col4: selectedUser?.RegistrationNUmber,
       },
@@ -148,13 +156,17 @@ export const VoterAuditHistory = () => {
     return [
       {
         col1: 'Channel:',
-        col2: 'Assisted',
-        col3: 'Centre:',
-        col4: 'Butha Butha',
+        col2: selectedUser?.channel?.ChannelName
+          ? selectedUser.channel.ChannelName
+          : 'N/A',
+        col3: 'Registration Site:',
+        col4: selectedUser?.channel?.RegistrationSiteName
+          ? selectedUser.channel.RegistrationSiteName
+          : 'N/A',
       },
       {
-        col1: 'Created Date:',
-        col2: selectedUser?.DateRegistered,
+        col1: 'Captured Date:',
+        col2: selectedUser?.DateRegistered_s,
       },
     ]
   }
@@ -199,7 +211,7 @@ export const VoterAuditHistory = () => {
     ]
   }
 
-  var [searchCriteria, setSearchCriteria] = useState([
+  var searchCriteria = [
     {
       name: 'Search By Id Number',
       val: 0,
@@ -208,13 +220,14 @@ export const VoterAuditHistory = () => {
       name: 'Search By Registration Number',
       val: 1,
     },
-  ])
+  ]
+
   var [selectedCriteria, setSelectedCriteria] = useState(searchCriteria[0])
 
   function VotersDetailsTable({ data = [], header = '' }) {
     return (
       <DataTable
-      className='remove-border'
+        className="remove-border"
         header={header}
         size="small"
         scrollable={true}
@@ -223,39 +236,10 @@ export const VoterAuditHistory = () => {
         responsiveLayout="scroll"
         style={{ width: '100%' }}
       >
-        <Column
-          // style={{ width: '100px' }}
-          field="col1"
-          body={(e) => <b>{e.col1}</b>}
-        ></Column>
+        <Column field="col1" body={(e) => <b>{e.col1}</b>}></Column>
         <Column field="col2"></Column>
-        <Column
-          // style={{ width: '100px' }}
-          field="col3"
-          body={(e) => <b>{e.col3}</b>}
-        ></Column>
+        <Column field="col3" body={(e) => <b>{e.col3}</b>}></Column>
         <Column field="col4"></Column>
-      </DataTable>
-    )
-  }
-
-  function InlineTable({ data = [], header = '' }) {
-    return (
-      <DataTable
-        header={header}
-        size="small"
-        scrollable={true}
-        value={data}
-        dataKey="id"
-        responsiveLayout="scroll"
-        style={{ width: '100%' }}
-      >
-        <Column
-          // style={{ width: '100px' }}
-          field="col1"
-          body={(e) => <b>{e.col1}</b>}
-        ></Column>
-        <Column field="col2"></Column>
       </DataTable>
     )
   }
@@ -332,7 +316,7 @@ export const VoterAuditHistory = () => {
             <Column field="Firstname" header="First name" sortable></Column>
 
             <Column field="village" header="Village" sortable></Column>
-            <Column field="DateRegistered" header="Captured Date"></Column>
+            <Column field="DateRegistered_s" header="Captured Date"></Column>
             <Column
               field="active"
               header="Status"
@@ -388,19 +372,6 @@ export const VoterAuditHistory = () => {
             header={
               <h6>{`Voter Details -  ${activeUser?.Surname}, ${activeUser?.Firstname}  (${activeUser?.IDNumber})`}</h6>
             }
-            // footer={
-            //   <>
-            //     <Button
-            //       label="Messaging History"
-            //       className="ml-3"
-            //       onClick={(e) => setShowCommunicationDialog(true)}
-            //     />
-            //     <Button
-            //       label="Voter History"
-            //       onClick={(e) => setShowHistroyDialog(true)}
-            //     />
-            //   </>
-            // }
             visible={showDialog}
             style={{ width: '73%', height: '98vh' }}
             modal
@@ -478,7 +449,7 @@ export const VoterAuditHistory = () => {
                     <Column field="LodgedBy" header="Lodged By"></Column>
                     <Column
                       field="DateRegistered"
-                      header="Date Registered"
+                      header="Captured Date"
                     ></Column>
                   </DataTable>
                 </TabPanel>
