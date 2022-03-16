@@ -12,7 +12,6 @@ import { Toast } from 'primereact/toast'
 import ObjectionsService from '../service/ObjectionsService'
 import { Dropdown } from 'primereact/dropdown'
 import { Divider } from 'primereact/divider'
-import { Timeline } from 'primereact/timeline'
 import VillageService from '../service/VillageService'
 import './voterAudit/audit.scss'
 
@@ -31,21 +30,18 @@ function getDateFromAspNetFormat(date) {
 }
 
 export const VoterAuditHistory = () => {
+  const toast = useRef(null)
   const [showDialog, setShowDialog] = useState(false)
   const [showHistroyDialog, setShowHistroyDialog] = useState(false)
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const toast = useRef(null)
-
-  let [data, setData] = useState([])
-  let [objection, setObjection] = useState([])
+  var [data, setData] = useState([])
+  var [objection, setObjection] = useState([])
   var [selectedUser, setSelectedUser] = useState([])
   var [activeUser, setActiveUser] = useState(null)
-  var [delimitationDetails, setDelimitationDetails] = useState(null)
-
-  const [idNumber, setIdNumber] = useState('')
-  var voterAuditHistory = new VoterAuditHistoryServices()
+  var [idNumber, setIdNumber] = useState('')
+ 
 
   const filters = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -56,6 +52,7 @@ export const VoterAuditHistory = () => {
   }
 
   const submitForm = () => {
+    var voterAuditHistory = new VoterAuditHistoryServices()
     setLoading(true)
     data = []
     setData(data)
@@ -89,6 +86,7 @@ export const VoterAuditHistory = () => {
               var DisabilityId = item?.DisabilityID
               var VoterRecordSourceID = item?.VoterRecordSourceID
               var RegistrationSiteID = item?.RegistrationSiteID
+
               voterAuditHistory
                 .getChannelData(
                   DisabilityId,
@@ -102,10 +100,11 @@ export const VoterAuditHistory = () => {
                 })
             })
           })
-         setTimeout(() => {
-          setLoading(false)
-         }, 3000);
+          setTimeout(() => {
+            setLoading(false)
+          }, 1000)
         } else {
+          setLoading(false)
           toast.current.show({
             severity: 'error',
             summary: 'Error Message',
@@ -122,10 +121,6 @@ export const VoterAuditHistory = () => {
       <h5 className="m-0">
         <b>{name}</b>
       </h5>
-      <span className="block mt-2 md:mt-0 p-input-icon-left">
-        {/* <i className="pi pi-search" /> */}
-        {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Filter" /> */}
-      </span>
     </div>
   )
 
@@ -164,13 +159,13 @@ export const VoterAuditHistory = () => {
         col2: selectedUser?.channel?.ChannelName
           ? selectedUser.channel.ChannelName
           : 'N/A',
-        col3: 'Registrationn Site:',
+        col3: 'Registration Site:',
         col4: selectedUser?.channel?.RegistrationSiteName
           ? selectedUser.channel.RegistrationSiteName
           : 'N/A',
       },
       {
-        col1: 'Created Date:',
+        col1: 'Captured Date:',
         col2: selectedUser?.DateRegistered_s,
       },
     ]
@@ -216,7 +211,7 @@ export const VoterAuditHistory = () => {
     ]
   }
 
-  var [searchCriteria, setSearchCriteria] = useState([
+  var searchCriteria = [
     {
       name: 'Search By Id Number',
       val: 0,
@@ -225,7 +220,8 @@ export const VoterAuditHistory = () => {
       name: 'Search By Registration Number',
       val: 1,
     },
-  ])
+  ]
+
   var [selectedCriteria, setSelectedCriteria] = useState(searchCriteria[0])
 
   function VotersDetailsTable({ data = [], header = '' }) {
@@ -240,17 +236,9 @@ export const VoterAuditHistory = () => {
         responsiveLayout="scroll"
         style={{ width: '100%' }}
       >
-        <Column
-          // style={{ width: '100px' }}
-          field="col1"
-          body={(e) => <b>{e.col1}</b>}
-        ></Column>
+        <Column field="col1" body={(e) => <b>{e.col1}</b>}></Column>
         <Column field="col2"></Column>
-        <Column
-          // style={{ width: '100px' }}
-          field="col3"
-          body={(e) => <b>{e.col3}</b>}
-        ></Column>
+        <Column field="col3" body={(e) => <b>{e.col3}</b>}></Column>
         <Column field="col4"></Column>
       </DataTable>
     )
@@ -384,19 +372,6 @@ export const VoterAuditHistory = () => {
             header={
               <h6>{`Voter Details -  ${activeUser?.Surname}, ${activeUser?.Firstname}  (${activeUser?.IDNumber})`}</h6>
             }
-            // footer={
-            //   <>
-            //     <Button
-            //       label="Messaging History"
-            //       className="ml-3"
-            //       onClick={(e) => setShowCommunicationDialog(true)}
-            //     />
-            //     <Button
-            //       label="Voter History"
-            //       onClick={(e) => setShowHistroyDialog(true)}
-            //     />
-            //   </>
-            // }
             visible={showDialog}
             style={{ width: '73%', height: '98vh' }}
             modal
@@ -474,7 +449,7 @@ export const VoterAuditHistory = () => {
                     <Column field="LodgedBy" header="Lodged By"></Column>
                     <Column
                       field="DateRegistered"
-                      header="Date Registered"
+                      header="Captured Date"
                     ></Column>
                   </DataTable>
                 </TabPanel>
