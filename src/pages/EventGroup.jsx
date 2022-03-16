@@ -122,14 +122,14 @@ export const EventGroup = () => {
     }
 
     return (
-        <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
+        <div className="card  p-align-stretch vertical-container">
             <div className="">
                 <Toast ref={toast} />
                 <Toolbar
                     className="mb-4"
                     left={
                         <div>
-                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add EventGroup" onClick={(e) => setShowAddEventGroupForm(true)} />
+                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Event Group" onClick={(e) => setShowAddEventGroupForm(true)} />
                         </div>
                     }
                     right={

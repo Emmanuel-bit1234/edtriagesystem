@@ -56,7 +56,7 @@ export const Events = () => {
                 return toast.current.show({
                     severity: "success",
                     summary: "Success Message",
-                    detail: "The By-election was de-activated successfully",
+                    detail: "By-election de-activated successfully",
                     life: 2000,
                 });
             });
@@ -187,7 +187,7 @@ export const Events = () => {
         });
     }
     return (
-        <div className="card  p-align-stretch vertical-container" style={{ height: "calc(100vh - 9rem)" }}>
+        <div className="card  p-align-stretch vertical-container">
             <Toast ref={toast} />
             <div className="">
                 <Toolbar
@@ -267,7 +267,7 @@ export const Events = () => {
                             >
                                 <Column field="Name" header="Name" sortable></Column>
                                 <Column field="Description" header="Description"></Column>
-                                <Column field="EventDate" header="Date"></Column>
+                                <Column field="EventDate_s" header="Date"></Column>
                                 <Column
                                     field="active"
                                     header="Status"
@@ -358,7 +358,7 @@ export const Events = () => {
                         >
                             <Column field="Name" header="Name" sortable></Column>
                             <Column field="Description" header="Description"></Column>
-                            <Column field="EventDate" header="Date"></Column>
+                            <Column field="EventDate_s" header="Date"></Column>
                             <Column
                                 field="active"
                                 header="Status"
@@ -369,7 +369,6 @@ export const Events = () => {
                                         <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                                     )
                                 }
-                                sortable
                             ></Column>
                         </DataTable>
                     </TabPanel>
@@ -409,7 +408,6 @@ export const Events = () => {
                     body={(e) =>
                         parseInt(e.IsActive) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
-                    sortable
                 ></Column>
                 <Column
                     field="actions"
