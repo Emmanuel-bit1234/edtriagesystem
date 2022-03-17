@@ -41,7 +41,6 @@ export const VoterAuditHistory = () => {
   var [selectedUser, setSelectedUser] = useState([])
   var [activeUser, setActiveUser] = useState(null)
   var [idNumber, setIdNumber] = useState('')
- 
 
   const filters = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -128,12 +127,19 @@ export const VoterAuditHistory = () => {
     var gender = JSON?.parse(localStorage.getItem('genders'))?.filter(
       (e) => e.id === selectedUser?.Gender,
     )[0]?.description
+
+    var DateOfBirth = null
+    try {
+      var dateofB = selectedUser?.DateOfBirth_s
+      DateOfBirth = dateofB.split(' ')[0]
+    } catch (error) {}
+
     return [
       {
         col1: 'Gender:',
         col2: gender,
         col3: 'Date of birth:',
-        col4: selectedUser?.DateOfBirth_s,
+        col4: DateOfBirth,
       },
       {
         col1: 'Email:',
@@ -165,7 +171,7 @@ export const VoterAuditHistory = () => {
           : 'N/A',
       },
       {
-        col1: 'Captured Date:',
+        col1: 'Date Captured:',
         col2: selectedUser?.DateRegistered_s,
       },
     ]
@@ -248,45 +254,47 @@ export const VoterAuditHistory = () => {
     <div className="grid">
       <div className="col-12">
         <Toast ref={toast} />
-        <div>
-          <Toolbar
-            className="mb-4"
-            left={
-              <div>
-                <span className="block mt-2 md:mt-0 p-input-icon-left">
-                  <i className="pi pi-search" />
-                  <InputText
-                    type="search"
-                    placeholder={selectedCriteria.name}
-                    value={idNumber}
-                    onInput={(e) => setIdNumber(e.target.value)}
-                    style={{ width: '280px' }}
-                  />
-                  <Dropdown
-                    className="ml-4"
-                    optionLabel="name"
-                    onChange={(e) => {
-                      setSelectedCriteria(e.value)
-                    }}
-                    options={searchCriteria}
-                    value={selectedCriteria}
-                    style={{ width: '280px' }}
-                  />
 
-                  <Button
-                    className="p-button-success ml-4"
-                    label="Search"
-                    onClick={submitForm}
-                  />
-                </span>
-              </div>
-            }
-          ></Toolbar>
-        </div>
         <div
           className="card  p-align-stretch vertical-container"
-          style={{ height: 'calc(100vh - 9rem)' }}
+          style={{ minHeight: 'calc(100vh - 9rem)' }}
         >
+          <div>
+            <Toolbar
+              className="mb-4"
+              left={
+                <div>
+                  <span className="block mt-2 md:mt-0 p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText
+                      type="search"
+                      placeholder={selectedCriteria.name}
+                      value={idNumber}
+                      onInput={(e) => setIdNumber(e.target.value)}
+                      style={{ width: '280px' }}
+                    />
+                    <Dropdown
+                      className="ml-4"
+                      optionLabel="name"
+                      onChange={(e) => {
+                        setSelectedCriteria(e.value)
+                      }}
+                      options={searchCriteria}
+                      value={selectedCriteria}
+                      style={{ width: '280px' }}
+                    />
+
+                    <Button
+                      className="p-button-success ml-4"
+                      label="Search"
+                      onClick={submitForm}
+                    />
+                  </span>
+                </div>
+              }
+            ></Toolbar>
+          </div>
+
           <DataTable
             loading={loading}
             size="small"
@@ -305,18 +313,18 @@ export const VoterAuditHistory = () => {
             columnResizeMode="expand"
             filters={filters}
             filterDisplay="menu"
-            globalFilterFields={['name', 'Firstname', 'IDNumber']}
+            globalFilterFields={["DateRegistered_s"]}
           >
             <Column
               filterField="Surname"
               field="Surname"
               header="Surname"
-              sortable
+              
             ></Column>
-            <Column field="Firstname" header="First name" sortable></Column>
+            <Column field="Firstname" header="First name" ></Column>
 
-            <Column field="village" header="Village" sortable></Column>
-            <Column field="DateRegistered_s" header="Captured Date"></Column>
+            <Column field="village" header="Village"></Column>
+            <Column field="DateRegistered_s" header="Date Captured" sortable></Column>
             <Column
               field="active"
               header="Status"
@@ -335,7 +343,6 @@ export const VoterAuditHistory = () => {
                   />
                 )
               }
-              sortable
             ></Column>
             <Column
               field="action"
@@ -362,6 +369,11 @@ export const VoterAuditHistory = () => {
                     icon={'pi pi-eye'}
                     tooltipOptions={{ position: 'top' }}
                     className=" p-button-rounded mr-2"
+                    style={{
+                      textAlign: 'center',
+                      width: '30px',
+                      height: '30px',
+                    }}
                   />
                 </>
               )}
@@ -398,7 +410,7 @@ export const VoterAuditHistory = () => {
               </TabPanel>
 
               {selectedUser?.Status === true ? (
-                <TabPanel header="Comunication">
+                <TabPanel header="communication">
                   <DataTable
                     size="small"
                     scrollable={true}
@@ -449,7 +461,7 @@ export const VoterAuditHistory = () => {
                     <Column field="LodgedBy" header="Lodged By"></Column>
                     <Column
                       field="DateRegistered"
-                      header="Captured Date"
+                      header="Date Captured"
                     ></Column>
                   </DataTable>
                 </TabPanel>
