@@ -13,21 +13,25 @@ import AddEvent from "../componets/AddEvent";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import EventGroupService from "../service/EventGroupService";
+import EventTypeService from "../service/EventTypeService";
 import { Toast } from "primereact/toast";
-import { Dropdown } from "primereact/dropdown";
+
 
 export const Events = () => {
     const toast = useRef(null);
     const [showAddEventForn, setshowAddEventForn] = useState(false);
     const [showEditEvent, setshowEditEvent] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [eventType, setEventType] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
     let [ByElecData, setByElecData] = useState([]);
     var [form, setForm] = useState({
         eventGroup: "SELECT AN EVENT GROUP",
+        eventType: "SELECT AN EVENT TYPE",
     });
     var eventGroupService = new EventGroupService();
+    var eventTypeService = new EventTypeService();
     var [eventGroup, setEventGroup] = useState([]);
     var [form2, setForm2] = useState({
         Name: "",
@@ -49,7 +53,7 @@ export const Events = () => {
             });
         });
     }
-    function deActivateByelectionHandler(){
+    function deActivateByelectionHandler() {
         eventService.deActivateByElection(ByElecData[0]?.EventID).then((e) => {
             eventService.getByElections(selectedEvents.EventID).then((data) => {
                 setByElecData(data);
@@ -60,7 +64,7 @@ export const Events = () => {
                     life: 2000,
                 });
             });
-        })
+        });
     }
     function formatDate(date) {
         var d = new Date(date),
@@ -122,7 +126,7 @@ export const Events = () => {
                     severity: "error",
                     summary: "Error Message",
                     detail: "Ooops, The is a technical problem,Please Try Again",
-                    life: 3000
+                    life: 3000,
                 });
             });
     }
@@ -130,6 +134,9 @@ export const Events = () => {
         eventGroupService.getAllEventGroups().then((data) => {
             setEventGroup(data);
             console.log(data);
+        });
+        eventTypeService.getEventTypes().then((data) => {
+            setEventType(data)
         });
     }, []);
     function byElectionHandler() {
@@ -186,6 +193,10 @@ export const Events = () => {
             setData(data);
         });
     }
+    function typeHandler(e)
+    {
+        setForm({ ...form, eventType: e.value });
+    }
     return (
         <div className="card  p-align-stretch vertical-container">
             <Toast ref={toast} />
@@ -193,9 +204,12 @@ export const Events = () => {
                 <Toolbar
                     className="mb-4"
                     left={
-                        <div>
-                            <div className="">
+                        <div className="grid">
+                            <div className="col-12  lg:col-5">
                                 <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} />
+                            </div>
+                            <div className="col-12  lg:col-5">
+                                <DropDown label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={form.eventType} />
                             </div>
                         </div>
                     }
@@ -245,7 +259,7 @@ export const Events = () => {
                         />
                     </TabPanel>
                     <TabPanel header="By-Elections">
-                        {ByElecData?.length>0 && ByElecData[0]?.IsActive == 1 ? (
+                        {ByElecData?.length > 0 && ByElecData[0]?.IsActive == 1 ? (
                             <DataTable
                                 size="small"
                                 scrollable={true}
@@ -286,7 +300,7 @@ export const Events = () => {
                                         <>
                                             <Button
                                                 onClick={(a) => {
-                                                    deActivateByelectionHandler()
+                                                    deActivateByelectionHandler();
                                                 }}
                                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                                 icon={"pi pi-times"}
@@ -406,7 +420,7 @@ export const Events = () => {
                     field="active"
                     header="Status"
                     body={(e) =>
-                        parseInt(e.IsActive) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        parseInt(e.IsActive) === 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                 ></Column>
                 <Column
@@ -435,9 +449,6 @@ export const Events = () => {
                                 className="p-button-primary p-button-rounded mr-2"
                                 tooltip="Click to View"
                                 onClick={(a) => {
-                                    setShowDialog(true);
-                                    setSelectedEvents(e);
-                                    console.log(e.EventID);
                                 }}
                             />
                             {/* {parseInt(e.IsActive) == 1 ? (

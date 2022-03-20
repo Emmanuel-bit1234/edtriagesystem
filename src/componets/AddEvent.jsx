@@ -29,18 +29,10 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
     function ByEventHandler(e) {
         setSelectedEvent(e.value);
         var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
-        // if (id == null) return setData([]);
-        // eventService.getAllEvents(id).then((data) => {
-        //     setData(data);
-        // });
     }
     function eventHandler(e) {
         setSelected(e.value);
         var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
-        // if (id == null) return setData([]);
-        // eventService.getAllEvents(id).then((data) => {
-        //     setData(data);
-        // });
     }
     function categoryHandler(e) {
         setSelectedCategory(e.value);

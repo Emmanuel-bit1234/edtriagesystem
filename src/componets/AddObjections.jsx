@@ -1,78 +1,69 @@
 import { Button } from "primereact/button";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
-import { FileUpload } from "primereact/fileupload";
-import { Image } from "primereact/image";
-import { MultiSelect } from "primereact/multiselect";
-import React, { useEffect, useState } from "react";
-import RegistrationCentreService from "../service/RegistrationCentreService";
+import React, { useEffect, useState, useRef } from "react";
 import DropDown from "./DropDown";
 import TextInput from "./TextInput";
-
-import { OrderList } from "primereact/orderlist";
-import { Dropdown } from "primereact/dropdown";
+import GroupInput from "./groupInput";
+import EventGroupService from "../service/EventGroupService";
+import EventService from "../service/EventServices";
 import { TabPanel, TabView } from "primereact/tabview";
-import StaffService from "../service/StaffService";
 import { Dialog } from "primereact/dialog";
-import UsersService from "../service/UsersService";
-import { useHistory } from "react-router-dom";
+import { Toast } from "primereact/toast";
+import ObjectionsService from "../service/ObjectionsService";
+
 export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
-   
-    // var sysGroupService = new SysGroupService();
-    // var [groups, setGroup] = useState([]);
-    // const [selectedGroups, setSelecedGroups] = useState([]);
-
-    // var [staffPosition, setStaffPosition] = useState([]);
-
-    // var genderService = new GenderService();
-
-    // var [gender, setGender] = useState([]);
+    var eventGroupService = new EventGroupService();
+    var objectionTypeService = new ObjectionsService();
+    const toast = useRef(null);
+    var [eventGroup, setEventGroup] = useState([]);
+    var [objectionType, setObjectionType] = useState([]);
+    var [SelectedObjectionType, setselectedObjectionType] = useState("Select an Objection Type");
+    let [event, setEvent] = useState([]);
+    var [selectedEvent, setSelectedEvent] = useState("Select an Event");
+    
 
     useEffect(() => {
-        // genderService.getAllGender().then((data) => {
-        //     setGender(data);
-        // });
-        // staffService.getStaffType().then((data) => {
-        //     setStaffType(data);
-        // });
-        // staffService.getStaffPosition().then((data) => {
-        //     setStaffPosition(data);
-        // });
-        // registrationService.getRegistrationCentres().then((data) => {
-        //     setCentre(data);
-        // });
-        // sysGroupService.getSysAllGroup().then((data) => {
-        //     // console.log(data);
-        //     setGroup(data);
-        // });
+        eventGroupService.getAllEventGroups().then((data) => {
+            setEventGroup(data);
+        });
+        objectionTypeService.getAllObjectionType().then((data) => {
+            setObjectionType(data);
+        });
     }, []);
-
-    var [pageIndex, setPageIndex] = useState(0);
-    var backWardPage = () => {
-        pageIndex--;
-        setPageIndex(pageIndex);
-    };
-    var forwardPage = () => {
-        pageIndex++;
-        setPageIndex(pageIndex);
-    };
+    function objectionTypeHandler(e) {
+        setForm({ ...form, SelectedObjectionType: e.value.Name });
+        setselectedObjectionType(e.value)
+    }
+    var eventService = new EventService();
+    function eventGroupHandler(e) {
+        setEvenGroupHolder({ ...eventgroupHolder, eventGroup: e.value.Name });
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        if (id == null) return setEvent([]);
+        eventService.getAllEvents(id).then((data) => {
+            setEvent(data);
+        });
+    }
+    function eventHandler(e) {
+        setForm({ ...form, event: e.value.Name });
+        setSelectedEvent(e.value)
+    }
 
     var [form, setForm] = useState({
-        username: "",
-        name: "",
-        surname: "",
-        email: "",
-        password: "",
-        createdBy: 3,
-        registrationCentreIds: [],
-        sysGroupIds: [],
-        auditUser: "auditUser",
-        staffTypeID: "",
-        address: "address",
-        signatureImage: "",
-        appointmentDate: "",
-        contactNumber: "contactNumber",
+        EventID: null,
+        ObjectionReason: "Testing",
+        LodgedBy: "",
+        Name : "",
+        IDnumber: "",
+        DateLodged: "",
+        RegistrationNumber: "DCON00000129",
+        SelectedObjectionType: null,
+        Comment: "",
+        CapturedBy: 1,
+        ObjectionEntityID: 1,
     });
+    var [eventgroupHolder, setEvenGroupHolder] = useState({
+        eventGroup: "Select an Event Group",
+    });
+    var submittedForm = false;
 
     function formatDate(date) {
         var d = new Date(date),
@@ -87,27 +78,42 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     }
 
     function SubmitForm() {
-        var groupIDs = [];
-        var centerIDS = [];
-        // if (selectedGroups != null && Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
-        // if (selectedCentre != null && Array.isArray(selectedCentre) == true) selectedCentre.map((centre) => centerIDS.push(centre.id));
-
-        form.registrationCentreIds = centerIDS;
-        form.sysGroupIds = groupIDs;
-        form.appointmentDate = formatDate(form.appointmentDate) + " 00:00";
-
-        var usersService = new UsersService();
-        usersService.createUser(form).then((res) => {
-            console.log(res);
+        form.SelectedObjectionType = SelectedObjectionType?.ObjectionTypeID;
+        form.EventID = selectedEvent.EventID;
+        var newForm = {};
+        Object.keys(form).map((key) => {
+            newForm[key] = form[key];
         });
-        // console.log(form);
-        /***
-         * message
-         * catch
-         */
-
-     
-        window.location.reload();
+        newForm["DateLodged"] = formatDate(form.DateLodged) + " 00:00";
+        var error = false;
+        Object.keys(newForm).map((key) => {
+            var value = newForm[key];
+            if (value === "") {
+                error = true;
+            }
+        });
+        var LodgedBy=`${newForm.Name} ${newForm.IDnumber}`
+        delete newForm.Name
+        delete newForm.IDnumber
+        delete newForm.event
+        newForm.LodgedBy= LodgedBy
+        console.log(4444,newForm);
+        // if (error == true) {
+        //     toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+        //     return false;
+        // }
+        var createdObjection = new ObjectionsService();
+        createdObjection
+            .createObjection(newForm)
+            .then((res) => {
+                submittedForm = true;
+                window.location.reload();
+                return toast.current.show({ severity: "success", summary: "Success Message", detail: "Objection was added successfully", life: 4000 });
+            },2000)
+            .catch((e) => {
+                submittedForm = false;
+                return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
+            });
     }
 
     return (
@@ -115,31 +121,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
             header="Add Objection"
             footer={
                 <>
-                    {/* {pageIndex == 0 ? (
-                        <>
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )}
-
-                    {pageIndex == 1 ? (
-                        <>
-                            <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
-                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
-                        </>
-                    ) : (
-                        ""
-                    )} */}
-
-                    {pageIndex == 0 ? (
-                        <>
-                            {/* <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" /> */}
-                            <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
-                        </>
-                    ) : (
-                        ""
-                    )}
+                    <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
                 </>
             }
             visible={show}
@@ -148,28 +130,39 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
+                <Toast ref={toast} />
                     <form method="post">
-                        <TabView onTabChange={(e) => (e.index = pageIndex)} activeIndex={pageIndex}>
-                            <TabPanel header="Objection Details" disabled={pageIndex == 0 ? false : true}>
+                        <TabView>
+                            <TabPanel header="Objection Details">
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Objection Name" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
-                                    </div>
-
-                                    <div className="col-12  lg:col-4">
-                                        <TextInput label="Reason" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                                        <DropDown label="Event group" optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Raised by" value={form.surname} onChange={(e) => setForm({ ...form, surname: e.target.value })} />
+                                        <DropDown label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <DropDown label="Objection Type" optionLabel="Objection Type" optionValue="id" />
+                                        <DropDown label="Objection Type" optionLabel="Name" placeholder="Select objection type" options={objectionType} onChange={(e) => objectionTypeHandler(e)} value={SelectedObjectionType} style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <DropDown label="Objection Status" optionLabel="Objection Status" optionValue="id" />
+                                        <TextInput label="Objection Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
                                     </div>
-                                    {/* <div className="col-12  lg:col-4">
-                                        <DropDown value={form.gender} onChange={(e) => setForm({ ...form, gender: e.value })} options={gender} label="Gender" optionLabel="description" optionValue="id" />
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput label="Comment" value={form.Comment} onChange={(e) => setForm({ ...form, Comment: e.target.value })} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput type="Calendar" label="Date Lodged" value={form.DateLodged} onChange={(e) => setForm({ ...form, DateLodged: e.target.value })} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput placeholder="Enter the name" label="Lodged by - Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
+                                    </div>
+                                    <div className="col-12  lg:col-4">
+                                        <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number"  value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
+                                    </div>
+                                    {/* <div className="col-12 md:col-4" >
+                                        <p>Lodged by</p>
+                                        <GroupInput placeholder="Name"></GroupInput>
+                                        <GroupInput placeholder="ID Number"></GroupInput>
                                     </div> */}
                                 </div>
                             </TabPanel>
