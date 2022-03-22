@@ -32,20 +32,20 @@ export const Objections = () => {
 
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      name: {
-          operator: FilterOperator.AND,
-          constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-  });
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const onGlobalFilterChange = (e) => {
-    const value = e.target.value;
-    let _filters1 = { ...filters };
-    _filters1["global"].value = value;
-    setFilters(_filters1);
-    setGlobalFilterValue(value);
-};
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: {
+            operator: FilterOperator.AND,
+            constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+        },
+    });
+    const [globalFilterValue, setGlobalFilterValue] = useState("");
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters1 = { ...filters };
+        _filters1["global"].value = value;
+        setFilters(_filters1);
+        setGlobalFilterValue(value);
+    };
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -113,12 +113,11 @@ export const Objections = () => {
                 resizableColumns
                 columnResizeMode="expand"
                 filters={filters}
-                filterDisplay="Name"
-                globalFilterFields={["Name"]}
+                filterDisplay="ObjectionType"
+                globalFilterFields={["ObjectionType"]}
             >
-                <Column field="Name" header="Name" sortable></Column>
-                <Column field="DateLodged" header="Date Lodged"></Column>
-                <Column field="IDNumber" header="ID Number"></Column>
+                <Column field="ObjectionType" header="Objection Type" sortable></Column>
+                <Column field="DateLodged" header="Date Lodged" sortable></Column>
                 <Column field="RegistrationNumber" header="Registration Number"></Column>
                 <Column
                     field="actions"
@@ -127,11 +126,7 @@ export const Objections = () => {
                         <>
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" onClick={(a) => {}} />
-                            {/* <Button
-                style={{ textAlign: 'center', width: '30px', height: '30px' }}
-                icon="pi pi-trash"
-                className="p-button-rounded p-button-danger mr-2"
-              /> */}
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
                         </>
                     )}
                 ></Column>

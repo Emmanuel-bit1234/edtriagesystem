@@ -7,7 +7,7 @@ export default function ObjectionsService() {
     return axios.get(url).then((response) => response.data)
   }
   this.getObjectionsByID = (ID) => {
-    var url = `${NET_IP}/DataInspection/GetObjections?regNo=${ID}`
+    var url = `${NET_IP}/DataInspection/GetObjectionsByRegistrationNo?regNo=${ID}`
     return axios.get(url).then((response) => response.data.Objections)
   }
   this.createObjection = (data) => {

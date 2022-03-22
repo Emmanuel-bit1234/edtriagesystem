@@ -50,11 +50,10 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     var [form, setForm] = useState({
         EventID: null,
         ObjectionReason: "Testing",
-        LodgedBy: "",
         Name : "",
         IDnumber: "",
         DateLodged: "",
-        RegistrationNumber: "DCON00000129",
+        RegistrationNumber: "",
         SelectedObjectionType: null,
         Comment: "",
         CapturedBy: 1,
@@ -98,10 +97,10 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         delete newForm.event
         newForm.LodgedBy= LodgedBy
         console.log(4444,newForm);
-        // if (error == true) {
-        //     toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
-        //     return false;
-        // }
+        if (error == true) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            return false;
+        }
         var createdObjection = new ObjectionsService();
         createdObjection
             .createObjection(newForm)
@@ -135,6 +134,9 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                         <TabView>
                             <TabPanel header="Objection Details">
                                 <div className="grid">
+                                <div className="col-12  lg:col-4">
+                                        <TextInput label="Registration Number" value={form.RegistrationNumber} onChange={(e) => setForm({ ...form, RegistrationNumber: e.target.value })} />
+                                    </div>
                                     <div className="col-12  lg:col-4">
                                         <DropDown label="Event group" optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
                                     </div>

@@ -16,13 +16,14 @@ import EventGroupService from "../service/EventGroupService";
 import EventTypeService from "../service/EventTypeService";
 import { Toast } from "primereact/toast";
 
-
 export const Events = () => {
     const toast = useRef(null);
     const [showAddEventForn, setshowAddEventForn] = useState(false);
     const [showEditEvent, setshowEditEvent] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [eventType, setEventType] = useState(false);
+    var [selectedEventType, setSelectedEventType] = useState("SELECT AN EVENT TYPE");
+    var [selectedEventGroupID, setselectedEventGroupID] = useState([]);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
     let [ByElecData, setByElecData] = useState([]);
@@ -136,7 +137,7 @@ export const Events = () => {
             console.log(data);
         });
         eventTypeService.getEventTypes().then((data) => {
-            setEventType(data)
+            setEventType(data);
         });
     }, []);
     function byElectionHandler() {
@@ -186,16 +187,30 @@ export const Events = () => {
     );
     var eventService = new EventService();
     function eventHandler(e) {
+        setselectedEventGroupID(e.value.EventGroupID);
         setForm({ ...form, eventGroup: e.value });
         var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
         if (id == null) return setData([]);
         eventService.getAllEvents(id).then((data) => {
             setData(data);
+            setSelectedEventType("SELECT AN EVENT TYPE");
         });
     }
-    function typeHandler(e)
-    {
+    function typeHandler(e) {
+        setSelectedEventType(e.value);
         setForm({ ...form, eventType: e.value });
+        var id1 = selectedEventGroupID;
+        if (id1 == "") {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "An event group should be selected first", life: 4000 });
+            return false;
+        }
+        if (id1 != "") {
+            var id2 = e.value?.Value ? e.value.Value : null;
+            if (id2 == null) return setData([]);
+            eventService.getEventBasedOnGroupAndType(id1, id2).then((data) => {
+                setData(data);
+            });
+        }
     }
     return (
         <div className="card  p-align-stretch vertical-container">
@@ -204,13 +219,17 @@ export const Events = () => {
                 <Toolbar
                     className="mb-4"
                     left={
-                        <div className="grid">
-                            <div className="col-12  lg:col-5">
-                                <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} />
-                            </div>
-                            <div className="col-12  lg:col-5">
-                                <DropDown label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={form.eventType} />
-                            </div>
+                        <div>
+                            <span className="block mt-2 md:mt-0 p-input-icon-left">
+                                <div className="grid">
+                                    <div className="col-12  lg:col-5">
+                                        <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} style={{ width: "280px" }} className="ml-4" />
+                                    </div>
+                                    <div className="col-12  lg:col-5">
+                                        <DropDown label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} style={{ width: "280px" }} className="ml-4" />
+                                    </div>
+                                </div>
+                            </span>
                         </div>
                     }
                 ></Toolbar>
@@ -449,6 +468,9 @@ export const Events = () => {
                                 className="p-button-primary p-button-rounded mr-2"
                                 tooltip="Click to View"
                                 onClick={(a) => {
+                                    setShowDialog(true);
+                                    setSelectedEvents(e);
+                                    console.log(e.EventID);
                                 }}
                             />
                             {/* {parseInt(e.IsActive) == 1 ? (

@@ -6,6 +6,10 @@ export default function EventService() {
         var url = `${NET_IP}/EventManagement/GetEventsData?EventGroupID=${id}`;
         return axios.get(url).then((response) => response.data.Events);
     };
+    this.getEventBasedOnGroupAndType = (id1,id2) => {
+        var url = `${NET_IP}/EventManagement/GetEventsDataByEventType?EventGroupID=${id1}&EventTypeID=${id2}`;
+        return axios.get(url).then((response) => response.data.Events);
+    };
     this.getByElections = (id) =>{
         var url = `${NET_IP}/EventManagement/GetByElectionOfAnEvent?EventID=${id}`;
         return axios.get(url).then((response) => response.data.Events);

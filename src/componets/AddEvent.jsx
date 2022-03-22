@@ -95,6 +95,16 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
             }
         });
         console.log(newForm);
+        const date1 = new Date();
+        const date2 = new Date(newForm["EventDate"]);
+        const diffTime = date2 - date1;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log(diffDays + " days");
+        if(diffDays < 0)
+        {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "Invalid date, past dates cannot be selected", life: 3000 });
+            return false;
+        }
         if (error == true) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
