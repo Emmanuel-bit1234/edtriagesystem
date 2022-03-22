@@ -15,20 +15,6 @@ export const Objections = () => {
     const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
-    const eventGroupOptions = [
-        { key: "NAME1", name: "NAME1", label: "EventGroup1" },
-        { key: "NAME2", name: "NAME2", label: "EventGroup2" },
-        { key: "NAME3", name: "NAME3", label: "EventGroup3" },
-    ];
-    var [form, setForm] = useState({
-        eventGroup: "SELECT AN OPTION",
-        event: "SELECT AN OPTION",
-        registration: "SELECT AN OPTION",
-        value: "",
-    });
-    var getInput = (key, ev) => {
-        setForm({ ...form, [key]: ev.value });
-    };
 
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
@@ -37,6 +23,12 @@ export const Objections = () => {
             operator: FilterOperator.AND,
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
+    });
+    var [form, setForm] = useState({
+        ObjectionType: "SELECT A TYPE",
+        ObjectionStatus: "SELECT A STATUS",
+        Event: "SELECT AN EVENT",
+        EventGroup:"SELECT AN EVENT GROUP"
     });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
@@ -64,6 +56,27 @@ export const Objections = () => {
     return (
         <div className="card  p-align-stretch vertical-container">
             <div className="">
+                <Toolbar
+                 className="mb-4"
+                    left={
+                        <div>
+                            <div className="grid">
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label={"Objection Type"} value={form.ObjectionType} />
+                                </div>
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label={"Status "} value={form.ObjectionStatus} />
+                                </div>
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label={"Event Group "} value={form.Event} />
+                                </div>
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label={"Event "} value={form.EventGroup} />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                ></Toolbar>
                 <Toolbar
                     className="mb-4"
                     left={
