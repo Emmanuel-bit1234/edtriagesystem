@@ -15,6 +15,8 @@ export const Objections = () => {
     const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
+    var [objectionType, setObjectionType] = useState([]);
+    var [SelectedObjectionType, setselectedObjectionType] = useState();
 
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
@@ -24,11 +26,27 @@ export const Objections = () => {
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
     });
+    var objectionTypeService = new ObjectionsService();
+    useEffect(() => {
+        objectionTypeService.getAllObjectionType().then((data) => {
+            setObjectionType(data);
+        });
+    }, []);
+    function objectionTypeHandler(e) {
+        setForm({ ...form, ObjectionType: e.value });
+        setselectedObjectionType(e.value);
+        var id = e.value?.ObjectionTypeID ? e.value?.ObjectionTypeID : null;
+        if (id == null) return setData([]);
+        objectionsService.getObjectionsByTypeStatusAndEvent(id).then((e) => {
+            console.log(e);
+            setData(e);
+        });
+    }
     var [form, setForm] = useState({
         ObjectionType: "SELECT A TYPE",
         ObjectionStatus: "SELECT A STATUS",
         Event: "SELECT AN EVENT",
-        EventGroup:"SELECT AN EVENT GROUP"
+        EventGroup: "SELECT AN EVENT GROUP",
     });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
@@ -57,21 +75,21 @@ export const Objections = () => {
         <div className="card  p-align-stretch vertical-container">
             <div className="">
                 <Toolbar
-                 className="mb-4"
+                    className="mb-4"
                     left={
                         <div>
                             <div className="grid">
                                 <div className="col-12  lg:col-3">
-                                    <DropDown label={"Objection Type"} value={form.ObjectionType} />
+                                    <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
                                 <div className="col-12  lg:col-3">
-                                    <DropDown label={"Status "} value={form.ObjectionStatus} />
+                                    <DropDown label="Status " value={form.ObjectionStatus} />
                                 </div>
                                 <div className="col-12  lg:col-3">
-                                    <DropDown label={"Event Group "} value={form.Event} />
+                                    <DropDown label="Event Group " value={form.Event} />
                                 </div>
                                 <div className="col-12  lg:col-3">
-                                    <DropDown label={"Event "} value={form.EventGroup} />
+                                    <DropDown label="Event " value={form.EventGroup} />
                                 </div>
                             </div>
                         </div>
