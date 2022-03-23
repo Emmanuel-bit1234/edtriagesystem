@@ -9,6 +9,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 import ObjectionsService from "../service/ObjectionsService";
+import { Toolbar } from "primereact/toolbar";
 
 export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     var eventGroupService = new EventGroupService();
@@ -160,12 +161,25 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                     <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="Date Lodged" value={form.DateLodged} onChange={(e) => setForm({ ...form, DateLodged: e.target.value })} />
                                     </div>
-                                    <div className="col-12  lg:col-4">
+                                    <Toolbar
+                                        right={
+                                            <div>
+                                                <div className="col-12  lg:col-10">
+                                                    <TextInput placeholder="Enter the name" label="Lodged by - Name and ID Number" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
+                                                </div>
+                                                <div className="col-12  lg:col-10">
+                                                    <TextInput placeholder="Enter the ID number" value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
+                                                </div>
+                                            </div>
+                                        }
+                                    ></Toolbar>
+                                    {/* <div className="col-12  lg:col-4">
                                         <TextInput placeholder="Enter the name" label="Lodged by - Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number" value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
-                                    </div>
+                                        <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number"  value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
+                                    </div> */}
+
                                     {/* <div className="col-12 md:col-4" >
                                         <p>Lodged by</p>
                                         <GroupInput placeholder="Name"></GroupInput>
