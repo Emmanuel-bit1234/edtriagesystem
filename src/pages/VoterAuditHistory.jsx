@@ -458,16 +458,16 @@ export const VoterAuditHistory = () => {
                     columnResizeMode="expand"
                     filterDisplay="menu"
                   >
-                    <Column field="Name" header="Type"></Column>
+                    <Column field="ObjectionType" header="Type"></Column>
                     <Column field="ObjectionStatus" header="Status"></Column>
                     <Column field="DateLodged" header="Date Lodged"></Column>
                     <Column field="LodgedBy" header="Lodged By"></Column>
-                    <Column
+                    {/* <Column
                       field="DateRegistered"
                       header="Date Captured"
-                    ></Column>
+                    ></Column> */}
                     <Column
-                      field="ObjectionReason"
+                      field="ObjectionDescription"
                       header="Description"
                     ></Column>
                   </DataTable>
