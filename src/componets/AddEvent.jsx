@@ -100,8 +100,7 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
         const diffTime = date2 - date1;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         console.log(diffDays + " days");
-        if(diffDays < 0)
-        {
+        if (diffDays < 0) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "Invalid date, past dates cannot be selected", life: 3000 });
             return false;
         }
@@ -129,7 +128,13 @@ export default function AddEvent({ eventGroup = null, setData = [], buttonIcon =
     }
     return (
         <Dialog
-            header="Add Event"
+            draggable={false}
+            header={
+                <>
+                    <li className="pi pi-plus"> </li>
+                    <span>Add Event</span>
+                </>
+            }
             footer={
                 <>
                     <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />

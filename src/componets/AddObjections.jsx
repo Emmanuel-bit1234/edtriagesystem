@@ -19,7 +19,6 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     var [SelectedObjectionType, setselectedObjectionType] = useState("Select an Objection Type");
     let [event, setEvent] = useState([]);
     var [selectedEvent, setSelectedEvent] = useState("Select an Event");
-    
 
     useEffect(() => {
         eventGroupService.getAllEventGroups().then((data) => {
@@ -31,7 +30,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     }, []);
     function objectionTypeHandler(e) {
         setForm({ ...form, SelectedObjectionType: e.value.Name });
-        setselectedObjectionType(e.value)
+        setselectedObjectionType(e.value);
     }
     var eventService = new EventService();
     function eventGroupHandler(e) {
@@ -44,13 +43,13 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     }
     function eventHandler(e) {
         setForm({ ...form, event: e.value.Name });
-        setSelectedEvent(e.value)
+        setSelectedEvent(e.value);
     }
 
     var [form, setForm] = useState({
         EventID: null,
         ObjectionReason: "Testing",
-        Name : "",
+        Name: "",
         IDnumber: "",
         DateLodged: "",
         RegistrationNumber: "",
@@ -91,12 +90,12 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                 error = true;
             }
         });
-        var LodgedBy=`${newForm.Name} ${newForm.IDnumber}`
-        delete newForm.Name
-        delete newForm.IDnumber
-        delete newForm.event
-        newForm.LodgedBy= LodgedBy
-        console.log(4444,newForm);
+        var LodgedBy = `${newForm.Name} ${newForm.IDnumber}`;
+        delete newForm.Name;
+        delete newForm.IDnumber;
+        delete newForm.event;
+        newForm.LodgedBy = LodgedBy;
+        console.log(4444, newForm);
         if (error == true) {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
@@ -108,7 +107,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                 submittedForm = true;
                 window.location.reload();
                 return toast.current.show({ severity: "success", summary: "Success Message", detail: "Objection was added successfully", life: 4000 });
-            },2000)
+            }, 2000)
             .catch((e) => {
                 submittedForm = false;
                 return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
@@ -117,7 +116,13 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
 
     return (
         <Dialog
-            header="Add Objection"
+            draggable={false}
+            header={
+                <>
+                    <li className="pi pi-plus"> </li>
+                    <span>Add Objection</span>
+                </>
+            }
             footer={
                 <>
                     <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
@@ -129,12 +134,12 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         >
             <div className="grid">
                 <div className="col-12 lg:col-12">
-                <Toast ref={toast} />
+                    <Toast ref={toast} />
                     <form method="post">
                         <TabView>
                             <TabPanel header="Objection Details">
                                 <div className="grid">
-                                <div className="col-12  lg:col-4">
+                                    <div className="col-12  lg:col-4">
                                         <TextInput label="Registration Number" value={form.RegistrationNumber} onChange={(e) => setForm({ ...form, RegistrationNumber: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
@@ -159,7 +164,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                         <TextInput placeholder="Enter the name" label="Lodged by - Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number"  value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
+                                        <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number" value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
                                     </div>
                                     {/* <div className="col-12 md:col-4" >
                                         <p>Lodged by</p>

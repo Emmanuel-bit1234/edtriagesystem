@@ -90,7 +90,13 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
     }
     return (
         <Dialog
-            header="Add Event Group"
+            draggable={false}
+            header={
+                <>
+                    <li className="pi pi-plus"> </li>
+                    <span>Add Event Group</span>
+                </>
+            }
             footer={
                 <>
                     {pageIndex == 0 ? (

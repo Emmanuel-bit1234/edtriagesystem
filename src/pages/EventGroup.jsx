@@ -143,7 +143,13 @@ export const EventGroup = () => {
                 ></Toolbar>
             </div>
             <Dialog
-                header="Event Group Details"
+                draggable={false}
+                header={
+                    <>
+                        <li className="pi pi-eye"> </li>
+                        <span> Event Group Details</span>
+                    </>
+                }
                 visible={showDialog}
                 style={{ width: "50%", height: "50%" }}
                 modal
@@ -185,6 +191,7 @@ export const EventGroup = () => {
                 </div>
             </Dialog>
             <Dialog
+                draggable={false}
                 header="Edit Event Group"
                 footer={
                     <>

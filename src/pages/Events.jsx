@@ -247,6 +247,7 @@ export const Events = () => {
                 ></Toolbar>
             </div>
             <Dialog
+                draggable={false}
                 header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
                 footer={<></>}
                 visible={showEditEvent}
@@ -350,7 +351,13 @@ export const Events = () => {
             </Dialog>
 
             <Dialog
-                header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
+                draggable={false}
+                header={
+                    <>
+                        <li className="pi pi-eye"> </li>
+                        <span>{` Event Details - ${selectedEvents?.Name} `}</span>
+                    </>
+                }
                 visible={showDialog}
                 style={{ width: "95%", height: "95%" }}
                 modal
