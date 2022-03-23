@@ -313,18 +313,21 @@ export const VoterAuditHistory = () => {
             columnResizeMode="expand"
             filters={filters}
             filterDisplay="menu"
-            globalFilterFields={["DateRegistered_s"]}
+            globalFilterFields={['DateRegistered_s']}
           >
             <Column
               filterField="Surname"
               field="Surname"
               header="Surname"
-              
             ></Column>
-            <Column field="Firstname" header="First name" ></Column>
+            <Column field="Firstname" header="First name"></Column>
 
             <Column field="village" header="Village"></Column>
-            <Column field="DateRegistered_s" header="Date Captured" sortable></Column>
+            <Column
+              field="DateRegistered_s"
+              header="Date Captured"
+              sortable
+            ></Column>
             <Column
               field="active"
               header="Status"
@@ -384,8 +387,9 @@ export const VoterAuditHistory = () => {
             header={
               <h6>{`Voter Details -  ${activeUser?.Surname}, ${activeUser?.Firstname}  (${activeUser?.IDNumber})`}</h6>
             }
+            draggable={false}
             visible={showDialog}
-            style={{ width: '73%', height: '98vh' }}
+            style={{ width: '95%', height: '95vh' }}
             modal
             onHide={(e) => {
               setShowDialog(false)
@@ -410,7 +414,7 @@ export const VoterAuditHistory = () => {
               </TabPanel>
 
               {selectedUser?.Status === true ? (
-                <TabPanel header="communication">
+                <TabPanel header="Communication">
                   <DataTable
                     size="small"
                     scrollable={true}
@@ -455,13 +459,16 @@ export const VoterAuditHistory = () => {
                     filterDisplay="menu"
                   >
                     <Column field="Name" header="Type"></Column>
-                    <Column field="ObjectionReason" header="Reason"></Column>
                     <Column field="ObjectionStatus" header="Status"></Column>
                     <Column field="DateLodged" header="Date Lodged"></Column>
                     <Column field="LodgedBy" header="Lodged By"></Column>
                     <Column
                       field="DateRegistered"
                       header="Date Captured"
+                    ></Column>
+                    <Column
+                      field="ObjectionReason"
+                      header="Description"
                     ></Column>
                   </DataTable>
                 </TabPanel>
