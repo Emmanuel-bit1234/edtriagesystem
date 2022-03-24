@@ -12,6 +12,8 @@ import AddObjections from "../componets/AddObjections";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import EventGroupService from "../service/EventGroupService";
 import EventService from "../service/EventServices";
+import { Dialog } from "primereact/dialog";
+import { TabPanel, TabView } from "primereact/tabview";
 
 export const Adjudication = () => {
     var eventGroupService = new EventGroupService();
@@ -25,6 +27,7 @@ export const Adjudication = () => {
     var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
     var [eventGroup, setEventGroup] = useState([]);
     let [event, setEvent] = useState([]);
+    const [showDialog, setShowDialog] = useState(false);
     var [selectedEvent, setSelectedEvent] = useState("SELECT AN EVENT");
 
     const [selectedObjections, setSelectedObjections] = useState(null);
@@ -111,6 +114,42 @@ export const Adjudication = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
+    function ObjectionDetails() {
+        return [
+            {
+                name: "Registration number",
+                value: selectedObjections?.RegistrationNumber
+            },
+            {
+                name: "Name",
+                value: selectedObjections?.ObjectionType,
+            },
+            {
+                name: "Date Lodged",
+                value: selectedObjections?.DateLodged,
+            },   
+            {
+                name: "Objection Description",
+                value: selectedObjections?.ObjectionDescription,
+            },
+            {
+                name: "Lodged By",
+                value: selectedObjections?.LodgedBy,
+            },      
+            {
+                name: "Captured By",
+                value: selectedObjections?.CapturedBy,
+            },
+            {
+                name: "Objection Status",
+                value: selectedObjections?.ObjectionStatus,
+            },
+            {
+                name: "Status Reason",
+                value: selectedObjections?.ObjectionStatusReason,
+            },
+        ];
+    }
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -170,8 +209,27 @@ export const Adjudication = () => {
                     }
                 ></Toolbar>
             </div>
+            <Dialog
+                draggable={false}
+                header={<h4>Objection Details</h4>}
+                style={{ width: "75%", height: "75%" }}
+                modal
+                visible={showDialog}
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="Objection">
+                    <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                            <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
+                            <Column body={(e) => e.value}></Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+            </Dialog>
 
-            <AddObjections show={showAddObjectionForm} setShow={setShowAddObjectionForm} />
+           
 
             <DataTable
                 size="small"
@@ -200,10 +258,13 @@ export const Adjudication = () => {
                 <Column
                     field="actions"
                     header="Actions"
-                    body={() => (
+                    body={(e) => (
                         <>
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" onClick={(a) => {}} />
+                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" onClick={(a) => {
+                                    setShowDialog(true);
+                                    setSelectedObjections(e);
+                                }} />
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
                         </>
                     )}

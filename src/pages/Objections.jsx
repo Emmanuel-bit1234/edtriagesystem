@@ -11,18 +11,21 @@ import ObjectionsService from "../service/ObjectionsService";
 import AddObjections from "../componets/AddObjections";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Toast } from "primereact/toast";
+import { Dialog } from "primereact/dialog";
+import { TabPanel, TabView } from "primereact/tabview";
 
 export const Objections = () => {
     const toast = useRef(null);
     const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
+    const [showDialog, setShowDialog] = useState(false);
     var [objectionType, setObjectionType] = useState([]);
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
     var [objectionStatus, setObjectionStatus] = useState([]);
-    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState( "SELECT A STATUS");
-
+    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
     const [selectedObjections, setSelectedObjections] = useState(null);
+
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: {
@@ -71,6 +74,42 @@ export const Objections = () => {
         setGlobalFilterValue(value);
     };
 
+    function ObjectionDetails() {
+        return [
+            {
+                name: "Registration number",
+                value: selectedObjections?.RegistrationNumber
+            },
+            {
+                name: "Name",
+                value: selectedObjections?.ObjectionType,
+            },
+            {
+                name: "Date Lodged",
+                value: selectedObjections?.DateLodged,
+            },   
+            {
+                name: "Objection Description",
+                value: selectedObjections?.ObjectionDescription,
+            },
+            {
+                name: "Lodged By",
+                value: selectedObjections?.LodgedBy,
+            },      
+            {
+                name: "Captured By",
+                value: selectedObjections?.CapturedBy,
+            },
+            {
+                name: "Objection Status",
+                value: selectedObjections?.ObjectionStatus,
+            },
+            {
+                name: "Status Reason",
+                value: selectedObjections?.ObjectionStatusReason,
+            },
+        ];
+    }
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Objections</h5>
@@ -140,6 +179,25 @@ export const Objections = () => {
                     }
                 ></Toolbar>
             </div>
+            <Dialog
+                draggable={false}
+                header={<h4>Objection Details</h4>}
+                style={{ width: "75%", height: "75%" }}
+                modal
+                visible={showDialog}
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="Objection">
+                    <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                            <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
+                            <Column body={(e) => e.value}></Column>
+                        </DataTable>
+                    </TabPanel>
+                </TabView>
+            </Dialog>
 
             <AddObjections show={showAddObjectionForm} setShow={setShowAddObjectionForm} />
 
@@ -170,10 +228,24 @@ export const Objections = () => {
                 <Column
                     field="actions"
                     header="Actions"
-                    body={() => (
+                    body={(e) => (
                         <>
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" onClick={(a) => {}} />
+                            <Button
+                                style={{
+                                    textAlign: "center",
+                                    width: "30px",
+                                    height: "30px",
+                                }}
+                                icon={"pi pi-eye"}
+                                tooltipOptions={{ position: "top" }}
+                                className="p-button-primary p-button-rounded mr-2"
+                                tooltip="Click to View"
+                                onClick={(a) => {
+                                    setShowDialog(true);
+                                    setSelectedObjections(e);
+                                }}
+                            />
                             <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
                         </>
                     )}
