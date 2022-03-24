@@ -162,13 +162,13 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                         <TextInput type="Calendar" label="Date Lodged" value={form.DateLodged} onChange={(e) => setForm({ ...form, DateLodged: e.target.value })} />
                                     </div>
                                     <Toolbar
-                                        right={
-                                            <div>
-                                                <div className="col-12  lg:col-10">
-                                                    <TextInput placeholder="Enter the name" label="Lodged by - Name and ID Number" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
+                                        left={
+                                            <div className="grid">
+                                                <div className="col-12  lg:col-6">
+                                                    <TextInput placeholder="Enter the name" label="Lodged by - Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                                 </div>
-                                                <div className="col-12  lg:col-10">
-                                                    <TextInput placeholder="Enter the ID number" value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
+                                                <div className="col-12  lg:col-6">
+                                                    <TextInput placeholder="Enter the ID number" label="Lodged by - ID Number"  value={form.IDnumber} onChange={(e) => setForm({ ...form, IDnumber: e.target.value })} />
                                                 </div>
                                             </div>
                                         }

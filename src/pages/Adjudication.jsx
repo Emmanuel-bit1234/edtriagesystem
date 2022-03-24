@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -10,17 +10,16 @@ import DropDown from "../componets/DropDown";
 import ObjectionsService from "../service/ObjectionsService";
 import AddObjections from "../componets/AddObjections";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { Toast } from "primereact/toast";
 
-export const Objections = () => {
-    const toast = useRef(null);
+export const Adjudication = () => {
     const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
+    var [objectionStatus, setObjectionStatus] = useState([]);
     let [data, setData] = useState([]);
     var [objectionType, setObjectionType] = useState([]);
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
-    var [objectionStatus, setObjectionStatus] = useState([]);
-    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState( "SELECT A STATUS");
+    var [SelectedObjectionType, setselectedObjectionType] = useState();
+    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
 
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
@@ -42,7 +41,7 @@ export const Objections = () => {
     }, []);
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
-        setselectedObjectionTypeID(e.value.ObjectionTypeID);
+        setselectedObjectionType(e.value);
         var id = e.value?.ObjectionTypeID ? e.value?.ObjectionTypeID : null;
         if (id == null) return setData([]);
         objectionsService.getObjectionsByTypeStatusAndEvent(id).then((e) => {
@@ -62,6 +61,9 @@ export const Objections = () => {
     }
     var [form, setForm] = useState({
         ObjectionType: "SELECT A TYPE",
+        ObjectionStatus: "SELECT A STATUS",
+        Event: "SELECT AN EVENT",
+        EventGroup: "SELECT AN EVENT GROUP",
     });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
@@ -88,32 +90,29 @@ export const Objections = () => {
     }
     return (
         <div className="card  p-align-stretch vertical-container">
-            <Toast ref={toast} />
             <div className="">
                 <Toolbar
                     className="mb-4"
                     left={
                         <div>
                             <div className="grid">
-                                <div className="col-12  lg:col-6">
+                                <div className="col-12  lg:col-3">
                                     <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
-                                <div className="col-12  lg:col-6">
+                                <div className="col-12  lg:col-3">
                                     <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
-                            </div>
-                        </div>
-                    }
-                    right={
-                        <div>
-                            <div className="">
-                                <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
-                                <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label="Event Group " value={form.Event} />
+                                </div>
+                                <div className="col-12  lg:col-3">
+                                    <DropDown label="Event " value={form.EventGroup} />
+                                </div>
                             </div>
                         </div>
                     }
                 ></Toolbar>
-                {/* <Toolbar
+                <Toolbar
                     className="mb-4"
                     left={
                         <div>
@@ -121,14 +120,6 @@ export const Objections = () => {
                                 <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
                                 <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
                             </div>
-                        </div>
-                    }
-                ></Toolbar> */}
-                <Toolbar
-                    className="mb-4"
-                    left={
-                        <div>
-                            <Button className="p-button-success mr-2" icon="pi pi-plus" label="Add Objection" onClick={(e) => setShowAddObjectionForm(true)} />
                         </div>
                     }
                     right={

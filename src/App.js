@@ -22,6 +22,7 @@ import { VoterData } from "./pages/VoterData";
 import { Objections } from "./pages/Objections";
 import { DelimitationManagement } from "./pages/DelimitationManagement";
 import { PoliticalPartyReports } from "./pages/PoliticalPartyReports";
+import {Adjudication} from "./pages/Adjudication";
 
 import PrimeReact from "primereact/api";
 import { Tooltip } from "primereact/tooltip";
@@ -223,12 +224,24 @@ const App = () => {
                             icon: "pi pi-fw pi-bookmark",
                             to: "/voter-audit-history",
                         },
+                    ],
+                },
+                {
+                    label: "Objection Management",
+                    icon: "pi pi-fw pi-database",
+                    items:
+                    [
                         {
                             label: "Objections",
                             icon: "pi pi-fw pi-bookmark",
                             to: "/objections",
                         },
-                    ],
+                        {
+                            label: "Adjudication",
+                            icon: "pi pi-fw pi-bookmark",
+                            to: "/adjudication",
+                        },
+                    ]
                 },
                 {
                     label: "Candidate Management",
@@ -324,6 +337,7 @@ const App = () => {
                             <Route path="/candidate-reports" component={CandidateReports} />
                             <Route path="/event" component={Events} />
                             <Route path="/event-group" component={EventGroup} />
+                            <Route path="/adjudication" component={Adjudication} />
                         </div>
                     </div>
                 </>

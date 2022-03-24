@@ -82,6 +82,7 @@ export const Events = () => {
     function submitByElection() {
         form2.EventGroupID = form.eventGroup.EventGroupID;
         form2.SelectedParentEvent = selectedEvents?.EventID;
+        console.log(selectedEvents.EventDate_s)
         var newForm = {};
         Object.keys(form2).map((key) => {
             newForm[key] = form2[key];
