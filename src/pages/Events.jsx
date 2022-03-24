@@ -95,6 +95,16 @@ export const Events = () => {
                 error = true;
             }
         });
+        const date1 = new Date(selectedEvents.EventDate_s)
+        const date2 = new Date(newForm["EventDate"]);
+        const diffTime = date2 - date1;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays <= 0) {
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "Invalid date, the date of the By-Election should be at least a day after the Event", life: 5000 });
+            return false;
+        }
+        console.log(diffDays + " days");
+        console.log(new Date);
         console.log(newForm);
         if (error == true) {
             toast.current.show({
