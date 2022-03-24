@@ -47,7 +47,6 @@ export const Objections = () => {
         if (id == null) return setData([]);
         objectionsService.getObjectionsByTypeStatusAndEvent(id).then((e) => {
             setData(e);
-            setselectedObjectionStatus("SELECT A STATUS");
         });
     }
     function objectionStatusHandler(e) {

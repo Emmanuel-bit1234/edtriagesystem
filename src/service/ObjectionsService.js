@@ -14,8 +14,8 @@ export default function ObjectionsService() {
     var url = `${NET_IP}/DataInspection/GetObjectionsByRegistrationNo?regNo=${ID}`
     return axios.get(url).then((response) => response.data.Objections)
   };
-  this.getObjectionsByTypeStatusAndEvent = (id1,id2) => {
-    var url = `${NET_IP}/DataInspection/GetObjections?ObjectionTypeID=${id1}&ObjectionStatusID=${id2}&EventID=null`
+  this.getObjectionsByTypeStatusAndEvent = (id1,id2,id3) => {
+    var url = `${NET_IP}/DataInspection/GetObjections?ObjectionTypeID=${id1}&ObjectionStatusID=${id2}&EventID=${id3}`
     return axios.get(url).then((response) => response.data.Objections)
   };
   this.createObjection = (data) => {
