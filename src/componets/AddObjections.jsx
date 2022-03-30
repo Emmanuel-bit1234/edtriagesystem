@@ -52,6 +52,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         ObjectionReason: "Testing",
         Name: "",
         IDnumber: "",
+        Description: "",
         DateLodged: "",
         RegistrationNumber: "",
         SelectedObjectionType: null,
@@ -96,8 +97,8 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         delete newForm.IDnumber;
         delete newForm.event;
         newForm.LodgedBy = LodgedBy;
-        console.log(4444, newForm);
-        if (error == true) {
+        if (form.RegistrationNumber == "" || SelectedObjectionType == "" || form.Description == "" || form.Comment == "" || form.Name == "" || form.IDnumber == "")
+        {
             toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
             return false;
         }
