@@ -13,18 +13,28 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
+import EventGroupService from "../service/EventGroupService";
+import EventService from "../service/EventServices";
 
 export const Objections = () => {
     const toast = useRef(null);
+    var eventGroupService = new EventGroupService();
+    var [eventGroup, setEventGroup] = useState([]);
+    let [event, setEvent] = useState([]);
+    var [selectedEvent, setSelectedEvent] = useState("Select an Event");
     const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
     var [objectionType, setObjectionType] = useState([]);
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
-    var [objectionStatus, setObjectionStatus] = useState([]);
-    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
-    const [selectedObjections, setSelectedObjections] = useState(null);
+    var [objectionStatus, setObjectionStatus] = useState("");
+    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("Select a status");
+    const [selectedObjections, setSelectedObjections] = useState("");
+    var [eventgroupHolder, setEvenGroupHolder] = useState({
+        eventGroup: "Select an Event group",
+    });
+    var eventService = new EventService();
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -42,28 +52,20 @@ export const Objections = () => {
         objectionStatusService.getAllObjectionStatuses().then((data) => {
             setObjectionStatus(data);
         });
+        eventGroupService.getAllEventGroups().then((data) => {
+            setEventGroup(data);
+        });
     }, []);
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
         setselectedObjectionTypeID(e.value.ObjectionTypeID);
-        var id = e.value?.ObjectionTypeID ? e.value?.ObjectionTypeID : null;
-        if (id == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id).then((e) => {
-            setData(e);
-        });
     }
     function objectionStatusHandler(e) {
         setForm({ ...form, ObjectionStatus: e.value });
         setselectedObjectionStatus(e.value);
-        var id1 = SelectedObjectionTypeID;
-        var id2 = e.value?.StatusID ? e.value?.StatusID : null;
-        if (id2 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
-            setData(e);
-        });
     }
     var [form, setForm] = useState({
-        ObjectionType: "SELECT A TYPE",
+        ObjectionType: "Select a Type",
     });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
@@ -73,12 +75,34 @@ export const Objections = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
-
+    function eventGroupHandler(e) {
+        setEvenGroupHolder({ ...eventgroupHolder, eventGroup: e.value.Name });
+        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+        if (id == null) return setEvent([]);
+        eventService.getAllEvents(id).then((data) => {
+            setEvent(data);
+            setSelectedEvent("Select an Event");
+        });
+    }
+    function searchHandler(e){
+        var id1 = SelectedObjectionTypeID ? SelectedObjectionTypeID : null;
+        var id2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
+        var id3 = selectedEvent?.EventID ? selectedEvent?.EventID : null;
+        console.log(id1,id2,id3)
+        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
+            setData(e);
+        });
+    }
+    function eventHandler(e) {
+        setForm({ ...form, event: e.value.Name });
+        setSelectedEvent(e.value);
+       
+    }
     function ObjectionDetails() {
         return [
             {
                 name: "Registration number",
-                value: selectedObjections?.RegistrationNumber
+                value: selectedObjections?.RegistrationNumber,
             },
             {
                 name: "Name",
@@ -87,7 +111,7 @@ export const Objections = () => {
             {
                 name: "Date Lodged",
                 value: selectedObjections?.DateLodged,
-            },   
+            },
             {
                 name: "Objection Description",
                 value: selectedObjections?.ObjectionDescription,
@@ -95,7 +119,7 @@ export const Objections = () => {
             {
                 name: "Lodged By",
                 value: selectedObjections?.LodgedBy,
-            },      
+            },
             {
                 name: "Captured By",
                 value: selectedObjections?.CapturedBy,
@@ -133,25 +157,35 @@ export const Objections = () => {
                     left={
                         <div>
                             <div className="grid">
-                                <div className="col-12  lg:col-6">
-                                    <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
+                                <div className="col-12  lg:col-2">
+                                    <DropDown style={{maxWidth: 300}} label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
-                                <div className="col-12  lg:col-6">
-                                    <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
+                                <div className="col-12  lg:col-2">
+                                    <DropDown style={{maxWidth: 300}} label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
+                                <div className="col-12  lg:col-2">
+                                    <DropDown style={{maxWidth: 300}} label="Event Group " optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
+                                </div>
+                                <div className="col-12  lg:col-2">
+                                    <DropDown style={{maxWidth: 300}} label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
+                                </div>
+                                <div className="col-12  lg:col-4">
+                                <div style={{ visibility: "hidden"}}>Search</div>
+                                <Button onClick={searchHandler} className="p-button-success ml-12" label="Search"></Button>
                             </div>
+                            </div>  
                         </div>
                     }
-                    right={
-                        <div>
-                            <div className="">
-                                <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
-                                <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
-                            </div>
-                        </div>
-                    }
+                    // right={
+                    //     <div>
+                    //         <div className="">
+                    //             <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
+                    //             <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
+                    //         </div>
+                    //     </div>
+                    // }
                 ></Toolbar>
-                {/* <Toolbar
+                <Toolbar
                     className="mb-4"
                     left={
                         <div>
@@ -161,7 +195,7 @@ export const Objections = () => {
                             </div>
                         </div>
                     }
-                ></Toolbar> */}
+                ></Toolbar>
                 <Toolbar
                     className="mb-4"
                     left={
@@ -191,7 +225,7 @@ export const Objections = () => {
             >
                 <TabView>
                     <TabPanel header="Objection">
-                    <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                        <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
@@ -230,7 +264,7 @@ export const Objections = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
+                            {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" /> */}
                             <Button
                                 style={{
                                     textAlign: "center",
@@ -246,7 +280,7 @@ export const Objections = () => {
                                     setSelectedObjections(e);
                                 }}
                             />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
+                            {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" /> */}
                         </>
                     )}
                 ></Column>

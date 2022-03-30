@@ -11,23 +11,23 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
     var [form, setForm] = useState({
         Name: "",
         Description: "",
-        EventDate: "",
+        // EventDate: "",
         Status: 1,
         StatusReason: null,
         Events: null,
     });
 
-    function formatDate(date) {
-        var d = new Date(date),
-            month = "" + (d.getMonth() + 1),
-            day = "" + d.getDate(),
-            year = d.getFullYear();
+    // function formatDate(date) {
+    //     var d = new Date(date),
+    //         month = "" + (d.getMonth() + 1),
+    //         day = "" + d.getDate(),
+    //         year = d.getFullYear();
 
-        if (month.length < 2) month = "0" + month;
-        if (day.length < 2) day = "0" + day;
+    //     if (month.length < 2) month = "0" + month;
+    //     if (day.length < 2) day = "0" + day;
 
-        return [year, month, day].join("-");
-    }
+    //     return [year, month, day].join("-");
+    // }
 
     var submittedForm = false;
 
@@ -36,7 +36,7 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
         });
-        newForm["EventDate"] = formatDate(form.EventDate) + " 00:00";
+        // newForm["EventDate"] = formatDate(form.EventDate) + " 00:00";
         var error = false;
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
@@ -44,16 +44,16 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
                 error = true;
             }
         });
-        console.log(newForm);
-        const date1 = new Date();
-        const date2 = new Date(newForm["EventDate"]);
-        const diffTime = date2 - date1;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        console.log(diffDays + " days");
-        if (diffDays < 0) {
-            toast.current.show({ severity: "error", summary: "Error Message", detail: "Invalid date, past dates cannot be selected", life: 3000 });
-            return false;
-        }
+        // console.log(newForm);
+        // const date1 = new Date();
+        // const date2 = new Date(newForm["EventDate"]);
+        // const diffTime = date2 - date1;
+        // const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // console.log(diffDays + " days");
+        // if (diffDays < 0) {
+        //     toast.current.show({ severity: "error", summary: "Error Message", detail: "Invalid date, past dates cannot be selected", life: 3000 });
+        //     return false;
+        // }
         if (error == true) {
             toast.current.show({
                 severity: "error",
@@ -119,16 +119,16 @@ export default function AddEventGroup({ buttonName = "Save", buttonIcon = "pi pi
                         <TabView onTabChange={(e) => (e.index = pageIndex)} activeIndex={pageIndex}>
                             <TabPanel header="Event Group Details" disabled={pageIndex == 0 ? false : true}>
                                 <div className="grid">
-                                    <div className="col-12  lg:col-4">
+                                    <div className="col-12  lg:col-6">
                                         <TextInput label="Event Group Name" value={form.Name} onChange={(e) => setForm({ ...form, Name: e.target.value })} />
                                     </div>
 
-                                    <div className="col-12  lg:col-4">
+                                    <div className="col-12  lg:col-6">
                                         <TextInput label="Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
                                     </div>
-                                    <div className="col-12  lg:col-4">
+                                    {/* <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="EventDate" value={form.EventDate} onChange={(e) => setForm({ ...form, EventDate: e.target.value })} />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </TabPanel>
                         </TabView>

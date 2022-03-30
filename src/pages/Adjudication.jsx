@@ -8,16 +8,16 @@ import { Toolbar } from "primereact/toolbar";
 import { InputText } from "primereact/inputtext";
 import DropDown from "../componets/DropDown";
 import ObjectionsService from "../service/ObjectionsService";
-import AddObjections from "../componets/AddObjections";
+// import AddObjections from "../componets/AddObjections";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import EventGroupService from "../service/EventGroupService";
-import EventService from "../service/EventServices";
+// import EventGroupService from "../service/EventGroupService";
+// import EventService from "../service/EventServices";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 
 export const Adjudication = () => {
-    var eventGroupService = new EventGroupService();
-    const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
+    // var eventGroupService = new EventGroupService();
+    // const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     var [objectionStatus, setObjectionStatus] = useState([]);
     let [data, setData] = useState([]);
@@ -25,10 +25,10 @@ export const Adjudication = () => {
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
     var [SelectedObjectionType, setselectedObjectionType] = useState();
     var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
-    var [eventGroup, setEventGroup] = useState([]);
-    let [event, setEvent] = useState([]);
+    // var [eventGroup, setEventGroup] = useState([]);
+    // let [event, setEvent] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
-    var [selectedEvent, setSelectedEvent] = useState("SELECT AN EVENT");
+    // var [selectedEvent, setSelectedEvent] = useState("SELECT AN EVENT");
 
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
@@ -38,19 +38,19 @@ export const Adjudication = () => {
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
     });
-    var [eventgroupHolder, setEvenGroupHolder] = useState({
-        eventGroup: "SELECT AN EVENT GROUP",
-    });
-    var eventService = new EventService();
-    function eventGroupHandler(e) {
-        setEvenGroupHolder({ ...eventgroupHolder, eventGroup: e.value.Name });
-        var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
-        if (id == null) return setEvent([]);
-        eventService.getAllEvents(id).then((data) => {
-            setEvent(data);
-            setSelectedEvent("SELECT AN EVENT")
-        });
-    }
+    // var [eventgroupHolder, setEvenGroupHolder] = useState({
+    //     eventGroup: "SELECT AN EVENT GROUP",
+    // });
+    // var eventService = new EventService();
+    // function eventGroupHandler(e) {
+    //     setEvenGroupHolder({ ...eventgroupHolder, eventGroup: e.value.Name });
+    //     var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
+    //     if (id == null) return setEvent([]);
+    //     eventService.getAllEvents(id).then((data) => {
+    //         setEvent(data);
+    //         setSelectedEvent("SELECT AN EVENT")
+    //     });
+    // }
     var objectionTypeService = new ObjectionsService();
     var objectionStatusService = new ObjectionsService();
     useEffect(() => {
@@ -60,21 +60,18 @@ export const Adjudication = () => {
         objectionStatusService.getAllObjectionStatuses().then((data) => {
             setObjectionStatus(data);
         });
-        eventGroupService.getAllEventGroups().then((data) => {
-            setEventGroup(data);
-        });
+        // eventGroupService.getAllEventGroups().then((data) => {
+        //     setEventGroup(data);
+        // });
     }, []);
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
         setselectedObjectionTypeID(e.value.ObjectionTypeID);
         var id1 = e.value?.ObjectionTypeID ? e.value?.ObjectionTypeID : null;
         var id2 = SelectedObjectionStatus.StatusID;
-        var id3 = selectedEvent.EventID;
-        console.log("Selected type", id1)
-        console.log("Selected Status", id2)
-        console.log("Selected Event", id3)
+        // var id3 = selectedEvent.EventID;
         if (id1 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
+        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
             setData(e);
         });
     }
@@ -83,23 +80,23 @@ export const Adjudication = () => {
         setselectedObjectionStatus(e.value);
         var id1 = SelectedObjectionTypeID;
         var id2 = e.value?.StatusID ? e.value?.StatusID : null;
-        var id3 = selectedEvent.EventID;
+        // var id3 = selectedEvent.EventID;
         if (id2 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
+        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
             setData(e);
         });
     }
-    function eventHandler(e) {
-        setForm({ ...form, event: e.value.Name });
-        setSelectedEvent(e.value);
-        var id1 = SelectedObjectionTypeID;
-        var id2 = SelectedObjectionStatus?.StatusID
-        var id3 = e.value?.EventID ? e.value?.EventID : null;
-        if (id3 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
-            setData(e);
-        });
-    }
+    // function eventHandler(e) {
+    //     setForm({ ...form, event: e.value.Name });
+    //     setSelectedEvent(e.value);
+    //     var id1 = SelectedObjectionTypeID;
+    //     var id2 = SelectedObjectionStatus?.StatusID
+    //     var id3 = e.value?.EventID ? e.value?.EventID : null;
+    //     if (id3 == null) return setData([]);
+    //     objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
+    //         setData(e);
+    //     });
+    // }
     var [form, setForm] = useState({
         ObjectionType: "SELECT A TYPE",
         ObjectionStatus: "SELECT A STATUS",
@@ -173,18 +170,18 @@ export const Adjudication = () => {
                     left={
                         <div>
                             <div className="grid">
-                                <div className="col-12  lg:col-3">
+                                <div className="col-12  lg:col-6">
                                     <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
-                                <div className="col-12  lg:col-3">
+                                <div className="col-12  lg:col-6">
                                     <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
-                                <div className="col-12  lg:col-3">
+                                {/* <div className="col-12  lg:col-3">
                                     <DropDown label="Event Group " optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
                                 </div>
                                 <div className="col-12  lg:col-3">
                                     <DropDown label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     }
