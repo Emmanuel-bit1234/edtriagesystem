@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -8,16 +8,12 @@ import { Toolbar } from "primereact/toolbar";
 import { InputText } from "primereact/inputtext";
 import DropDown from "../componets/DropDown";
 import ObjectionsService from "../service/ObjectionsService";
-// import AddObjections from "../componets/AddObjections";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-// import EventGroupService from "../service/EventGroupService";
-// import EventService from "../service/EventServices";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Toast } from "primereact/toast";
 
 export const Adjudication = () => {
-    // var eventGroupService = new EventGroupService();
-    // const [showAddObjectionForm, setShowAddObjectionForm] = useState(false);
     const [objectionNumber, setObjectionNumber] = useState("");
     var [objectionStatus, setObjectionStatus] = useState([]);
     let [data, setData] = useState([]);
@@ -25,11 +21,10 @@ export const Adjudication = () => {
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
     var [SelectedObjectionType, setselectedObjectionType] = useState();
     var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
-    // var [eventGroup, setEventGroup] = useState([]);
-    // let [event, setEvent] = useState([]);
+    var [SelectedObjectionStatusForAdjuducate, setSelectedObjectionStatusForAdjuducate] = useState("Select a status");
     const [showDialog, setShowDialog] = useState(false);
-    // var [selectedEvent, setSelectedEvent] = useState("SELECT AN EVENT");
-
+    const [showAdjudicateObjection, setshowAdjudicateObjection] = useState(false);
+    const toast = useRef(null);
     const [selectedObjections, setSelectedObjections] = useState(null);
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -38,19 +33,6 @@ export const Adjudication = () => {
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
     });
-    // var [eventgroupHolder, setEvenGroupHolder] = useState({
-    //     eventGroup: "SELECT AN EVENT GROUP",
-    // });
-    // var eventService = new EventService();
-    // function eventGroupHandler(e) {
-    //     setEvenGroupHolder({ ...eventgroupHolder, eventGroup: e.value.Name });
-    //     var id = e.value?.EventGroupID ? e.value.EventGroupID : null;
-    //     if (id == null) return setEvent([]);
-    //     eventService.getAllEvents(id).then((data) => {
-    //         setEvent(data);
-    //         setSelectedEvent("SELECT AN EVENT")
-    //     });
-    // }
     var objectionTypeService = new ObjectionsService();
     var objectionStatusService = new ObjectionsService();
     useEffect(() => {
@@ -60,49 +42,30 @@ export const Adjudication = () => {
         objectionStatusService.getAllObjectionStatuses().then((data) => {
             setObjectionStatus(data);
         });
-        // eventGroupService.getAllEventGroups().then((data) => {
-        //     setEventGroup(data);
-        // });
     }, []);
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
         setselectedObjectionTypeID(e.value.ObjectionTypeID);
-        var id1 = e.value?.ObjectionTypeID ? e.value?.ObjectionTypeID : null;
-        var id2 = SelectedObjectionStatus.StatusID;
-        // var id3 = selectedEvent.EventID;
-        if (id1 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
-            setData(e);
-        });
     }
     function objectionStatusHandler(e) {
         setForm({ ...form, ObjectionStatus: e.value });
         setselectedObjectionStatus(e.value);
-        var id1 = SelectedObjectionTypeID;
-        var id2 = e.value?.StatusID ? e.value?.StatusID : null;
-        // var id3 = selectedEvent.EventID;
-        if (id2 == null) return setData([]);
-        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
-            setData(e);
-        });
     }
-    // function eventHandler(e) {
-    //     setForm({ ...form, event: e.value.Name });
-    //     setSelectedEvent(e.value);
-    //     var id1 = SelectedObjectionTypeID;
-    //     var id2 = SelectedObjectionStatus?.StatusID
-    //     var id3 = e.value?.EventID ? e.value?.EventID : null;
-    //     if (id3 == null) return setData([]);
-    //     objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
-    //         setData(e);
-    //     });
-    // }
+
+    function objStatusHandler(e) {
+        setadjForm({ ...adjForm, ObjectionStatusID: e.value.StatusID });
+        setSelectedObjectionStatusForAdjuducate(e.value);
+    }
     var [form, setForm] = useState({
         ObjectionType: "SELECT A TYPE",
         ObjectionStatus: "SELECT A STATUS",
         Event: "SELECT AN EVENT",
         EventGroup: "SELECT AN EVENT GROUP",
     });
+    var [adjForm, setadjForm] = useState({
+        ObjectionStatusID: "",
+        StatusReason: "",
+    })
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
@@ -111,11 +74,48 @@ export const Adjudication = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
+    function searchHandler(e) {
+        var id1 = SelectedObjectionTypeID ? SelectedObjectionTypeID : null;
+        var id2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
+        objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
+            setData(e);
+        });
+    }
+    function submitAdjudication(){
+
+        var id1 = selectedObjections?.ObjectionID;
+        var id2 = adjForm?.ObjectionStatusID;
+        var reason = adjForm?.StatusReason;
+        if (reason == "" || adjForm?.ObjectionStatusID == "")
+        {
+            return toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "The Status Reason and Objection Status cannot be empty ",
+                life: 2000,
+            });
+        }
+        objectionsService.adjudicateObjection(id1,id2,reason).then((e) => {
+            var i1 = SelectedObjectionTypeID ? SelectedObjectionTypeID : null;
+            var i2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
+            objectionsService.getObjectionsByTypeStatusAndEvent(i1, i2)
+            .then((e) => {
+                setData(e);
+                setshowAdjudicateObjection(false);
+                return toast.current.show({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: "Objecction adjudicated successfully",
+                    life: 2000,
+                });
+            })
+        })
+    }
     function ObjectionDetails() {
         return [
             {
                 name: "Registration number",
-                value: selectedObjections?.RegistrationNumber
+                value: selectedObjections?.RegistrationNumber,
             },
             {
                 name: "Name",
@@ -124,7 +124,7 @@ export const Adjudication = () => {
             {
                 name: "Date Lodged",
                 value: selectedObjections?.DateLodged,
-            },   
+            },
             {
                 name: "Objection Description",
                 value: selectedObjections?.ObjectionDescription,
@@ -132,7 +132,7 @@ export const Adjudication = () => {
             {
                 name: "Lodged By",
                 value: selectedObjections?.LodgedBy,
-            },      
+            },
             {
                 name: "Captured By",
                 value: selectedObjections?.CapturedBy,
@@ -165,23 +165,22 @@ export const Adjudication = () => {
     return (
         <div className="card  p-align-stretch vertical-container">
             <div className="">
+            <Toast ref={toast} />
                 <Toolbar
                     className="mb-4"
                     left={
                         <div>
                             <div className="grid">
-                                <div className="col-12  lg:col-6">
+                                <div className="col-12  lg:col-4">
                                     <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
-                                <div className="col-12  lg:col-6">
+                                <div className="col-12  lg:col-4">
                                     <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
-                                {/* <div className="col-12  lg:col-3">
-                                    <DropDown label="Event Group " optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
+                                <div className="col-12  lg:col-4">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                    <Button onClick={searchHandler} className="p-button-success ml-12" label="Search"></Button>
                                 </div>
-                                <div className="col-12  lg:col-3">
-                                    <DropDown label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
-                                </div> */}
                             </div>
                         </div>
                     }
@@ -218,7 +217,7 @@ export const Adjudication = () => {
             >
                 <TabView>
                     <TabPanel header="Objection">
-                    <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                        <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
@@ -226,7 +225,42 @@ export const Adjudication = () => {
                 </TabView>
             </Dialog>
 
-           
+            <Dialog
+                draggable={false}
+                header="Adjudicate Objection"
+                footer={
+                    <>
+                        <Button label="Adjudicate" onClick={submitAdjudication} className="p-button-success" icon="pi pi-plus" type="submit" />
+                    </>
+                }
+                visible={showAdjudicateObjection}
+                style={{ width: "95%", height: "95%" }}
+                modal
+                onHide={(e) => {
+                    setshowAdjudicateObjection(false);
+                }}
+            >
+                <div className="grid">
+                    <div className="col-12  lg:col-4">
+                        <TextInput label="Registration Number" value={selectedObjections?.RegistrationNumber} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-4">
+                        <TextInput label="Lodged By" value={selectedObjections?.LodgedBy} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-4">
+                        <TextInput label="Description" value={selectedObjections?.Description} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-4">
+                        <TextInput label="Objection Type" value={selectedObjections?.ObjectionType} disabled={true} />
+                    </div>
+                    <div className="col-12  lg:col-4">
+                        <TextInput label=" Status Reason" value={adjForm.StatusReason} onChange={(e) => setadjForm({ ...adjForm, StatusReason: e.target.value })}  />
+                    </div>
+                    <div className="col-12  lg:col-4">
+                        <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objStatusHandler(e)} value={SelectedObjectionStatusForAdjuducate} options={objectionStatus} />
+                    </div>
+                </div>
+            </Dialog>
 
             <DataTable
                 size="small"
@@ -257,12 +291,28 @@ export const Adjudication = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-eye"} tooltipOptions={{ position: "top" }} className="p-button-primary p-button-rounded mr-2" tooltip="Click to View" onClick={(a) => {
+                            <Button
+                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                icon="pi pi-pencil"
+                                tooltip="Click to Adjudicate"
+                                className="p-button-rounded p-button-success mr-2"
+                                onClick={(a) => {
+                                    setshowAdjudicateObjection(true);
+                                    setSelectedObjections(e);
+                                }}
+                            />
+                            <Button
+                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                icon={"pi pi-eye"}
+                                tooltipOptions={{ position: "top" }}
+                                className="p-button-primary p-button-rounded mr-2"
+                                tooltip="Click to View"
+                                onClick={(a) => {
                                     setShowDialog(true);
                                     setSelectedObjections(e);
-                                }} />
-                            <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" />
+                                }}
+                            />
+                            {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" /> */}
                         </>
                     )}
                 ></Column>

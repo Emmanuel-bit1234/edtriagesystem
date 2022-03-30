@@ -27,6 +27,7 @@ export const Events = () => {
     const [objectionNumber, setObjectionNumber] = useState("");
     let [data, setData] = useState([]);
     let [ByElecData, setByElecData] = useState([]);
+    let [ActiveByElecData, setActiveByElecData] = useState([]);
     var [form, setForm] = useState({
         eventGroup: "SELECT AN EVENT GROUP",
         eventType: "SELECT AN EVENT TYPE",
@@ -55,9 +56,9 @@ export const Events = () => {
         });
     }
     function deActivateByelectionHandler() {
-        eventService.deActivateByElection(ByElecData[0]?.EventID).then((e) => {
-            eventService.getByElections(selectedEvents.EventID).then((data) => {
-                setByElecData(data);
+        eventService.deActivateByElection(ActiveByElecData[0]?.EventID).then((e) => {
+            eventService.getByElections(selectedEvents?.EventID).then((data) => {
+                setActiveByElecData(data);
                 return toast.current.show({
                     severity: "success",
                     summary: "Success Message",
@@ -152,9 +153,12 @@ export const Events = () => {
         });
     }, []);
     function byElectionHandler() {
-        eventService.getByElections(selectedEvents.EventID).then((data) => {
+        eventService.getByElections(selectedEvents?.EventID).then((data) => {
             setByElecData(data);
         });
+        eventService.getActiveByElections(selectedEvents?.EventID).then((data) => {
+            setActiveByElecData(data);
+        })
     }
 
     var getInput = (key, ev) => {
@@ -234,10 +238,10 @@ export const Events = () => {
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
                                 <div className="grid">
                                     <div className="col-12  lg:col-5">
-                                        <DropDown label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} style={{ width: "280px" }} className="ml-4" />
+                                        <DropDown style={{maxWidth: 300}} label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup}  className="ml-4" />
                                     </div>
                                     <div className="col-12  lg:col-5">
-                                        <DropDown label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} style={{ width: "280px" }} className="ml-4" />
+                                        <DropDown style={{maxWidth: 300}} label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} className="ml-4" />
                                     </div>
                                 </div>
                             </span>
@@ -290,11 +294,11 @@ export const Events = () => {
                         />
                     </TabPanel>
                     <TabPanel header="By-Elections">
-                        {ByElecData?.length > 0 && ByElecData[0]?.IsActive == 1 ? (
+                        {ActiveByElecData?.length > 0 && ActiveByElecData[0]?.IsActive == 1 ? (
                             <DataTable
                                 size="small"
                                 scrollable={true}
-                                value={ByElecData}
+                                value={ActiveByElecData}
                                 dataKey="id"
                                 rows={5}
                                 className="datatable-responsive"
@@ -381,7 +385,8 @@ export const Events = () => {
             >
                 <TabView>
                     <TabPanel header="Event Details">
-                        <DataTable size="small" scrollable={true} value={EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                        <DataTable size="small" scrollable={true} value={
+                            EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
