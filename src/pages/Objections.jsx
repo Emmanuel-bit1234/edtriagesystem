@@ -84,11 +84,11 @@ export const Objections = () => {
             setSelectedEvent("Select an Event");
         });
     }
-    function searchHandler(e){
+    function searchHandler(e) {
         var id1 = SelectedObjectionTypeID ? SelectedObjectionTypeID : null;
         var id2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
         var id3 = selectedEvent?.EventID ? selectedEvent?.EventID : null;
-        console.log(id1,id2,id3)
+        console.log(id1, id2, id3);
         objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2, id3).then((e) => {
             setData(e);
         });
@@ -96,7 +96,6 @@ export const Objections = () => {
     function eventHandler(e) {
         setForm({ ...form, event: e.value.Name });
         setSelectedEvent(e.value);
-       
     }
     function ObjectionDetails() {
         return [
@@ -134,11 +133,7 @@ export const Objections = () => {
             },
         ];
     }
-    const header = (
-        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Objections</h5>
-        </div>
-    );
+    const header = <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">{data?.length > 1 ? <h5 className="m-0">Objections - ({data?.length} Objections) </h5> : <h5 className="m-0">Objections - ({data?.length} Objection)</h5>}</div>;
 
     var objectionsService = new ObjectionsService();
     function submitForm() {
@@ -158,40 +153,28 @@ export const Objections = () => {
                         <div>
                             <div className="grid">
                                 <div className="col-12  lg:col-2">
-                                    <DropDown style={{maxWidth: 300}} label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
+                                    <DropDown style={{ maxWidth: 300 }} label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
                                 <div className="col-12  lg:col-2">
-                                    <DropDown style={{maxWidth: 300}} label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
+                                    <DropDown style={{ maxWidth: 300 }} label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
                                 <div className="col-12  lg:col-2">
-                                    <DropDown style={{maxWidth: 300}} label="Event Group " optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
+                                    <DropDown style={{ maxWidth: 300 }} label="Event Group " optionLabel="Name" onChange={(e) => eventGroupHandler(e)} options={eventGroup} value={eventgroupHolder.eventGroup} />
                                 </div>
                                 <div className="col-12  lg:col-2">
-                                    <DropDown style={{maxWidth: 300}} label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
+                                    <DropDown style={{ maxWidth: 300 }} label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
                                 </div>
-                                <div className="col-12  lg:col-4">
-                                <div style={{ visibility: "hidden"}}>Search</div>
-                                <Button onClick={searchHandler} className="p-button-success ml-12" label="Search"></Button>
-                            </div>
-                            </div>  
-                        </div>
-                    }
-                    // right={
-                    //     <div>
-                    //         <div className="">
-                    //             <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
-                    //             <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
-                    //         </div>
-                    //     </div>
-                    // }
-                ></Toolbar>
-                <Toolbar
-                    className="mb-4"
-                    left={
-                        <div>
-                            <div className="">
-                                <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
-                                <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
+                               
+                                    <div className="col-12  lg:col-2">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                        <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }} />
+                                        {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} /> */}
+                                    </div>
+                              
+                                <div className="col-12  lg:col-2">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                    <Button onClick={objectionNumber?.length > 11 ? submitForm : searchHandler} className="p-button-success ml-12" label="Search"></Button>
+                                </div>
                             </div>
                         </div>
                     }

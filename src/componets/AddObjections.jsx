@@ -10,6 +10,8 @@ import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 import ObjectionsService from "../service/ObjectionsService";
 import { Toolbar } from "primereact/toolbar";
+import InputTextArea from "./InputTextArea"
+
 
 export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     var eventGroupService = new EventGroupService();
@@ -45,6 +47,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     function eventHandler(e) {
         setForm({ ...form, event: e.value.Name });
         setSelectedEvent(e.value);
+        
     }
 
     var [form, setForm] = useState({
@@ -99,7 +102,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         newForm.LodgedBy = LodgedBy;
         if (form.RegistrationNumber == "" || SelectedObjectionType == "" || form.Description == "" || form.Comment == "" || form.Name == "" || form.IDnumber == "")
         {
-            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+            toast.current.show({ severity: "error", summary: "Error Message", detail: "Please fill the required fields", life: 3000 });
             return false;
         }
         var createdObjection = new ObjectionsService();
@@ -154,10 +157,10 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                         <DropDown label="Objection Type" optionLabel="Name" placeholder="Select objection type" options={objectionType} onChange={(e) => objectionTypeHandler(e)} value={SelectedObjectionType} style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Objection Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
+                                        <InputTextArea rows="2" cols="61" label="Objection Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <TextInput label="Comment" value={form.Comment} onChange={(e) => setForm({ ...form, Comment: e.target.value })} />
+                                        <InputTextArea rows="2" cols="61" label="Comment" value={form.Comment} onChange={(e) => setForm({ ...form, Comment: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="Date Lodged" value={form.DateLodged} onChange={(e) => setForm({ ...form, DateLodged: e.target.value })} />

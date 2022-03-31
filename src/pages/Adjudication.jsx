@@ -65,7 +65,7 @@ export const Adjudication = () => {
     var [adjForm, setadjForm] = useState({
         ObjectionStatusID: "",
         StatusReason: "",
-    })
+    });
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const onGlobalFilterChange = (e) => {
         const value = e.target.value;
@@ -81,13 +81,11 @@ export const Adjudication = () => {
             setData(e);
         });
     }
-    function submitAdjudication(){
-
+    function submitAdjudication() {
         var id1 = selectedObjections?.ObjectionID;
         var id2 = adjForm?.ObjectionStatusID;
         var reason = adjForm?.StatusReason;
-        if (reason == "" || adjForm?.ObjectionStatusID == "")
-        {
+        if (reason == "" || adjForm?.ObjectionStatusID == "") {
             return toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -95,11 +93,10 @@ export const Adjudication = () => {
                 life: 2000,
             });
         }
-        objectionsService.adjudicateObjection(id1,id2,reason).then((e) => {
+        objectionsService.adjudicateObjection(id1, id2, reason).then((e) => {
             var i1 = SelectedObjectionTypeID ? SelectedObjectionTypeID : null;
             var i2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
-            objectionsService.getObjectionsByTypeStatusAndEvent(i1, i2)
-            .then((e) => {
+            objectionsService.getObjectionsByTypeStatusAndEvent(i1, i2).then((e) => {
                 setData(e);
                 setshowAdjudicateObjection(false);
                 return toast.current.show({
@@ -108,8 +105,8 @@ export const Adjudication = () => {
                     detail: "Objecction adjudicated successfully",
                     life: 2000,
                 });
-            })
-        })
+            });
+        });
     }
     function ObjectionDetails() {
         return [
@@ -165,7 +162,7 @@ export const Adjudication = () => {
     return (
         <div className="card  p-align-stretch vertical-container">
             <div className="">
-            <Toast ref={toast} />
+                <Toast ref={toast} />
                 <Toolbar
                     className="mb-4"
                     left={
@@ -254,7 +251,7 @@ export const Adjudication = () => {
                         <TextInput label="Objection Type" value={selectedObjections?.ObjectionType} disabled={true} />
                     </div>
                     <div className="col-12  lg:col-4">
-                        <TextInput label=" Status Reason" value={adjForm.StatusReason} onChange={(e) => setadjForm({ ...adjForm, StatusReason: e.target.value })}  />
+                        <TextInput label=" Status Reason" value={adjForm.StatusReason} onChange={(e) => setadjForm({ ...adjForm, StatusReason: e.target.value })} />
                     </div>
                     <div className="col-12  lg:col-4">
                         <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objStatusHandler(e)} value={SelectedObjectionStatusForAdjuducate} options={objectionStatus} />
@@ -291,16 +288,21 @@ export const Adjudication = () => {
                     header="Actions"
                     body={(e) => (
                         <>
-                            <Button
-                                style={{ textAlign: "center", width: "30px", height: "30px" }}
-                                icon="pi pi-pencil"
-                                tooltip="Click to Adjudicate"
-                                className="p-button-rounded p-button-success mr-2"
-                                onClick={(a) => {
-                                    setshowAdjudicateObjection(true);
-                                    setSelectedObjections(e);
-                                }}
-                            />
+                            {e.ObjectionStatus == "Captured" ? (
+                                <Button
+                                    style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                    icon="pi pi-pencil"
+                                    tooltip="Click to Adjudicate"
+                                    className="p-button-rounded p-button-success mr-2"
+                                    onClick={(a) => {
+                                        setshowAdjudicateObjection(true);
+                                        setSelectedObjections(e);
+                                    }}
+                                />
+                            ) : (
+                                <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" tooltip="Click to Adjudicate" className="p-button-rounded p-button-success mr-2" />
+                            )}
+
                             <Button
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-eye"}
