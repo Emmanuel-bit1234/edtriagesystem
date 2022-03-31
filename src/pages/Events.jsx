@@ -263,7 +263,7 @@ export const Events = () => {
             </div>
             <Dialog
                 draggable={false}
-                header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
+                header={<span>{`Event Details - ${selectedEvents?.Name} `}</span>}
                 footer={<></>}
                 visible={showEditEvent}
                 style={{ width: "95%", height: "95%" }}
