@@ -249,7 +249,6 @@ export const EventGroup = () => {
                     body={(e) =>
                         parseInt(e.Status) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
-                    sortable
                 ></Column>
                 <Column
                     field="actions"

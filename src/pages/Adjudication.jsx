@@ -168,15 +168,21 @@ export const Adjudication = () => {
                     left={
                         <div>
                             <div className="grid">
-                                <div className="col-12  lg:col-4">
-                                    <DropDown label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
+                                <div className="col-12  lg:col-3">
+                                    <DropDown style={{ maxWidth: 300 }} label="Objection Type" optionLabel="Name" onChange={(e) => objectionTypeHandler(e)} options={objectionType} value={form.ObjectionType} />
                                 </div>
-                                <div className="col-12  lg:col-4">
-                                    <DropDown label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
+                                <div className="col-12  lg:col-3">
+                                    <DropDown style={{ maxWidth: 300 }} label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
-                                <div className="col-12  lg:col-4">
+                                <div className="col-12  lg:col-3">
                                     <div style={{ visibility: "hidden" }}>Search</div>
-                                    <Button onClick={searchHandler} className="p-button-success ml-12" label="Search"></Button>
+                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }}/>
+                                    {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />   */}
+                                </div>
+
+                                <div className="col-12  lg:col-3">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                    <Button onClick={objectionNumber?.length > 11 ? submitForm : searchHandler} className="p-button-success ml-12" label="Search"></Button>
                                 </div>
                             </div>
                         </div>
@@ -184,14 +190,6 @@ export const Adjudication = () => {
                 ></Toolbar>
                 <Toolbar
                     className="mb-4"
-                    left={
-                        <div>
-                            <div className="">
-                                <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "250px" }} />
-                                <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />
-                            </div>
-                        </div>
-                    }
                     right={
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">

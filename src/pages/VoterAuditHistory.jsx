@@ -219,11 +219,11 @@ export const VoterAuditHistory = () => {
 
   var searchCriteria = [
     {
-      name: 'Search By Id Number',
+      name: 'Id Number',
       val: 0,
     },
     {
-      name: 'Search By Registration Number',
+      name: 'Registration Number',
       val: 1,
     },
   ]
@@ -268,7 +268,7 @@ export const VoterAuditHistory = () => {
                     <i className="pi pi-search" />
                     <InputText
                       type="search"
-                      placeholder={selectedCriteria.name}
+                      placeholder="Search By"
                       value={idNumber}
                       onInput={(e) => setIdNumber(e.target.value)}
                       style={{ width: '280px' }}
