@@ -83,7 +83,7 @@ export const Events = () => {
     function submitByElection() {
         form2.EventGroupID = form.eventGroup.EventGroupID;
         form2.SelectedParentEvent = selectedEvents?.EventID;
-        console.log(selectedEvents.EventDate_s)
+        console.log(selectedEvents.EventDate_s);
         var newForm = {};
         Object.keys(form2).map((key) => {
             newForm[key] = form2[key];
@@ -96,7 +96,7 @@ export const Events = () => {
                 error = true;
             }
         });
-        const date1 = new Date(selectedEvents.EventDate_s)
+        const date1 = new Date(selectedEvents.EventDate_s);
         const date2 = new Date(newForm["EventDate"]);
         const diffTime = date2 - date1;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -105,7 +105,7 @@ export const Events = () => {
             return false;
         }
         console.log(diffDays + " days");
-        console.log(new Date);
+        console.log(new Date());
         console.log(newForm);
         if (error == true) {
             toast.current.show({
@@ -158,7 +158,7 @@ export const Events = () => {
         });
         eventService.getActiveByElections(selectedEvents?.EventID).then((data) => {
             setActiveByElecData(data);
-        })
+        });
     }
 
     var getInput = (key, ev) => {
@@ -238,10 +238,10 @@ export const Events = () => {
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
                                 <div className="grid">
                                     <div className="col-12  lg:col-5">
-                                        <DropDown style={{maxWidth: 300}} label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup}  className="ml-4" />
+                                        <DropDown style={{ maxWidth: 300 }} label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} className="ml-4" />
                                     </div>
                                     <div className="col-12  lg:col-5">
-                                        <DropDown style={{maxWidth: 300}} label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} className="ml-4" />
+                                        <DropDown style={{ maxWidth: 300 }} label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} className="ml-4" />
                                     </div>
                                 </div>
                             </span>
@@ -263,7 +263,7 @@ export const Events = () => {
             </div>
             <Dialog
                 draggable={false}
-                header={<h4>{`Event Details - ${selectedEvents?.Name} `}</h4>}
+                header={<span>{`Event Details - ${selectedEvents?.Name} `}</span>}
                 footer={<></>}
                 visible={showEditEvent}
                 style={{ width: "95%", height: "95%" }}
@@ -385,8 +385,7 @@ export const Events = () => {
             >
                 <TabView>
                     <TabPanel header="Event Details">
-                        <DataTable size="small" scrollable={true} value={
-                            EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                        <DataTable size="small" scrollable={true} value={EventDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
