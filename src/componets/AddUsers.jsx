@@ -16,6 +16,7 @@ import UsersService from "../service/UsersService";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
 import DelimitationServices from "../service/DelimitationServices";
+import { Accordion, AccordionTab } from "primereact/accordion";
 export default function AddUsers({ show = false, setShow }) {
     const toast = useRef(null);
 
@@ -26,6 +27,7 @@ export default function AddUsers({ show = false, setShow }) {
     var delimitationServices = new DelimitationServices();
     var [district, setDistrict] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState([]);
+    var [delimtation, setDelimtation] = useState({});
 
     var registrationService = new RegistrationCentreService();
     var [centre, setCentre] = useState([]);
@@ -115,11 +117,20 @@ export default function AddUsers({ show = false, setShow }) {
     function SubmitForm() {
         var groupIDs = [];
         var centerIDS = [];
+       
+        if (Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
+        else groupIDs.push([]);
 
-        if (selectedGroups != null && Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
-        else groupIDs.push(selectedGroups.id);
 
-        if (selectedCentre != null && Array.isArray(selectedCentre) == true) selectedCentre.map((centre) => centerIDS.push(centre.id));
+        if (delimtation != null) {
+            Object.keys(delimtation).map((name) => {
+                var all_centre = delimtation[name].centres;
+                console.log(all_centre);
+                all_centre.map((centre) => {
+                    centerIDS.push(centre.id);
+                });
+            });
+        }
 
         var newForm = {};
 
@@ -129,7 +140,7 @@ export default function AddUsers({ show = false, setShow }) {
 
         newForm["registrationCentreIds"] = centerIDS;
         newForm["sysGroupIds"] = groupIDs;
-        newForm["appointmentDate"] = formatDate(form.appointmentDate) + " 00:00";
+        newForm["appointmentDate"] = formatDate(form.dateOfBirth) + " 00:00";
         newForm["dateOfBirth"] = formatDate(form.dateOfBirth) + " 00:00";
 
         var error = false;
@@ -141,10 +152,10 @@ export default function AddUsers({ show = false, setShow }) {
             }
         });
 
-        if (error == true) {
-            toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
-            return false;
-        }
+        // if (error == true) {
+        //     toast.current.show({ severity: "error", summary: "Error Message", detail: "please fill the required fields", life: 3000 });
+        //     return false;
+        // }
 
         // console.log(newForm);
         // return false;
@@ -165,8 +176,64 @@ export default function AddUsers({ show = false, setShow }) {
             });
     }
 
+    function delimitationHandler() {
+        // console.log(selectedDistrict);
+        // console.log(selectedCentre);
+        delimtation[selectedDistrict?.id] = { centres: selectedCentre, district: selectedDistrict };
+
+        setDelimtation({ ...delimtation });
+        console.log(delimtation);
+
+        setSelectedCentre([]);
+        setSelectedDistrict(null);
+
+        toast.current.show({
+            severity: "success",
+            summary: "Success Message",
+            detail: selectedDistrict?.description + " Registration Centre's Added",
+            life: 3000,
+        });
+    }
+
+    function clearDelimitationHandler() {
+        setSelectedCentre([]);
+        setSelectedDistrict(null);
+        toast.current.show({
+            severity: "error",
+            summary: "Error Message",
+            detail: "centre list  is empty",
+            life: 3000,
+        });
+    }
+
+    function removeAccordionTabByid(id = "") {
+        toast.current.show({
+            severity: "error",
+            summary: "Error Message",
+            detail: "district removed from the list",
+            life: 3000,
+        });
+        delete delimtation[id];
+        delimtation = { ...delimtation };
+        setDelimtation(delimtation);
+    }
+
+    function setSelectedDistrictHandler(value) {
+        setSelectedDistrict(value);
+        var id = value?.id;
+        if (id in delimtation) {
+            var centres = delimtation[id].centres;
+            setSelectedCentre(centres);
+        } else {
+            setSelectedCentre(null);
+        }
+    }
+
+    
+
     return (
         <Dialog
+            draggable={false}
             header="Add User"
             footer={
                 <>
@@ -179,6 +246,15 @@ export default function AddUsers({ show = false, setShow }) {
                     )}
 
                     {pageIndex == 1 ? (
+                        <>
+                            <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
+                            <Button onClick={forwardPage} label="Next" icon="pi pi-forward" />
+                        </>
+                    ) : (
+                        ""
+                    )}
+
+                    {pageIndex == 2 ? (
                         <>
                             <Button onClick={backWardPage} className="mx-1" label="Back" icon="pi pi-backward" />
                             <Button label="Submit" onClick={SubmitForm} className="p-button-success" icon="pi pi-plus" type="submit" />
@@ -246,26 +322,102 @@ export default function AddUsers({ show = false, setShow }) {
                                 </div>
                             </TabPanel>
 
-                            <TabPanel header="Access Allocation" disabled={pageIndex == 2 ? false : true} activeIndex={pageIndex}>
-                                <div className="flex">
-                                    <div className="grid" style={{ flex: 1 }}>
-                                        <div className="col-12 lg:col-12">
-                                            <label>Select groups</label>
-                                            <Dropdown filter style={{ width: "100%" }} value={selectedGroups} options={groups} onChange={(e) => setSelecedGroups(e.value)} optionLabel="name" placeholder="Select groups" className="multiselect-custom" display="chip" />
-                                        </div>
-                                    </div>
-                                    <Divider layout="vertical" />
+                            <TabPanel header="User Group Allocation " disabled={pageIndex == 1 ? false : true} activeIndex={pageIndex}>
+                                <div className="grid" style={{ flex: 1 }}>
+                                    <div className="col-12 lg:col-12">
+                                        <label>Select groups</label>
+                                        <MultiSelect filter style={{ width: "100%" }} value={selectedGroups} options={groups} onChange={(e) => setSelecedGroups(e.value)} optionLabel="name" placeholder="Select groups" className="multiselect-custom" display="chip" />
 
-                                    <div className="grid" style={{ flex: 1 }}>
-                                        <div className="col-12 lg:col-12">
-                                            <label>District</label>
-                                            <Dropdown filter style={{ width: "100%" }} value={selectedDistrict} options={district} onChange={(e) => setSelectedDistrict(e.value)} optionLabel="name" placeholder="Select District" />
-                                        </div>
-                                        <div className="col-12 lg:col-12">
-                                            <label>Registration Centre</label>
-                                            <MultiSelect style={{ width: "100%" }} value={selectedCentre} options={centre} onChange={(e) => setSelectedCentre(e.value)} optionLabel="name" placeholder="Select Registration Centre" filter className="multiselect-custom" display="chip" />
-                                            {selectedCentre != null && selectedCentre?.length > 0 ? <OrderList value={selectedCentre} header="List of assigned Registration Centres" listStyle={{ height: "auto" }} dataKey="id" itemTemplate={(item) => item.name}></OrderList> : ""}
-                                        </div>
+                                        {selectedGroups != null && selectedGroups?.length > 0 ? (
+                                            <>
+                                                <OrderList value={selectedGroups} dataKey="id" itemTemplate={(item) => item.name}></OrderList>
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
+                                </div>
+                            </TabPanel>
+
+                            <TabPanel header="Registration Centre Allocation" disabled={pageIndex == 2 ? false : true} activeIndex={pageIndex}>
+                                <div className="grid">
+                                    <div className="col-12 lg:col-6">
+                                        <label>District</label>
+                                        <Dropdown filter style={{ width: "100%" }} value={selectedDistrict} options={district} onChange={(e) => setSelectedDistrictHandler(e.value)} optionLabel="name" placeholder="Select District" />
+                                    </div>
+                                    <div className="col-12 lg:col-6">
+                                        <label>Registration Centre</label>
+                                        <MultiSelect style={{ width: "100%" }} value={selectedCentre} options={centre} onChange={(e) => setSelectedCentre(e.value)} optionLabel="name" placeholder="Select Registration Centre" filter className="multiselect-custom" display="chip" />
+                                    </div>
+                                    <div className="col-12 lg:col-12">
+                                        {selectedCentre != null && selectedCentre?.length > 0 ? (
+                                            <>
+                                                <OrderList
+                                                    value={selectedCentre}
+                                                    header={
+                                                        <div className="flex flex-column md:flex-row md:align-items-center">
+                                                            <Button
+                                                                style={{ textAlign: "center", width: "35px", height: "35px", padding: 0 }}
+                                                                className="p-button-success p-button-sm  p-button-rounded  p-button-icon-only mr-2"
+                                                                icon="pi pi-plus"
+                                                                onClick={delimitationHandler}
+                                                                tooltipOptions={{ position: "top" }}
+                                                                tooltip="Click to Add"
+                                                            />
+                                                            <Button
+                                                                style={{ textAlign: "center", width: "35px", height: "35px" }}
+                                                                className="p-button-danger p-button-sm  p-button-rounded  p-button-icon-only mr-2"
+                                                                icon="pi pi-trash"
+                                                                onClick={clearDelimitationHandler}
+                                                                tooltipOptions={{ position: "top" }}
+                                                                tooltip="Click to Clear"
+                                                            />
+                                                            {selectedDistrict?.description} Registration Centres
+                                                        </div>
+                                                    }
+                                                    dataKey="id"
+                                                    itemTemplate={(item) => item.name}
+                                                ></OrderList>
+                                            </>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
+                                    <div className="col-12 lg:col-12">
+                                        {Object.keys(delimtation).length > 0 ? (
+                                            <h6 className="flex flex-column md:flex-row md:align-items-center">
+                                                <b>Registration Centres</b>
+                                            </h6>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <Accordion>
+                                            {Object.keys(delimtation).map((key, index) => {
+                                                var d = delimtation[key].district;
+                                                var centres = delimtation[key].centres;
+
+                                                return (
+                                                    <AccordionTab
+                                                        header={
+                                                            <span className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                                                <Button
+                                                                    onClick={(e) => removeAccordionTabByid(key)}
+                                                                    style={{ textAlign: "center", width: "35px", height: "35px" }}
+                                                                    className="p-button-danger p-button-sm  p-button-rounded  p-button-icon-only mr-5 ml-5"
+                                                                    icon="pi pi-trash"
+                                                                    tooltipOptions={{ position: "top" }}
+                                                                    tooltip="Click to Remove"
+                                                                />
+                                                                <div>{d?.description} Registration Centres</div>
+                                                            </span>
+                                                        }
+                                                        key={index}
+                                                    >
+                                                        <OrderList value={centres} dataKey="id" itemTemplate={(item) => item.name}></OrderList>
+                                                    </AccordionTab>
+                                                );
+                                            })}
+                                        </Accordion>
                                     </div>
                                 </div>
                             </TabPanel>

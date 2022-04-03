@@ -10,7 +10,6 @@ import { Toast } from "primereact/toast";
 import SysGroupService from "../service/SysGroupService";
 export default function AddUserGroup({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     const toast = useRef(null);
-
     var moduleService = new ModuleService();
     var [module, setModule] = useState([]);
     const [selectedModule, setselectedModule] = useState([]);

@@ -453,14 +453,14 @@ export const VoterAuditHistory = () => {
                     className="datatable-responsive"
                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Objections"
                     emptyMessage="No Objections."
-                    responsiveLayout="scroll"
-                    resizableColumns
-                    columnResizeMode="expand"
+                    // responsiveLayout="scroll"
+                    // resizableColumns
+                    // columnResizeMode="expand"
                     filterDisplay="menu"
                   >
+                    <Column field="DateLodged" header="Date Lodged"></Column>
                     <Column field="ObjectionType" header="Type"></Column>
                     <Column field="ObjectionStatus" header="Status"></Column>
-                    <Column field="DateLodged" header="Date Lodged"></Column>
                     <Column field="LodgedBy" header="Lodged By"></Column>
                     {/* <Column
                       field="DateRegistered"
