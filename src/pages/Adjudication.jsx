@@ -46,10 +46,12 @@ export const Adjudication = () => {
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
         setselectedObjectionTypeID(e.value.ObjectionTypeID);
+        setObjectionNumber("")
     }
     function objectionStatusHandler(e) {
         setForm({ ...form, ObjectionStatus: e.value });
         setselectedObjectionStatus(e.value);
+        setObjectionNumber("")
     }
 
     function objStatusHandler(e) {
@@ -79,6 +81,12 @@ export const Adjudication = () => {
         var id2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
         objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
             setData(e);
+        });
+    }
+    function onRegistrationHandler(){
+        setselectedObjectionStatus("Select a Status");
+        setForm({
+            ObjectionType: "Select a Type",
         });
     }
     function submitAdjudication() {
@@ -176,7 +184,7 @@ export const Adjudication = () => {
                                 </div>
                                 <div className="col-12  lg:col-3">
                                     <div style={{ visibility: "hidden" }}>Search</div>
-                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }}/>
+                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }}/>
                                     {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />   */}
                                 </div>
 
