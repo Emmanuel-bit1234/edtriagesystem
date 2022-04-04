@@ -153,12 +153,7 @@ export const Adjudication = () => {
         ];
     }
 
-    const header = (
-        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Objections</h5>
-        </div>
-    );
-
+    const header = <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">{data?.length > 1 ? <h5 className="m-0">Objections - ({data?.length} Objections) </h5> : <h5 className="m-0">Objections - ({data?.length} Objection)</h5>}</div>;
     var objectionsService = new ObjectionsService();
     function submitForm() {
         console.log(objectionNumber);
