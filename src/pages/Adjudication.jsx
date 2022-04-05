@@ -20,7 +20,7 @@ export const Adjudication = () => {
     var [objectionType, setObjectionType] = useState([]);
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
     var [SelectedObjectionType, setselectedObjectionType] = useState();
-    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
+    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("Select a Status");
     var [SelectedObjectionStatusForAdjuducate, setSelectedObjectionStatusForAdjuducate] = useState("Select a status");
     const [showDialog, setShowDialog] = useState(false);
     const [showAdjudicateObjection, setshowAdjudicateObjection] = useState(false);
@@ -59,10 +59,10 @@ export const Adjudication = () => {
         setSelectedObjectionStatusForAdjuducate(e.value);
     }
     var [form, setForm] = useState({
-        ObjectionType: "SELECT A TYPE",
-        ObjectionStatus: "SELECT A STATUS",
-        Event: "SELECT AN EVENT",
-        EventGroup: "SELECT AN EVENT GROUP",
+        ObjectionType: "Select a Type",
+        ObjectionStatus: "Select a Status",
+        Event: "Select an Event",
+        EventGroup: "Select an Event Group",
     });
     var [adjForm, setadjForm] = useState({
         ObjectionStatusID: "",
@@ -179,7 +179,7 @@ export const Adjudication = () => {
                                 </div>
                                 <div className="col-12  lg:col-4">
                                     <div style={{ visibility: "hidden" }}>Search</div>
-                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "100%" }}/>
+                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "90%" }}/>
                                     {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />   */}
                                 </div>
 

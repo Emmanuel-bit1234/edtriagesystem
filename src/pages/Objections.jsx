@@ -179,13 +179,13 @@ export const Objections = () => {
                                     <DropDown style={{ maxWidth: 300 }} label="Event" optionLabel="Name" onChange={(e) => eventHandler(e)} options={event} value={selectedEvent} placeholder="Select an Event" />
                                 </div>
                                
-                                    <div className="col-12  lg:col-2">
+                                    <div className="col-12  lg:col-3">
                                     <div style={{ visibility: "hidden" }}>Search</div>
-                                        <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }} />
+                                        <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "90%" }} />
                                         {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} /> */}
                                     </div>
                               
-                                <div className="col-12  lg:col-2">
+                                <div className="col-12  lg:col-1">
                                     <div style={{ visibility: "hidden" }}>Search</div>
                                     <Button onClick={objectionNumber?.length > 11 ? submitForm : searchHandler} className="p-button-success ml-12" label="Search"></Button>
                                 </div>
