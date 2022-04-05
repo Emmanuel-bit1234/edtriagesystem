@@ -154,7 +154,7 @@ export const Events = () => {
     }, []);
     function byElectionHandler() {
         eventService.getByElections(selectedEvents?.EventID).then((data) => {
-            setByElecData(data);
+            setByElecData(data.reverse());
         });
         eventService.getActiveByElections(selectedEvents?.EventID).then((data) => {
             setActiveByElecData(data);
