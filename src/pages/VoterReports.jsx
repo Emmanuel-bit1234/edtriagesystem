@@ -102,6 +102,7 @@ export const VoterReports = () => {
                                     </div>
 
                                     <div className="col-4">
+                                        <div style={{ visibility: "hidden" }}>View</div>
                                         <Button label="view" className="p-button-success ml-3" onClick={SubmitForm} />
                                     </div>
                                 </div>
