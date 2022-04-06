@@ -186,7 +186,7 @@ export const Users = () => {
             </div>
 
             {/* add users */}
-            <AddUsers show={showAddUserForm} setShow={setShowAddUserForm} />
+            <AddUsers show={showAddUserForm} setShow={setShowAddUserForm} setUserData={setUserData} />
             {/* <EditUser show={showEditUserForm} setShow={setShowEditUserForm} /> */}
             {/* end */}
 
@@ -259,7 +259,7 @@ export const Users = () => {
                                 tooltip="Click to View"
                             />
                             {e.user?.active === "Y" ? (
-                                <Button onClick={(a) => deActivateHandler(e.sysUser?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to De-Activate" />
+                                <Button onClick={(a) => deActivateHandler(e.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to De-Activate" />
                             ) : (
                                 <Button onClick={(a) => activateHandler(e.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-success p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to Activate" />
                             )}
