@@ -20,7 +20,7 @@ export const Adjudication = () => {
     var [objectionType, setObjectionType] = useState([]);
     var [SelectedObjectionTypeID, setselectedObjectionTypeID] = useState();
     var [SelectedObjectionType, setselectedObjectionType] = useState();
-    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("SELECT A STATUS");
+    var [SelectedObjectionStatus, setselectedObjectionStatus] = useState("Select a Status");
     var [SelectedObjectionStatusForAdjuducate, setSelectedObjectionStatusForAdjuducate] = useState("Select a status");
     const [showDialog, setShowDialog] = useState(false);
     const [showAdjudicateObjection, setshowAdjudicateObjection] = useState(false);
@@ -46,10 +46,12 @@ export const Adjudication = () => {
     function objectionTypeHandler(e) {
         setForm({ ...form, ObjectionType: e.value });
         setselectedObjectionTypeID(e.value.ObjectionTypeID);
+        setObjectionNumber("")
     }
     function objectionStatusHandler(e) {
         setForm({ ...form, ObjectionStatus: e.value });
         setselectedObjectionStatus(e.value);
+        setObjectionNumber("")
     }
 
     function objStatusHandler(e) {
@@ -57,10 +59,10 @@ export const Adjudication = () => {
         setSelectedObjectionStatusForAdjuducate(e.value);
     }
     var [form, setForm] = useState({
-        ObjectionType: "SELECT A TYPE",
-        ObjectionStatus: "SELECT A STATUS",
-        Event: "SELECT AN EVENT",
-        EventGroup: "SELECT AN EVENT GROUP",
+        ObjectionType: "Select a Type",
+        ObjectionStatus: "Select a Status",
+        Event: "Select an Event",
+        EventGroup: "Select an Event Group",
     });
     var [adjForm, setadjForm] = useState({
         ObjectionStatusID: "",
@@ -79,6 +81,12 @@ export const Adjudication = () => {
         var id2 = SelectedObjectionStatus?.StatusID ? SelectedObjectionStatus?.StatusID : null;
         objectionsService.getObjectionsByTypeStatusAndEvent(id1, id2).then((e) => {
             setData(e);
+        });
+    }
+    function onRegistrationHandler(){
+        setselectedObjectionStatus("Select a Status");
+        setForm({
+            ObjectionType: "Select a Type",
         });
     }
     function submitAdjudication() {
@@ -145,12 +153,7 @@ export const Adjudication = () => {
         ];
     }
 
-    const header = (
-        <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Objections</h5>
-        </div>
-    );
-
+    const header = <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">{data?.length > 1 ? <h5 className="m-0">Objections - ({data?.length} Objections) </h5> : <h5 className="m-0">Objections - ({data?.length} Objection)</h5>}</div>;
     var objectionsService = new ObjectionsService();
     function submitForm() {
         console.log(objectionNumber);
@@ -174,13 +177,13 @@ export const Adjudication = () => {
                                 <div className="col-12  lg:col-3">
                                     <DropDown style={{ maxWidth: 300 }} label="Objection Status" optionLabel="Name" onChange={(e) => objectionStatusHandler(e)} value={SelectedObjectionStatus} options={objectionStatus} />
                                 </div>
-                                <div className="col-12  lg:col-3">
+                                <div className="col-12  lg:col-4">
                                     <div style={{ visibility: "hidden" }}>Search</div>
-                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "200px" }}/>
+                                    <InputText type="search" placeholder="Search by Registration Number" value={objectionNumber} onChange ={onRegistrationHandler} onInput={(e) => setObjectionNumber(e.target.value)} style={{ width: "90%" }}/>
                                     {/* <Button className="p-button-success ml-4" label="Search" onClick={submitForm} />   */}
                                 </div>
 
-                                <div className="col-12  lg:col-3">
+                                <div className="col-12  lg:col-2">
                                     <div style={{ visibility: "hidden" }}>Search</div>
                                     <Button onClick={objectionNumber?.length > 11 ? submitForm : searchHandler} className="p-button-success ml-12" label="Search"></Button>
                                 </div>
