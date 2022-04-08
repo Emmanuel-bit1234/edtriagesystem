@@ -17,7 +17,9 @@ import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
 import DelimitationServices from "../service/DelimitationServices";
 import { Accordion, AccordionTab } from "primereact/accordion";
-export default function AddUsers({ show = false, setShow }) {
+
+var img = `data:image/png;base64,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`;
+export default function AddUsers({ show = false, setShow, setUserData }) {
     const toast = useRef(null);
 
     var sysGroupService = new SysGroupService();
@@ -83,11 +85,11 @@ export default function AddUsers({ show = false, setShow }) {
         createdBy: 3,
         registrationCentreIds: [],
         sysGroupIds: [],
-        auditUser: "auditUser",
-        staffPositionID: "",
+        auditUser: 1,
+        staffPositionID: 1,
         // staffTypeID: "",
         physicalAddress: "",
-        signatureImage: "signatureImage",
+        //signatureImage: img,
         appointmentDate: "",
         gender: "",
         contactNumber: "",
@@ -117,10 +119,9 @@ export default function AddUsers({ show = false, setShow }) {
     function SubmitForm() {
         var groupIDs = [];
         var centerIDS = [];
-       
+
         if (Array.isArray(selectedGroups) == true) selectedGroups.map((group) => groupIDs.push(group.id));
         else groupIDs.push([]);
-
 
         if (delimtation != null) {
             Object.keys(delimtation).map((name) => {
@@ -164,11 +165,14 @@ export default function AddUsers({ show = false, setShow }) {
         usersService
             .createUser(newForm)
             .then((res) => {
-                setTimeout(() => {
-                    window.location.reload();
+                submittedForm = true;
+                toast.current.show({ severity: "success", summary: "Success Message", detail: "User was added successfully", life: 2000 });
+                usersService.getAllUsers().then((data) => {
+                    console.log(data);
+                    setUserData(data);
                     submittedForm = true;
-                }, 2000);
-                return toast.current.show({ severity: "success", summary: "Success Message", detail: "User was added successfully", life: 2000 });
+                });
+                setShow(false);
             })
             .catch((e) => {
                 submittedForm = false;
@@ -228,8 +232,6 @@ export default function AddUsers({ show = false, setShow }) {
             setSelectedCentre(null);
         }
     }
-
-    
 
     return (
         <Dialog
