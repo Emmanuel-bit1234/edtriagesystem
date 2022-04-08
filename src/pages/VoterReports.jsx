@@ -8,6 +8,7 @@ import ReportService from "../service/ReportService";
 
 import Viewer, { Worker, defaultLayout } from "@phuocng/react-pdf-viewer";
 import "@phuocng/react-pdf-viewer/cjs/react-pdf-viewer.css";
+import { NET_IP } from "../config/Config";
 
 export const VoterReports = () => {
     const options = [
@@ -32,8 +33,9 @@ export const VoterReports = () => {
         var report = new ReportService();
         report
             .getReport({
-                district: selectedDistrict?.id == null ? "" : selectedDistrict.id,
-                reportID: 0,
+                district: selectedDistrict?.id == null ? null : selectedDistrict.id,
+                village: null,
+                reportID:0,
             })
             .then((res) => {
                 if (res?.status == true) {
@@ -121,7 +123,7 @@ export const VoterReports = () => {
                                 }
                             >
                                 {/* layout={layout} */}
-                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={"https://localhost:44317/report/preview"} />
+                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}/report/preview`} />
                             </div>
                         </Worker>
                     ) : (
