@@ -83,7 +83,7 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
                                     <div className="col-12  lg:col-4">
                                         <label htmlFor="description">Logo/Symbol</label>
                                         <React.Fragment>
-                                            <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} label="Choose file" chooseLabel="Choose file" />
+                                            <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} url="./upload" label="Choose file" chooseLabel="Choose file" />
                                         </React.Fragment>
                                     </div>
                                 </div>
