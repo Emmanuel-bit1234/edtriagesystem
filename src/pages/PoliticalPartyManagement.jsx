@@ -12,11 +12,11 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
+import { Image } from "primereact/image";
 
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
     const [showAddPartyForm, setShowAddPartyForm] = useState(false);
-    let [data, setData] = useState([]);
     const [showDialog, setShowDialog] = useState(false);
     const [selectedObjections, setSelectedObjections] = useState("");
 
@@ -35,6 +35,60 @@ export const PoliticalPartyManagement = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
+    let [data, setData] = useState([
+        {
+            name: "ANC",
+            abbreviation: "ANC",
+            description: "ANC",
+            slogan: "ANC",
+            "Date Registered": "1912-01-08",
+            Anniversary: "1912-01-08",
+            Image: (
+                <>
+                    <Image src="https://www.linkpicture.com/q/ANC.jpg" template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />
+                </>
+            ),
+            active: 1,
+            actions: (
+                <>
+                    <Button icon={"pi pi-pencil"} className="p-button-info p-button-rounded mr-2" tooltip="Click to Edit" />
+                    <Button icon={"pi pi-eye"} className="p-button p-button-rounded" tooltip="Click to View" onClick={(e) => setShowDialog(true)} />
+                </>
+            ),
+        },
+    ]);
+    function PartyDetails() {
+        return [
+            {
+                name: "Party name",
+                value: "ANC",
+            },
+            {
+                name: "Abbreviation",
+                value: "ANC",
+            },
+            {
+                name: "Description",
+                value: "ANC",
+            },
+            {
+                name: "Slogan",
+                value: "ANC",
+            },
+            {
+                name: "Date Registered",
+                value: "1912-01-08",
+            },
+            {
+                name: "Anniversary",
+                value: "1912-01-08",
+            },
+            {
+                name: "Logo",
+                value: <Image src="https://www.linkpicture.com/q/ANC.jpg" template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />,
+            },
+        ];
+    }
     // const imageBodyTemplate = (rowData) => {
     //     return (
     //       <>
@@ -76,23 +130,27 @@ export const PoliticalPartyManagement = () => {
                 ></Toolbar>
             </div>
             <Dialog
-            // draggable={false}
-            // header={<h4>Objection Details</h4>}
-            // style={{ width: "75%", height: "75%" }}
-            // modal
-            // visible={showDialog}
-            // onHide={(e) => {
-            //     setShowDialog(false);
-            // }}
+                draggable={false}
+                header={<h4>Political party details</h4>}
+                style={{ width: "90%", height: "90%" }}
+                modal
+                visible={showDialog}
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
             >
-                {/* <TabView>
-                    <TabPanel header="Objection">
-                        <DataTable size="small" scrollable={true} value={ObjectionDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                <TabView>
+                    <TabPanel header="Party Details">
+                        <DataTable size="small" scrollable={true} value={PartyDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
                             <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
-                </TabView> */}
+                    <TabPanel header="Executive Members">
+                    </TabPanel>
+                    <TabPanel header="Members">
+                    </TabPanel>
+                </TabView>
             </Dialog>
 
             <AddPoliticalParty show={showAddPartyForm} setShow={setShowAddPartyForm} />
@@ -122,7 +180,7 @@ export const PoliticalPartyManagement = () => {
                 <Column field="abbreviation" header="Abbreviation" sortable></Column>
                 <Column field="description" header="Description"></Column>
                 <Column field="slogan" header="Slogan"></Column>
-                <Column header="Logo" headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                <Column field="Image" header="Logo" headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                 <Column field="Date Registered" header="Date Registered"></Column>
                 <Column field="Anniversary" header="Anniversary"></Column>
                 <Column
