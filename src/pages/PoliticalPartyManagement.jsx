@@ -13,12 +13,22 @@ import { Toast } from "primereact/toast";
 import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Image } from "primereact/image";
+import PoliticalPartyService from "../service/PoliticalPartyService";
 
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
     const [showAddPartyForm, setShowAddPartyForm] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
-    const [selectedObjections, setSelectedObjections] = useState("");
+    const [SelectedPoliticalParty, setSelectedPoliticalParty] = useState("");
+    var [PoliticalParties, setPoliticalParties] = useState([]);
+
+    var PoliticalParty = new PoliticalPartyService();
+    useEffect(() => {
+        PoliticalParty.getAllPoliticalParties().then((data) => {
+            console.log(data);
+            setPoliticalParties(data);
+        });
+    }, []);
 
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -61,27 +71,27 @@ export const PoliticalPartyManagement = () => {
         return [
             {
                 name: "Party name",
-                value: "ANC",
+                value: SelectedPoliticalParty?.Name,
             },
             {
                 name: "Abbreviation",
-                value: "ANC",
+                value: SelectedPoliticalParty?.Abbreviation,
             },
             {
                 name: "Description",
-                value: "ANC",
+                value: SelectedPoliticalParty?.Description,
             },
             {
                 name: "Slogan",
-                value: "ANC",
+                value: SelectedPoliticalParty?.Slogan,
             },
             {
                 name: "Date Registered",
-                value: "1912-01-08",
+                value: SelectedPoliticalParty?.DateRegistered,
             },
             {
                 name: "Anniversary",
-                value: "1912-01-08",
+                value: SelectedPoliticalParty?.Annivesary,
             },
             {
                 name: "Logo",
@@ -146,10 +156,8 @@ export const PoliticalPartyManagement = () => {
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Executive Members">
-                    </TabPanel>
-                    <TabPanel header="Members">
-                    </TabPanel>
+                    <TabPanel header="Executive Members"></TabPanel>
+                    <TabPanel header="Members"></TabPanel>
                 </TabView>
             </Dialog>
 
@@ -158,7 +166,7 @@ export const PoliticalPartyManagement = () => {
             <DataTable
                 size="small"
                 scrollable={true}
-                value={data}
+                value={PoliticalParties}
                 dataKey="id"
                 paginator
                 rows={5}
@@ -168,45 +176,57 @@ export const PoliticalPartyManagement = () => {
                 emptyMessage="No political party found."
                 header={header}
                 responsiveLayout="scroll"
-                selection={selectedObjections}
-                onSelectionChange={(e) => setSelectedObjections(e.value)}
+                selection={SelectedPoliticalParty}
+                onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
                 resizableColumns
                 columnResizeMode="expand"
                 filters={filters}
-                filterDisplay="name"
-                globalFilterFields={["name"]}
+                filterDisplay="Name"
+                globalFilterFields={["Name"]}
             >
-                <Column field="name" header="Name" sortable></Column>
-                <Column field="abbreviation" header="Abbreviation" sortable></Column>
-                <Column field="description" header="Description"></Column>
-                <Column field="slogan" header="Slogan"></Column>
-                <Column field="Image" header="Logo" headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
-                <Column field="Date Registered" header="Date Registered"></Column>
-                <Column field="Anniversary" header="Anniversary"></Column>
+                <Column field="Name" header="Name" sortable></Column>
+                <Column field="Abbreviation" header="Abbreviation" sortable></Column>
+                <Column field="Description" header="Description"></Column>
+                <Column field="Slogan" header="Slogan"></Column>
+                <Column field="Logo" header="Logo" body={(e) => <Image preview={true} src="https://www.linkpicture.com/q/ANC.jpg" template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                <Column field="DateRegistered" header="Date Registered" body={e=>e?.DateRegistered?.split("T")[0]}></Column>
+                <Column field="Annivesary" header="Anniversary" body={e=>e?.Annivesary?.split("T")[0]}></Column>
                 <Column
                     field="actions"
                     header="Actions"
-                    // body={(e) => (
-                    //     <>
-                    //         {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" /> */}
-                    //         <Button
-                    //             style={{
-                    //                 textAlign: "center",
-                    //                 width: "30px",
-                    //                 height: "30px",
-                    //             }}
-                    //             icon={"pi pi-eye"}
-                    //             tooltipOptions={{ position: "top" }}
-                    //             className="p-button-primary p-button-rounded mr-2"
-                    //             tooltip="Click to View"
-                    //             onClick={(a) => {
-                    //                 setShowDialog(true);
-                    //                 setSelectedObjections(e);
-                    //             }}
-                    //         />
-                    //         {/* <Button style={{ textAlign: "center", width: "30px", height: "30px" }} icon="pi pi-trash" className="p-button-rounded p-button-danger mr-2" /> */}
-                    //     </>
-                    // )}
+                    body={(e) => (
+                        <>
+                            <Button
+                                style={{
+                                    textAlign: "center",
+                                    width: "30px",
+                                    height: "30px",
+                                }}
+                                icon={"pi pi-eye"}
+                                tooltipOptions={{ position: "top" }}
+                                className="p-button-primary p-button-rounded mr-2"
+                                tooltip="Click to View"
+                                onClick={(a) => {
+                                    setShowDialog(true);
+                                    setSelectedPoliticalParty(e);
+                                }}
+                            />
+                            {parseInt(e.Status) == 1 ? (
+                                <Button
+                                    onClick={(a) => {
+                                        // setShowEditForm(true);
+                                        // setSelectedEventGroup(e);
+                                    }}
+                                    style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                    icon={"pi pi-times"}
+                                    className="p-button-danger p-button-rounded mr-2"
+                                    tooltip="Click to De-Activate"
+                                />
+                            ) : (
+                                <Button disabled style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-times"} className="p-button-danger p-button-rounded mr-2" tooltip="Click to Activate" />
+                            )}
+                        </>
+                    )}
                 ></Column>
             </DataTable>
         </div>
