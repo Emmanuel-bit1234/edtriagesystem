@@ -6,7 +6,7 @@ export default function TextInput({placeholder="",label = "", type = "text", val
     return type === "text" ? (
         <div className="p-fluid">
             <label>{label}</label>
-            <InputText placeholder={placeholder} value={value} onChange={onChange} required disabled={disabled} />
+            <InputText placeholder={placeholder} value={value} onChange={onChange} disabled={disabled} />
             <small style={{ width: "100%" }} className="p-error">
                 {/* input error{" "} */}
             </small>
@@ -14,7 +14,7 @@ export default function TextInput({placeholder="",label = "", type = "text", val
     ) : (
         <div className="p-fluid">
             <label>{label}</label>
-            <Calendar  dateFormat="yy-mm-dd" value={value} onChange={onChange} showIcon={true} required />
+            <Calendar  dateFormat="yy-mm-dd" value={value} onChange={onChange} showIcon={true} />
             <small style={{ width: "100%" }} className="p-error">
                 {/* input error{" "} */}
             </small>

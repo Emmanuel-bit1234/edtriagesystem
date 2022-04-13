@@ -5,7 +5,7 @@ export default function InputTextArea ({placeholder="",label = "", type = "text"
     return (
         <div className="p-fluid">
             <label>{label}</label>
-            <InputTextarea placeholder={placeholder} value={value} onChange={onChange} required disabled={disabled} />
+            <InputTextarea placeholder={placeholder} value={value} onChange={onChange} disabled={disabled} />
         </div>
     )   
 }

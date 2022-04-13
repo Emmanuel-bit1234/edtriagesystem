@@ -8,8 +8,9 @@ import { Toolbar } from "primereact/toolbar";
 import InputTextArea from "./InputTextArea";
 import { FileUpload } from "primereact/fileupload";
 import PoliticalPartyService from "../service/PoliticalPartyService";
+import imageToBase64 from "image-to-base64/browser";
 
-export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
+export default function AddPoliticalParty({ setPoliticalParties, buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     const toast = useRef(null);
 
     var [form, setForm] = useState({
@@ -19,6 +20,7 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
         Slogan: "",
         DateRegistered: "",
         Annivesary: "",
+        FileName: "",
         Logo: null,
         Created_By: 1.0,
         Created_Date: "2022-04-08T00:00:00",
@@ -26,6 +28,31 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
         Updated_By: 1.0,
         Status: 1,
     });
+    const inputFileRef = useRef(null);
+
+    const onBtnClick = () => {
+        inputFileRef.current.click();
+    };
+
+    var convertBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+        });
+    };
+
+    async function onUploadHandler(e) {
+        const file = e.files[0];
+        const base64 = await convertBase64(file);
+        var base64result = base64.split(",")[1];
+        setForm({ ...form, Logo: base64result, FileName: file.name });
+    }
     var submittedForm = false;
 
     function formatDate(date) {
@@ -49,24 +76,8 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
         newForm["Annivesary"] = formatDate(form.Annivesary) + " 00:00";
         var error = false;
 
-       
         let formdata = new FormData();
-
-        //formdata.append("product[image]", { uri: photo.uri, name: "image.jpg", type: "image/jpeg" });
-        //Image type can be image/png
-
-        // fetch('http://192.168.1.0:3000/image',{
-        //   method: 'post',
-        //   headers: {
-        //     'Content-Type': 'multipart/form-data',
-        //   },
-        //   body: formdata
-        //   }).then(response => {
-        //     console.log("image uploaded")
-        //   }).catch(err => {
-        //     console.log(err)
-        //   })
-        // }
+        console.log(newForm);
 
         Object.keys(newForm).map((key) => {
             var value = newForm[key];
@@ -75,41 +86,39 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
                 error = true;
             }
         });
-
-        // if (error == true) {
-        //     toast.current.show({
-        //         severity: "error",
-        //         summary: "Error Message",
-        //         detail: "please fill the required fields",
-        //         life: 3000,
-        //     });
-        //     return false;
-        // }
+        delete form.FileName
+        if (error == true) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "please fill the required fields",
+                life: 3000,
+            });
+            return false;
+        }
 
         var PoliticalParty = new PoliticalPartyService();
-        console.log(form)
-        // PoliticalParty.createFetchApi(newForm)
-        //     .then((res) => {
-        //         setTimeout(() => {
-        //             window.location.reload();
-        //             submittedForm = true;
-        //         }, 1500);
-        //         return toast.current.show({
-        //             severity: "success",
-        //             summary: "Success Message",
-        //             detail: "Political party was added successfully",
-        //             life: 1500,
-        //         });
-        //     })
-        //     .catch((e) => {
-        //         submittedForm = false;
-        //         return toast.current.show({
-        //             severity: "error",
-        //             summary: "Error Message",
-        //             detail: "Ooops, The is a technical problem,Please Try Again",
-        //             life: 2000,
-        //         });
-        //     });
+        PoliticalParty.createParty(newForm)
+            .then((res) => {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+                return toast.current.show({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: "Political party was added successfully",
+                    life: 1500,
+                });
+            })
+            .catch((e) => {
+                submittedForm = false;
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error Message",
+                    detail: "Ooops, The is a technical problem,Please Try Again",
+                    life: 2000,
+                });
+            });
     }
 
     return (
@@ -133,7 +142,7 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
             <div className="grid">
                 <div className="col-12 lg:col-12">
                     <Toast ref={toast} />
-                    <form method="post">
+                    <div method="post">
                         <TabView>
                             <TabPanel header="Political Party Details">
                                 <div className="grid">
@@ -156,15 +165,16 @@ export default function AddPoliticalParty({ buttonName = "Save", buttonIcon = "p
                                         <TextInput type="Calendar" label="Anniversary" value={form.Annivesary} onChange={(e) => setForm({ ...form, Annivesary: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <label htmlFor="description">Logo/Symbol</label>
+                                        <label htmlFor="description">Logo/Symbol</label> <br></br>
                                         <React.Fragment>
-                                            <FileUpload mode="basic" accept="image/*"  maxFileSize={1000000} url="./upload" label="Choose file" chooseLabel="Choose file" onUpload ={e=>setForm({ ...form, Logo: e.files[0] })} />
+                                            <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
+                                            <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e.target)} style={{ display: "none" }}></input>
                                         </React.Fragment>
                                     </div>
                                 </div>
                             </TabPanel>
                         </TabView>
-                    </form>
+                    </div>
                 </div>
             </div>
         </Dialog>

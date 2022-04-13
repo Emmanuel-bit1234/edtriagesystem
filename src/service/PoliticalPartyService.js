@@ -10,17 +10,4 @@ export default function PoliticalPartyService() {
         var url = `${NET_IP}/api/PoliticalPartiesApi`;
         return axios.post(url, data).then((response) => response.data);
     };
-    
-    this.createFetchApi = (data) => {
-        var form = {
-            method: "post",
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-            body: data
-        }
-        
-        var url = `${NET_IP}/api/PoliticalPartiesApi`;
-        return  fetch(url,form).then(res=>res.json());
-    };
 }
