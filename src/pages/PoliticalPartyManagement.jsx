@@ -14,7 +14,7 @@ import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Image } from "primereact/image";
 import PoliticalPartyService from "../service/PoliticalPartyService";
-import imageToBase64 from 'image-to-base64/browser';
+import imageToBase64 from "image-to-base64/browser";
 
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
@@ -100,8 +100,7 @@ export const PoliticalPartyManagement = () => {
             },
             {
                 name: "Logo",
-                value: <Image preview={true} src={`data:image/png;base64,${SelectedPoliticalParty?.Logo}`}  template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />
-               
+                value: <Image preview={true} src={`data:image/png;base64,${SelectedPoliticalParty?.Logo}`} template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />,
             },
         ];
     }
@@ -154,6 +153,11 @@ export const PoliticalPartyManagement = () => {
                 onHide={(e) => {
                     setShowDialog(false);
                 }}
+                footer={
+                    <>
+                        <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
+                    </>
+                }
             >
                 <TabView>
                     <TabPanel header="Party Details">
@@ -162,7 +166,27 @@ export const PoliticalPartyManagement = () => {
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Executive Members"></TabPanel>
+                    <TabPanel header="Executive Members">
+                        <div className="grid">
+                            <div className="col-5  lg:col-2">
+                                <InputText type="search" placeholder="Registration Number" style={{ width: "100%" }} />
+                            </div>
+                            <div className="col-5  lg:col-1">
+                                <Button className="p-button-success ml-12" label="Search"></Button>
+                            </div>
+                        </div>
+                        <div className="grid">
+                            <div className="col-12  lg:col-4">
+                                <TextInput label="First name" disabled />
+                            </div>
+                            <div className="col-12 lg:col-4">
+                                <TextInput label="Surname" disabled />
+                            </div>
+                            <div className="col-12  lg:col-4">
+                                <DropDown label="Party Executive Role" />
+                            </div>
+                        </div>
+                    </TabPanel>
                     <TabPanel header="Members"></TabPanel>
                 </TabView>
             </Dialog>
@@ -194,7 +218,7 @@ export const PoliticalPartyManagement = () => {
                 <Column field="Abbreviation" header="Abbreviation" sortable></Column>
                 <Column field="Description" header="Description"></Column>
                 <Column field="Slogan" header="Slogan"></Column>
-                <Column field="Logo" header="Logo" body={(e) => <Image preview={true} src={`data:image/png;base64,${e.Logo}`}  template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
+                <Column field="Logo" header="Logo" body={(e) => <Image preview={true} src={`data:image/png;base64,${e.Logo}`} template="Logo" alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />} headerStyle={{ width: "14%", minWidth: "10rem" }}></Column>
                 <Column field="DateRegistered" header="Date Registered" body={(e) => e?.DateRegistered?.split("T")[0]}></Column>
                 <Column field="Annivesary" header="Anniversary" body={(e) => e?.Annivesary?.split("T")[0]}></Column>
                 <Column
