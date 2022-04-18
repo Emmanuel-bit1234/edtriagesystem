@@ -15,6 +15,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Image } from "primereact/image";
 import PoliticalPartyService from "../service/PoliticalPartyService";
 import imageToBase64 from "image-to-base64/browser";
+import { FileUpload } from 'primereact/fileupload'
 
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
@@ -186,6 +187,9 @@ export const PoliticalPartyManagement = () => {
                         </div>
                     </TabPanel>
                     <TabPanel header="Members">
+                        <div className="col">
+                            <FileUpload chooseLabel="Upload a csv file" name="demo" accept="csv/*" maxFileSize={1000000} mode="basic" className="mr-2 my-1 p-button-info" />
+                        </div>
                         <DataTable
                             size="small"
                             scrollable={true}
