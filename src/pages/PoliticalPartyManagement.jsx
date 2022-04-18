@@ -153,11 +153,6 @@ export const PoliticalPartyManagement = () => {
                 onHide={(e) => {
                     setShowDialog(false);
                 }}
-                footer={
-                    <>
-                        <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
-                    </>
-                }
             >
                 <TabView>
                     <TabPanel header="Party Details">
@@ -185,9 +180,42 @@ export const PoliticalPartyManagement = () => {
                             <div className="col-12  lg:col-4">
                                 <DropDown label="Party Executive Role" />
                             </div>
+                            <div className="col-12  lg:col-4">
+                                <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
+                            </div>
                         </div>
                     </TabPanel>
-                    <TabPanel header="Members"></TabPanel>
+                    <TabPanel header="Members">
+                       
+                    </TabPanel>
+                    <TabPanel header="View Members">
+                    <DataTable
+                            size="small"
+                            scrollable={true}
+                            // value={PoliticalParties}
+                            dataKey="id"
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className="datatable-responsive"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                            emptyMessage="No members found."
+                            responsiveLayout="scroll"
+                            // selection={SelectedPoliticalParty}
+                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            resizableColumns
+                            columnResizeMode="expand"
+                            filters={filters}
+                            filterDisplay="Name"
+                            globalFilterFields={["Name"]}
+                        >
+                            <Column field="Name" header="Political Party"></Column>
+                            <Column field="Receipt No" header="Receipt No" sortable></Column>
+                            <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Surname" header="Surname" sortable></Column>
+                            <Column field="Status" header="Status"></Column>
+                        </DataTable>
+                    </TabPanel>
                 </TabView>
             </Dialog>
 
