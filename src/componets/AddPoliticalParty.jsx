@@ -72,8 +72,8 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
         });
-        newForm["DateRegistered"] = formatDate(form.DateRegistered) + " 00:00";
-        newForm["Annivesary"] = formatDate(form.Annivesary) + " 00:00";
+        newForm["DateRegistered"] = formatDate(form.DateRegistered) ;
+        newForm["Annivesary"] = formatDate(form.Annivesary);
         var error = false;
 
         let formdata = new FormData();

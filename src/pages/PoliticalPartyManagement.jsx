@@ -92,11 +92,11 @@ export const PoliticalPartyManagement = () => {
             },
             {
                 name: "Date Registered",
-                value: SelectedPoliticalParty?.DateRegistered,
+                value: SelectedPoliticalParty?.DateRegistered?.split("T")[0],
             },
             {
                 name: "Anniversary",
-                value: SelectedPoliticalParty?.Annivesary,
+                value: SelectedPoliticalParty?.Annivesary?.split("T")[0],
             },
             {
                 name: "Logo",
@@ -186,10 +186,38 @@ export const PoliticalPartyManagement = () => {
                         </div>
                     </TabPanel>
                     <TabPanel header="Members">
-                       
+                        <DataTable
+                            size="small"
+                            scrollable={true}
+                            // value={PoliticalParties}
+                            dataKey="id"
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className="datatable-responsive"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                            emptyMessage="No members found."
+                            responsiveLayout="scroll"
+                            // selection={SelectedPoliticalParty}
+                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            resizableColumns
+                            columnResizeMode="expand"
+                            filters={filters}
+                            filterDisplay="Name"
+                            globalFilterFields={["Name"]}
+                        >
+                            <Column field="Name" header="Political Party"></Column>
+                            <Column field="Receipt No" header="Receipt No" sortable></Column>
+                            <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Surname" header="Surname" sortable></Column>
+                            <Column field="Status" header="Status"></Column>
+                        </DataTable>
+                        <div className="col">
+                            <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
+                        </div>
                     </TabPanel>
                     <TabPanel header="View Members">
-                    <DataTable
+                        <DataTable
                             size="small"
                             scrollable={true}
                             // value={PoliticalParties}
