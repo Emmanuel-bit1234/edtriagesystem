@@ -9,6 +9,7 @@ import InputTextArea from "./InputTextArea";
 import { FileUpload } from "primereact/fileupload";
 import PoliticalPartyService from "../service/PoliticalPartyService";
 import imageToBase64 from "image-to-base64/browser";
+import { Image } from "primereact/image";
 
 export default function AddPoliticalParty({ setPoliticalParties, buttonName = "Save", buttonIcon = "pi pi-save", show = false, setShow }) {
     const toast = useRef(null);
@@ -72,7 +73,7 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
         Object.keys(form).map((key) => {
             newForm[key] = form[key];
         });
-        newForm["DateRegistered"] = formatDate(form.DateRegistered) ;
+        newForm["DateRegistered"] = formatDate(form.DateRegistered);
         newForm["Annivesary"] = formatDate(form.Annivesary);
         var error = false;
 
@@ -86,7 +87,7 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
                 error = true;
             }
         });
-        delete form.FileName
+        delete form.FileName;
         if (error == true) {
             toast.current.show({
                 severity: "error",
@@ -164,14 +165,19 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
                                     <div className="col-12  lg:col-4">
                                         <TextInput type="Calendar" label="Anniversary" value={form.Annivesary} onChange={(e) => setForm({ ...form, Annivesary: e.target.value })} />
                                     </div>
+                                </div>
+                                <div className="grid">
                                     <div className="col-12  lg:col-4">
                                         <label htmlFor="description">Logo/Symbol</label> <br></br>
                                         <React.Fragment>
                                             <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
                                             <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e.target)} style={{ display: "none" }}></input>
                                         </React.Fragment>
+                                        <div style={{ visibility: "hidden" }}>LOGO</div>  
+                                        {form.FileName.trim().length === 0 ? "" : <Image preview={true} src={`data:image/png;base64,${form.Logo}`} alt="Logo" width="100px" style={{ width: "100px", objectFit: "cover" }} />}
                                     </div>
                                 </div>
+                              
                             </TabPanel>
                         </TabView>
                     </div>

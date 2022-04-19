@@ -23,14 +23,17 @@ export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
     const [showAddPartyForm, setShowAddPartyForm] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [SelectedPoliticalParty, setSelectedPoliticalParty] = useState("");
     var [PoliticalParties, setPoliticalParties] = useState([]);
-    var [executiveRoles, setExecutiveRoles] = useState([])
+    var [executiveRoles, setExecutiveRoles] = useState([]);
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
-    var [form, setForm] = useState({ 
+    var [form, setForm] = useState({
         File: "",
         FileName: "",
     });
+    let [data, setData] = useState([]);
+    const [registrationNumber, setRegistrationNumber] = useState("");
     const inputFileRef = useRef(null);
     const onBtnClick = () => {
         inputFileRef.current.click();
@@ -42,10 +45,39 @@ export const PoliticalPartyManagement = () => {
             setPoliticalParties(data);
         });
         PoliticalParty.getAllExecutiveRoles().then((data) => {
-            setExecutiveRoles(data)
-        })
+            setExecutiveRoles(data);
+        });
     }, []);
 
+    function getExecData() {
+        PoliticalParty.getExecutiveDetails(registrationNumber).then((e) => {
+            setData(e);
+        });
+    }
+
+    const [count, setCount] = useState(0);
+    const [rowData, setRowData] = useState({});
+    function generateRow() {
+        return (
+            <div className="grid">
+                <div className="col-16  lg:col-3">
+                    <div style={{ visibility: "hidden" }}>Search</div>
+                    <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
+                </div>
+                <div className="col-16  lg:col-3">
+                    <TextInput label="First name" value={data?.Firstname} disabled />
+                </div>
+                <div className="col-16 lg:col-3">
+                    <TextInput label="Surname" value={data?.Surname} disabled />
+                </div>
+                <div className="col-16  lg:col-3">
+                    <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={(e) => typeHandler(e)} label="Party Executive Role" />
+                </div>
+            </div>
+        );
+    }
+    const [row, setRow] = useState([generateRow()]);
+    var d = {id:"", name:""}
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: {
@@ -81,7 +113,7 @@ export const PoliticalPartyManagement = () => {
         };
 
         let formdata = new FormData();
-        var file = e.files[0];
+        var file = e.target.files[0];
         console.log(file);
         formdata.append("csvFile", file);
         setForm({ ...form, FileName: file.name });
@@ -101,6 +133,10 @@ export const PoliticalPartyManagement = () => {
 
     function typeHandler(e) {
         setSelectedExecutiveRole(e.value);
+    }
+    function formRowsHandler(){
+        setRow([... row, generateRow()])
+        setRowData({})
     }
 
     function PartyDetails() {
@@ -135,7 +171,7 @@ export const PoliticalPartyManagement = () => {
             },
         ];
     }
-   
+
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             {" "}
@@ -168,9 +204,9 @@ export const PoliticalPartyManagement = () => {
                 header={<h4>Political party details</h4>}
                 style={{ width: "90%", height: "90%" }}
                 modal
-                visible={showDialog}
+                visible={showEditDialog}
                 onHide={(e) => {
-                    setShowDialog(false);
+                    setShowEditDialog(false);
                 }}
             >
                 <TabView>
@@ -182,24 +218,28 @@ export const PoliticalPartyManagement = () => {
                     </TabPanel>
                     <TabPanel header="Executive Members">
                         <div className="grid">
-                            <div className="col-5  lg:col-2">
-                                <InputText type="search" placeholder="Registration Number" style={{ width: "100%" }} />
-                            </div>
                             <div className="col-5  lg:col-1">
-                                <Button className="p-button-success ml-12" label="Search"></Button>
+                                <Button onClick={formRowsHandler} className="p-button-success" icon="pi pi-plus" label="Add"></Button>
                             </div>
                         </div>
                         <div className="grid">
-                            <div className="col-12  lg:col-4">
-                                <TextInput label="First name" disabled />
+                            <div className="col-16  lg:col-3">
+                                <div style={{ visibility: "hidden" }}>Search</div>
+                                <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
                             </div>
-                            <div className="col-12 lg:col-4">
-                                <TextInput label="Surname" disabled />
+                            <div className="col-16  lg:col-3">
+                                <TextInput label="First name" value={data?.Firstname} disabled />
                             </div>
-                            <div className="col-12  lg:col-4">
+                            <div className="col-16 lg:col-3">
+                                <TextInput label="Surname" value={data?.Surname} disabled />
+                            </div>
+                            <div className="col-16  lg:col-3">
                                 <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={(e) => typeHandler(e)} label="Party Executive Role" />
                             </div>
-                            <div className="col-12  lg:col-4">
+                        </div>
+                        {row.map((e) => e)}
+                        <div className="grid">
+                            <div className="col-16  lg:col-1">
                                 <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
                             </div>
                         </div>
@@ -209,7 +249,7 @@ export const PoliticalPartyManagement = () => {
                             <label htmlFor="description">Upload a CSV</label> <br></br>
                             <React.Fragment>
                                 <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
-                                <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e.target)} style={{ display: "none" }}></input>
+                                <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
                             </React.Fragment>
                         </div>
                         <DataTable
@@ -239,7 +279,54 @@ export const PoliticalPartyManagement = () => {
                             <Column field="Status" header="Status"></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="View Members">
+                </TabView>
+            </Dialog>
+            <Dialog
+                draggable={false}
+                header={<h4>Political party details</h4>}
+                style={{ width: "90%", height: "90%" }}
+                modal
+                visible={showDialog}
+                onHide={(e) => {
+                    setShowDialog(false);
+                }}
+            >
+                <TabView>
+                    <TabPanel header="Party Details">
+                        <DataTable size="small" scrollable={true} value={PartyDetails()} dataKey="id" responsiveLayout="scroll" resizableColumns>
+                            <Column style={{ width: "100px" }} body={(e) => <b>{e.name}</b>}></Column>
+                            <Column body={(e) => e.value}></Column>
+                        </DataTable>
+                    </TabPanel>
+                    <TabPanel header="Executive Members">
+                        <DataTable
+                            size="small"
+                            scrollable={true}
+                            // value={PoliticalParties}
+                            dataKey="id"
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className="datatable-responsive"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                            emptyMessage="No members found."
+                            responsiveLayout="scroll"
+                            // selection={SelectedPoliticalParty}
+                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            resizableColumns
+                            columnResizeMode="expand"
+                            filters={filters}
+                            filterDisplay="Name"
+                            globalFilterFields={["Name"]}
+                        >
+                            <Column field="Name" header="Political Party"></Column>
+                            <Column field="Receipt No" header="Receipt No" sortable></Column>
+                            <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Surname" header="Surname" sortable></Column>
+                            <Column field="Status" header="Status"></Column>
+                        </DataTable>
+                    </TabPanel>
+                    <TabPanel header="Members">
                         <DataTable
                             size="small"
                             scrollable={true}
@@ -312,6 +399,16 @@ export const PoliticalPartyManagement = () => {
                     header="Actions"
                     body={(e) => (
                         <>
+                            <Button
+                                style={{ textAlign: "center", width: "30px", height: "30px" }}
+                                icon={"pi pi-pencil"}
+                                className="p-button-primary p-button-rounded mr-2 "
+                                tooltip="Click to Edit"
+                                onClick={(a) => {
+                                    setShowEditDialog(true);
+                                    setSelectedPoliticalParty(e);
+                                }}
+                            />
                             <Button
                                 style={{
                                     textAlign: "center",

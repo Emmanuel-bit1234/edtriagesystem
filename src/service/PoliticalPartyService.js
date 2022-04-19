@@ -18,5 +18,10 @@ export default function PoliticalPartyService() {
         var url = `${NET_IP}/API/GetPartyExecutiveRole`; 
         return axios.get(url).then((response) => response.data);
     };
+    this.getExecutiveDetails = (regNum) => {
+
+        var url = `${NET_IP}/API/GetVoterDetailsByRegNumber/${regNum}`
+        return axios.post(url).then((response) => response.data?.VoterDetails[0]);
+    }
 
 }
