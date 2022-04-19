@@ -15,7 +15,9 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Image } from "primereact/image";
 import PoliticalPartyService from "../service/PoliticalPartyService";
 import imageToBase64 from "image-to-base64/browser";
-import { FileUpload } from 'primereact/fileupload'
+import { FileUpload } from "primereact/fileupload";
+import { NET_IP } from "../config/Config";
+import axios from "axios";
 
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
@@ -23,7 +25,14 @@ export const PoliticalPartyManagement = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [SelectedPoliticalParty, setSelectedPoliticalParty] = useState("");
     var [PoliticalParties, setPoliticalParties] = useState([]);
-
+    var [form, setForm] = useState({
+        File: "",
+        FileName: "",
+    });
+    const inputFileRef = useRef(null);
+    const onBtnClick = () => {
+        inputFileRef.current.click();
+    };
     var PoliticalParty = new PoliticalPartyService();
     useEffect(() => {
         PoliticalParty.getAllPoliticalParties().then((data) => {
@@ -47,6 +56,43 @@ export const PoliticalPartyManagement = () => {
         setFilters(_filters1);
         setGlobalFilterValue(value);
     };
+    function deActivateHandler(id) {
+        PoliticalParty.deActivatePoliticalParty(id).then((e) => {
+            PoliticalParty.getAllPoliticalParties().then((data) => {
+                setPoliticalParties(data);
+                return toast.current.show({
+                    severity: "success",
+                    summary: "Success Message",
+                    detail: "Political party de-activated successfully",
+                    life: 2000,
+                });
+            });
+        });
+    }
+    async function onUploadHandler(e) {
+        let headersList = {
+            Accept: "*/*",
+            // "User-Agent": "Thunder Client (https://www.thunderclient.com)"
+        };
+
+        let formdata = new FormData();
+        var file = e.files[0];
+        console.log(file);
+        formdata.append("csvFile", file);
+        setForm({ ...form, FileName: file.name });
+
+        let bodyContent = formdata;
+
+        let reqOptions = {
+            url: "http://20.87.43.104:84/API/AddPoliticalPartyMembersCSV",
+            method: "POST",
+            headers: headersList,
+            body: bodyContent,
+        };
+        axios.request(reqOptions).then(function (response) {
+            console.log(response.data);
+        });
+    }
     // let [data, setData] = useState([
     //     {
     //         name: "ANC",
@@ -188,7 +234,11 @@ export const PoliticalPartyManagement = () => {
                     </TabPanel>
                     <TabPanel header="Members">
                         <div className="col">
-                            <FileUpload chooseLabel="Upload a csv file" name="demo" accept="csv/*" maxFileSize={1000000} mode="basic" className="mr-2 my-1 p-button-info" />
+                            <label htmlFor="description">Upload a CSV</label> <br></br>
+                            <React.Fragment>
+                                <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
+                                <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e.target)} style={{ display: "none" }}></input>
+                            </React.Fragment>
                         </div>
                         <DataTable
                             size="small"
@@ -216,9 +266,6 @@ export const PoliticalPartyManagement = () => {
                             <Column field="Surname" header="Surname" sortable></Column>
                             <Column field="Status" header="Status"></Column>
                         </DataTable>
-                        <div className="col">
-                            <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
-                        </div>
                     </TabPanel>
                     <TabPanel header="View Members">
                         <DataTable
@@ -282,6 +329,13 @@ export const PoliticalPartyManagement = () => {
                 <Column field="DateRegistered" header="Date Registered" body={(e) => e?.DateRegistered?.split("T")[0]}></Column>
                 <Column field="Annivesary" header="Anniversary" body={(e) => e?.Annivesary?.split("T")[0]}></Column>
                 <Column
+                    field="Status"
+                    header="Status"
+                    body={(e) =>
+                        parseInt(e.Status) == 1 ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                    }
+                ></Column>
+                <Column
                     field="actions"
                     header="Actions"
                     body={(e) => (
@@ -304,8 +358,7 @@ export const PoliticalPartyManagement = () => {
                             {parseInt(e.Status) == 1 ? (
                                 <Button
                                     onClick={(a) => {
-                                        // setShowEditForm(true);
-                                        // setSelectedEventGroup(e);
+                                        deActivateHandler(e.PoliticalPartyID);
                                     }}
                                     style={{ textAlign: "center", width: "30px", height: "30px" }}
                                     icon={"pi pi-times"}
