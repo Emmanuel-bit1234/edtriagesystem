@@ -14,4 +14,9 @@ export default function PoliticalPartyService() {
         var url = `${NET_IP}/API/ChangeStatusPoliticalParty/${id}`; 
         return axios.post(url).then((response) => response.data);
     };
+    this.getAllExecutiveRoles = () => {
+        var url = `${NET_IP}/API/GetPartyExecutiveRole`; 
+        return axios.get(url).then((response) => response.data);
+    };
+
 }
