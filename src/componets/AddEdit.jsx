@@ -60,7 +60,7 @@ export default function AddEdit({
 
           <div className="col-12  lg:col-4">
             <TextInput label="Ballot  Order" />
-          </div>
+          </div>8
 
           <div className="col-12 lg:col-4">
             <Image
