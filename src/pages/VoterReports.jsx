@@ -17,7 +17,9 @@ export const VoterReports = () => {
         { name: "Source Data Report", reportID: 2 },
         { name: "The Deceased Report", reportID: 3 },
         { name: "Underage Electors Report", reportID: 4 },
+        { name: "Pending Transfers Report", reportID: 5 },
     ];
+
     var [selectedOption, setSelectedOption] = useState(null);
     const toast = useRef(null);
     var delimitationServices = new DelimitationServices();
@@ -39,9 +41,47 @@ export const VoterReports = () => {
     var [reportLoaded, setReportLoaded] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
 
+    function clear_when_updating_district() {
+        setSelectedConstituency("");
+        setConstituency([]);
+
+        setSelectedVillage("");
+        setVillage([]);
+
+        setRegistrationCentre([]);
+        setSelectedRegistrationCentre("");
+
+        setPollingDivision([]);
+        setSelectedPollingDivision("");
+    }
+
+    function clear_when_updating_constituency() {
+        setSelectedVillage("");
+        setVillage([]);
+
+        setRegistrationCentre([]);
+        setSelectedRegistrationCentre("");
+
+        setPollingDivision([]);
+        setSelectedPollingDivision("");
+    }
+
+    function clear_when_updating_polling_division() {
+        setSelectedVillage("");
+        setVillage([]);
+
+        setRegistrationCentre([]);
+        setSelectedRegistrationCentre("");
+    }
+
+    function clear_when_updating_registration_centre() {
+        setSelectedVillage("");
+        setVillage([]);
+    }
+
     function DistrictHandler(id) {
         setSelectedDistrict(id);
-        setConstituency([]);
+        clear_when_updating_district();
         delimitationServices.getConstituency(id.id).then((data) => {
             setConstituency(data);
         });
@@ -49,8 +89,7 @@ export const VoterReports = () => {
 
     function ConstituencyHandler(id) {
         setSelectedConstituency(id);
-
-        setPollingDivision([]);
+        clear_when_updating_constituency();
         delimitationServices.pollingDivision(id.id).then((data) => {
             setPollingDivision(data);
         });
@@ -58,7 +97,7 @@ export const VoterReports = () => {
 
     function PollingHandler(id) {
         setSelectedPollingDivision(id);
-        setRegistrationCentre([]);
+        clear_when_updating_polling_division();
         delimitationServices.registrationCentre(id.id).then((data) => {
             setRegistrationCentre(data);
         });
@@ -66,15 +105,26 @@ export const VoterReports = () => {
 
     function RegistrationCentreHandler(id) {
         setSelectedRegistrationCentre(id);
-        setVillage([]);
+        clear_when_updating_registration_centre();
         delimitationServices.getVillage(id.id).then((data) => {
             setVillage(data);
         });
     }
 
     function ClearHandler() {
+        setSelectedDistrict("");
+
+        setSelectedConstituency("");
         setConstituency([]);
+
+        setSelectedVillage("");
         setVillage([]);
+
+        setRegistrationCentre([]);
+        setSelectedRegistrationCentre("");
+
+        setPollingDivision([]);
+        setSelectedPollingDivision("");
     }
 
     useEffect(() => {
@@ -98,6 +148,9 @@ export const VoterReports = () => {
                 reportID: selectedOption?.reportID,
             })
             .then((res) => {
+                if (res?.reportHasData == false) {
+                    return toast.current.show({ severity: "error", summary: "Error Message", detail: "No data to display for this filter", life: 3000 });
+                }
                 if (res?.status == true) {
                     setReportLoaded(true);
                     setShowDialog(false);
@@ -165,7 +218,7 @@ export const VoterReports = () => {
                     footer={
                         <>
                             <Button className="my-2  p-button-primary" label="Clear" onClick={ClearHandler} icon="pi pi-times" />
-                            <Button className="my-2  p-button-success" label="Filter" onClick={SubmitFilter} icon="pi pi-search" />
+                            <Button className="my-2  p-button-success" label="Preview" onClick={SubmitFilter} icon="pi pi-eye" />
                         </>
                     }
                 >
@@ -226,7 +279,7 @@ export const VoterReports = () => {
                                     {selectedOption != null && (
                                         <div className="col-2">
                                             <div style={{ visibility: "hidden" }}>View</div>
-                                            <Button label="Filter" className="p-button-success ml-2" onClick={(e) => setShowDialog(true)} />
+                                            <Button label="Filter" className="p-button-success ml-2" icon="pi pi-search" onClick={(e) => setShowDialog(true)} />
                                         </div>
                                     )}
                                 </div>
@@ -245,7 +298,7 @@ export const VoterReports = () => {
                                 }
                             >
                                 {/* layout={layout} */}
-                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}/report/preview`} />
+                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${LOCALHOST_NET_IP}/report/preview`} />
                             </div>
                         </Worker>
                     ) : (
