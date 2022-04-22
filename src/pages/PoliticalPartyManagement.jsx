@@ -22,9 +22,13 @@ import axios from "axios";
 export const PoliticalPartyManagement = () => {
     const toast = useRef(null);
     const [showAddPartyForm, setShowAddPartyForm] = useState(false);
+    const [selectedExecMember, setSelectedExecMember] = useState("");
+    const [selectedMember, setSelectedMember] = useState("");
     const [showDialog, setShowDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [SelectedPoliticalParty, setSelectedPoliticalParty] = useState("");
+    var [execMembers, setExecMembers] = useState();
+    var [members, setMembers] = useState();
     var [PoliticalParties, setPoliticalParties] = useState([]);
     var [executiveRoles, setExecutiveRoles] = useState([]);
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
@@ -32,6 +36,86 @@ export const PoliticalPartyManagement = () => {
         File: "",
         FileName: "",
     });
+    var [execForm, setExecForm] = useState({
+        PartyExecutiveRoleID: "",
+        RegistrationNumber: "",
+        PoliticalPartyID: "",
+    });
+    function execRoleHandler(e) {
+        setSelectedExecutiveRole(e.value);
+        setExecForm({ ...execForm, PartyExecutiveRoleID: e.value.PartyExecutiveRoleID });
+    }
+    function execMembersHandler() {
+        var id = SelectedPoliticalParty?.PoliticalPartyID;
+        PoliticalParty.getExecMembersByParty(id).then((data) => {
+            setExecMembers(data);
+        });
+    }
+    function membersHandler() {
+        var id = SelectedPoliticalParty?.PoliticalPartyID;
+        PoliticalParty.getMembersByParty(id).then((data) => {
+            setMembers(data);
+        });
+    }
+    function execMemberRoleAvail() {
+        var id = SelectedPoliticalParty?.PoliticalPartyID;
+        PoliticalParty.getAllExecutiveRoles(id).then((data) => {
+            setExecutiveRoles(data);
+        });
+    }
+    var submittedForm = false;
+    function SubmitExecForm() {
+        execForm.RegistrationNumber = registrationNumber;
+        var newForm = {};
+        Object.keys(execForm).map((key) => {
+            newForm[key] = execForm[key];
+        });
+        var error = false;
+        let formdata = new FormData();
+        var executives = {
+            Executives: [newForm],
+        };
+        var PoliticalParty = new PoliticalPartyService();
+        PoliticalParty.addExecutiveMember(executives)
+            .then((res) => {
+                setTimeout(() => {
+                    submittedForm = true;
+                    var id = SelectedPoliticalParty?.PoliticalPartyID;
+                    PoliticalParty.getExecMembersByParty(id).then((data) => {
+                        setExecMembers(data);
+                        return toast.current.show({
+                            severity: "success",
+                            summary: "Success Message",
+                            detail: "The Executive member was added successfully",
+                            life: 1500,
+                        });
+                    });
+                    setExecForm({ PartyExecutiveRoleID: "", RegistrationNumber: "", PoliticalPartyID: "" });
+                    setSelectedExecutiveRole("Select an Executive Role")
+                    execMembersHandler()
+
+                }, 1500);
+            })
+            .catch((e) => {
+                submittedForm = false;
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error Message",
+                    detail: "Ooops, The is a technical problem,Please Try Again",
+                    life: 2000,
+                });
+            });
+        console.log(newForm);
+        if (error == true) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "There was an error",
+                life: 3000,
+            });
+            return false;
+        }
+    }
     let [data, setData] = useState([]);
     const [registrationNumber, setRegistrationNumber] = useState("");
     const inputFileRef = useRef(null);
@@ -44,9 +128,6 @@ export const PoliticalPartyManagement = () => {
             console.log(data);
             setPoliticalParties(data);
         });
-        PoliticalParty.getAllExecutiveRoles().then((data) => {
-            setExecutiveRoles(data);
-        });
     }, []);
 
     function getExecData() {
@@ -55,29 +136,6 @@ export const PoliticalPartyManagement = () => {
         });
     }
 
-    const [count, setCount] = useState(0);
-    const [rowData, setRowData] = useState({});
-    function generateRow() {
-        return (
-            <div className="grid">
-                <div className="col-16  lg:col-3">
-                    <div style={{ visibility: "hidden" }}>Search</div>
-                    <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
-                </div>
-                <div className="col-16  lg:col-3">
-                    <TextInput label="First name" value={data?.Firstname} disabled />
-                </div>
-                <div className="col-16 lg:col-3">
-                    <TextInput label="Surname" value={data?.Surname} disabled />
-                </div>
-                <div className="col-16  lg:col-3">
-                    <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={(e) => typeHandler(e)} label="Party Executive Role" />
-                </div>
-            </div>
-        );
-    }
-    const [row, setRow] = useState([generateRow()]);
-    var d = {id:"", name:""}
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         name: {
@@ -129,14 +187,6 @@ export const PoliticalPartyManagement = () => {
         axios.request(reqOptions).then(function (response) {
             console.log(response.data);
         });
-    }
-
-    function typeHandler(e) {
-        setSelectedExecutiveRole(e.value);
-    }
-    function formRowsHandler(){
-        setRow([... row, generateRow()])
-        setRowData({})
     }
 
     function PartyDetails() {
@@ -205,6 +255,12 @@ export const PoliticalPartyManagement = () => {
                 style={{ width: "90%", height: "90%" }}
                 modal
                 visible={showEditDialog}
+                onShow={() => {
+                    execMembersHandler();
+                    membersHandler();
+                    execMemberRoleAvail();
+                    setExecForm({ ...execForm, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID });
+                }}
                 onHide={(e) => {
                     setShowEditDialog(false);
                 }}
@@ -219,7 +275,7 @@ export const PoliticalPartyManagement = () => {
                     <TabPanel header="Executive Members">
                         <div className="grid">
                             <div className="col-5  lg:col-1">
-                                <Button onClick={formRowsHandler} className="p-button-success" icon="pi pi-plus" label="Add"></Button>
+                                <Button onClick={getExecData} className="p-button-success" icon="pi pi-plus" label="Search"></Button>
                             </div>
                         </div>
                         <div className="grid">
@@ -234,15 +290,38 @@ export const PoliticalPartyManagement = () => {
                                 <TextInput label="Surname" value={data?.Surname} disabled />
                             </div>
                             <div className="col-16  lg:col-3">
-                                <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={(e) => typeHandler(e)} label="Party Executive Role" />
+                                <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={execRoleHandler} label="Party Executive Role" />
                             </div>
                         </div>
-                        {row.map((e) => e)}
                         <div className="grid">
                             <div className="col-16  lg:col-1">
-                                <Button label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
+                                <Button onClick={SubmitExecForm} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
                             </div>
                         </div>
+                        <DataTable
+                            size="small"
+                            scrollable={true}
+                            value={execMembers}
+                            dataKey="id"
+                            paginator
+                            rows={5}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className="datatable-responsive"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                            emptyMessage="No Executive Members found."
+                            responsiveLayout="scroll"
+                            selection={selectedExecMember}
+                            onSelectionChange={(e) => setSelectedExecMember(e.value)}
+                            resizableColumns
+                            columnResizeMode="expand"
+                            filters={filters}
+                            filterDisplay="Name"
+                            globalFilterFields={["Name"]}
+                        >
+                            <Column field="Name" header="Name"></Column>
+                            <Column field="Surname" header="Surname"></Column>
+                            <Column field="Role" header="Role"></Column>
+                        </DataTable>
                     </TabPanel>
                     <TabPanel header="Members">
                         <div className="col">
@@ -255,7 +334,7 @@ export const PoliticalPartyManagement = () => {
                         <DataTable
                             size="small"
                             scrollable={true}
-                            // value={PoliticalParties}
+                            value={members}
                             dataKey="id"
                             paginator
                             rows={5}
@@ -264,19 +343,19 @@ export const PoliticalPartyManagement = () => {
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
                             emptyMessage="No members found."
                             responsiveLayout="scroll"
-                            // selection={SelectedPoliticalParty}
-                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            selection={selectedMember}
+                            onSelectionChange={(e) => setSelectedMember(e.value)}
                             resizableColumns
                             columnResizeMode="expand"
                             filters={filters}
                             filterDisplay="Name"
                             globalFilterFields={["Name"]}
                         >
-                            <Column field="Name" header="Political Party"></Column>
-                            <Column field="Receipt No" header="Receipt No" sortable></Column>
-                            <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Name" header="Name"></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="Status" header="Status"></Column>
+                            <Column field="ContactNumber" header="Contact"></Column>
+                            <Column field="Email" header="Email Address"></Column>
+                            <Column field="RegistrationNumber" header="Registration Number"></Column>
                         </DataTable>
                     </TabPanel>
                 </TabView>
@@ -287,6 +366,11 @@ export const PoliticalPartyManagement = () => {
                 style={{ width: "90%", height: "90%" }}
                 modal
                 visible={showDialog}
+                onShow={() => {
+                    execMembersHandler();
+                    membersHandler();
+                    execMemberRoleAvail();
+                }}
                 onHide={(e) => {
                     setShowDialog(false);
                 }}
@@ -302,35 +386,33 @@ export const PoliticalPartyManagement = () => {
                         <DataTable
                             size="small"
                             scrollable={true}
-                            // value={PoliticalParties}
+                            value={execMembers}
                             dataKey="id"
                             paginator
                             rows={5}
                             rowsPerPageOptions={[5, 10, 25]}
                             className="datatable-responsive"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
-                            emptyMessage="No members found."
+                            emptyMessage="No Executive Members found."
                             responsiveLayout="scroll"
-                            // selection={SelectedPoliticalParty}
-                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            selection={selectedExecMember}
+                            onSelectionChange={(e) => setSelectedExecMember(e.value)}
                             resizableColumns
                             columnResizeMode="expand"
                             filters={filters}
                             filterDisplay="Name"
                             globalFilterFields={["Name"]}
                         >
-                            <Column field="Name" header="Political Party"></Column>
-                            <Column field="Receipt No" header="Receipt No" sortable></Column>
-                            <Column field="Name" header="Name" sortable></Column>
-                            <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="Status" header="Status"></Column>
+                            <Column field="Name" header="Name"></Column>
+                            <Column field="Surname" header="Surname"></Column>
+                            <Column field="Role" header="Role"></Column>
                         </DataTable>
                     </TabPanel>
                     <TabPanel header="Members">
                         <DataTable
                             size="small"
                             scrollable={true}
-                            // value={PoliticalParties}
+                            value={members}
                             dataKey="id"
                             paginator
                             rows={5}
@@ -339,19 +421,19 @@ export const PoliticalPartyManagement = () => {
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
                             emptyMessage="No members found."
                             responsiveLayout="scroll"
-                            // selection={SelectedPoliticalParty}
-                            // onSelectionChange={(e) => setSelectedPoliticalParty(e.value)}
+                            selection={selectedMember}
+                            onSelectionChange={(e) => setSelectedMember(e.value)}
                             resizableColumns
                             columnResizeMode="expand"
                             filters={filters}
                             filterDisplay="Name"
                             globalFilterFields={["Name"]}
                         >
-                            <Column field="Name" header="Political Party"></Column>
-                            <Column field="Receipt No" header="Receipt No" sortable></Column>
-                            <Column field="Name" header="Name" sortable></Column>
+                            <Column field="Name" header="Name"></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="Status" header="Status"></Column>
+                            <Column field="ContactNumber" header="Contact"></Column>
+                            <Column field="Email" header="Email Address"></Column>
+                            <Column field="RegistrationNumber" header="Registration Number"></Column>
                         </DataTable>
                     </TabPanel>
                 </TabView>

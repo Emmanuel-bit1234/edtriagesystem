@@ -14,14 +14,25 @@ export default function PoliticalPartyService() {
         var url = `${NET_IP}/API/ChangeStatusPoliticalParty/${id}`; 
         return axios.post(url).then((response) => response.data);
     };
-    this.getAllExecutiveRoles = () => {
-        var url = `${NET_IP}/API/GetPartyExecutiveRole`; 
-        return axios.get(url).then((response) => response.data);
+    this.getAllExecutiveRoles = (id) => {
+        var url = `${NET_IP}/API/GetAvailablePartyExecutiveRole/${id}`; 
+        return axios.post(url).then((response) => response.data);
     };
     this.getExecutiveDetails = (regNum) => {
 
         var url = `${NET_IP}/API/GetVoterDetailsByRegNumber/${regNum}`
         return axios.post(url).then((response) => response.data?.VoterDetails[0]);
-    }
-
+    };
+    this.addExecutiveMember = (data) => {
+        var url = `${NET_IP}/API/AssignExecutiveMember`;
+        return axios.post(url, data).then((response) => response.data);
+    };
+    this.getExecMembersByParty = (id) => {
+        var url = `${NET_IP}/API/GetPartyExecutiveMembers/${id}`;
+        return axios.get(url).then((response) => response.data.ExecutiveList);
+    };
+    this.getMembersByParty = (id) => {
+        var url = `${NET_IP}/API/GetPoliticalPartyMembers/${id}`;
+        return axios.get(url).then((response) => response.data.MemberList);
+    };
 }
