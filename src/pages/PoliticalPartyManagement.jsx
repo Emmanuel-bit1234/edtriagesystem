@@ -32,6 +32,7 @@ export const PoliticalPartyManagement = () => {
     var [PoliticalParties, setPoliticalParties] = useState([]);
     var [executiveRoles, setExecutiveRoles] = useState([]);
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
+    let [data, setData] = useState([]);
     var [form, setForm] = useState({
         File: "",
         FileName: "",
@@ -75,6 +76,33 @@ export const PoliticalPartyManagement = () => {
         var executives = {
             Executives: [newForm],
         };
+        if(registrationNumber == "" && selectedExecutiveRole == "Select an Executive Role")
+        {
+            return toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "Ooops, Please enter a Registration Number and select a Party Executive Role",
+                life: 4400,
+            });
+        }
+        if(registrationNumber == "")
+        {
+            return toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "Ooops, Please enter a Registration Number",
+                life: 2000,
+            });
+        }
+        if(selectedExecutiveRole == "Select an Executive Role")
+        {
+            return toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "Ooops, Please select a Party Executive Role",
+                life: 2000,
+            });
+        }
         var PoliticalParty = new PoliticalPartyService();
         PoliticalParty.addExecutiveMember(executives)
             .then((res) => {
@@ -90,10 +118,10 @@ export const PoliticalPartyManagement = () => {
                             life: 1500,
                         });
                     });
-                    setExecForm({ PartyExecutiveRoleID: "", RegistrationNumber: "", PoliticalPartyID: "" });
                     setSelectedExecutiveRole("Select an Executive Role")
                     execMemberRoleAvail()
-                    // setData("")
+                    setData([])
+                    setRegistrationNumber("")
                 }, 1500);
             })
             .catch((e) => {
@@ -116,7 +144,6 @@ export const PoliticalPartyManagement = () => {
             return false;
         }
     }
-    let [data, setData] = useState([]);
     const [registrationNumber, setRegistrationNumber] = useState("");
     const inputFileRef = useRef(null);
     const onBtnClick = () => {
@@ -131,9 +158,32 @@ export const PoliticalPartyManagement = () => {
     }, []);
 
     function getExecData() {
-        PoliticalParty.getExecutiveDetails(registrationNumber).then((e) => {
-            setData(e);
-        });
+        if(registrationNumber != "" && registrationNumber.length >= 12)
+        {
+            PoliticalParty.getExecutiveDetails(registrationNumber).then((e) => {
+                setData(e);
+            });
+        }
+        if(registrationNumber == "")
+        {
+            toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "Please enter a Registration Number",
+                life: 3000,
+            });
+            return false;
+        }
+        if(registrationNumber.length < 12)
+        {
+            toast.current.show({
+                severity: "error",
+                summary: "Error Message",
+                detail: "Please enter a valid Registration Number",
+                life: 3000,
+            });
+            return false;
+        }
     }
 
     const [filters, setFilters] = useState({
@@ -251,7 +301,11 @@ export const PoliticalPartyManagement = () => {
             </div>
             <Dialog
                 draggable={false}
-                header={<h4>Political party details</h4>}
+                header={
+                <span>
+                    {`Political Party Details - ${SelectedPoliticalParty?.Name}`}
+                </span>
+                }
                 style={{ width: "90%", height: "90%" }}
                 modal
                 visible={showEditDialog}
@@ -275,7 +329,7 @@ export const PoliticalPartyManagement = () => {
                     <TabPanel header="Executive Members">
                         <div className="grid">
                             <div className="col-5  lg:col-1">
-                                <Button onClick={getExecData} className="p-button-success" icon="pi pi-plus" label="Search"></Button>
+                                <Button onClick={getExecData} className="p-button-success" icon="pi pi-search" label="Search"></Button>
                             </div>
                         </div>
                         <div className="grid">
@@ -294,10 +348,11 @@ export const PoliticalPartyManagement = () => {
                             </div>
                         </div>
                         <div className="grid">
-                            <div className="col-16  lg:col-1">
+                            <div className="col-5  lg:col-1">
                                 <Button onClick={SubmitExecForm} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
                             </div>
                         </div>
+                        <div style={{ visibility: "hidden" }}>Space</div>
                         <DataTable
                             size="small"
                             scrollable={true}
@@ -362,7 +417,7 @@ export const PoliticalPartyManagement = () => {
             </Dialog>
             <Dialog
                 draggable={false}
-                header={<h4>Political party details</h4>}
+                header={<span>{`Political Party Details - ${SelectedPoliticalParty?.Name} `}</span>}
                 style={{ width: "90%", height: "90%" }}
                 modal
                 visible={showDialog}
