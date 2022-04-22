@@ -92,8 +92,8 @@ export const PoliticalPartyManagement = () => {
                     });
                     setExecForm({ PartyExecutiveRoleID: "", RegistrationNumber: "", PoliticalPartyID: "" });
                     setSelectedExecutiveRole("Select an Executive Role")
-                    execMembersHandler()
-
+                    execMemberRoleAvail()
+                    // setData("")
                 }, 1500);
             })
             .catch((e) => {
