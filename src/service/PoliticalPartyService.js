@@ -35,4 +35,8 @@ export default function PoliticalPartyService() {
         var url = `${NET_IP}/API/GetPoliticalPartyMembers/${id}`;
         return axios.get(url).then((response) => response.data.MemberList);
     };
+    this.addCsvMembers = (data) => {
+        var url = `${NET_IP}/API/CheckPoliticalPartyMembersCSV`; 
+        return axios.post(url,data).then((response) => response.data);
+    }
 }

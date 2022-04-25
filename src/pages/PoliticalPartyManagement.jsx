@@ -36,6 +36,8 @@ export const PoliticalPartyManagement = () => {
     var [form, setForm] = useState({
         File: "",
         FileName: "",
+        PoliticalPartyID:"",
+
     });
     var [execForm, setExecForm] = useState({
         PartyExecutiveRoleID: "",
@@ -76,8 +78,7 @@ export const PoliticalPartyManagement = () => {
         var executives = {
             Executives: [newForm],
         };
-        if(registrationNumber == "" && selectedExecutiveRole == "Select an Executive Role")
-        {
+        if (registrationNumber == "" && selectedExecutiveRole == "Select an Executive Role") {
             return toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -85,8 +86,7 @@ export const PoliticalPartyManagement = () => {
                 life: 4400,
             });
         }
-        if(registrationNumber == "")
-        {
+        if (registrationNumber == "") {
             return toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -94,8 +94,7 @@ export const PoliticalPartyManagement = () => {
                 life: 2000,
             });
         }
-        if(selectedExecutiveRole == "Select an Executive Role")
-        {
+        if (selectedExecutiveRole == "Select an Executive Role") {
             return toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -118,10 +117,10 @@ export const PoliticalPartyManagement = () => {
                             life: 1500,
                         });
                     });
-                    setSelectedExecutiveRole("Select an Executive Role")
-                    execMemberRoleAvail()
-                    setData([])
-                    setRegistrationNumber("")
+                    setSelectedExecutiveRole("Select an Executive Role");
+                    execMemberRoleAvail();
+                    setData([]);
+                    setRegistrationNumber("");
                 }, 1500);
             })
             .catch((e) => {
@@ -158,14 +157,12 @@ export const PoliticalPartyManagement = () => {
     }, []);
 
     function getExecData() {
-        if(registrationNumber != "" && registrationNumber.length >= 12)
-        {
+        if (registrationNumber != "" && registrationNumber.length >= 12) {
             PoliticalParty.getExecutiveDetails(registrationNumber).then((e) => {
                 setData(e);
             });
         }
-        if(registrationNumber == "")
-        {
+        if (registrationNumber == "") {
             toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -174,8 +171,7 @@ export const PoliticalPartyManagement = () => {
             });
             return false;
         }
-        if(registrationNumber.length < 12)
-        {
+        if (registrationNumber.length < 12) {
             toast.current.show({
                 severity: "error",
                 summary: "Error Message",
@@ -214,28 +210,32 @@ export const PoliticalPartyManagement = () => {
             });
         });
     }
+
+    var convertBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+        });
+    };
     async function onUploadHandler(e) {
-        let headersList = {
-            Accept: "*/*",
-            // "User-Agent": "Thunder Client (https://www.thunderclient.com)"
-        };
-
-        let formdata = new FormData();
         var file = e.target.files[0];
-        console.log(file);
-        formdata.append("csvFile", file);
-        setForm({ ...form, FileName: file.name });
-
-        let bodyContent = formdata;
-
-        let reqOptions = {
-            url: "http://20.87.43.104:84/API/CheckPoliticalPartyMembersCSV",
-            method: "POST",
-            headers: headersList,
-            body: bodyContent,
-        };
-        axios.request(reqOptions).then(function (response) {
-            console.log(response.data);
+        const base64 = await convertBase64(file);
+        var base64result = base64.split(",")[1];
+        console.log(base64result);
+    
+        let bodyContent = base64result;
+        await setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID });
+        console.log(form) 
+    }
+    function submitUpload(){
+        PoliticalParty.addCsvMembers(form).then((e) => {
+            console.log(e)
         });
     }
 
@@ -301,11 +301,7 @@ export const PoliticalPartyManagement = () => {
             </div>
             <Dialog
                 draggable={false}
-                header={
-                <span>
-                    {`Political Party Details - ${SelectedPoliticalParty?.Name}`}
-                </span>
-                }
+                header={<span>{`Political Party Details - ${SelectedPoliticalParty?.Name}`}</span>}
                 style={{ width: "90%", height: "90%" }}
                 modal
                 visible={showEditDialog}
@@ -382,8 +378,9 @@ export const PoliticalPartyManagement = () => {
                         <div className="col">
                             <label htmlFor="description">Upload a CSV</label> <br></br>
                             <React.Fragment>
-                                <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
+                                <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success mr-3" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
                                 <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
+                                <Button onClick={submitUpload} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
                             </React.Fragment>
                         </div>
                         <DataTable
