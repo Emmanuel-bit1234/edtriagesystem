@@ -140,7 +140,7 @@ export const Adjudication = () => {
             },
             {
                 name: "Captured By",
-                value: selectedObjections?.CapturedBy,
+                value: selectedObjections?.RegisteredUserName,
             },
             {
                 name: "Objection Status",
