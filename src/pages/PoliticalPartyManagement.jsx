@@ -36,9 +36,9 @@ export const PoliticalPartyManagement = () => {
     var [form, setForm] = useState({
         File: "",
         FileName: "",
-        PoliticalPartyID:"",
-
+        PoliticalPartyID: "",
     });
+    var [csvData, setCsvData] = useState([]);
     var [execForm, setExecForm] = useState({
         PartyExecutiveRoleID: "",
         RegistrationNumber: "",
@@ -223,19 +223,49 @@ export const PoliticalPartyManagement = () => {
             };
         });
     };
+    var handleFiles = (file) => {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsText(file);
+            fileReader.onload = () => {
+                resolve(fileReader.result);
+            };
+            fileReader.onerror = (error) => {
+                reject(error);
+            };
+        });
+    };
     async function onUploadHandler(e) {
         var file = e.target.files[0];
         const base64 = await convertBase64(file);
         var base64result = base64.split(",")[1];
+        var result = await handleFiles(file);
+        var check = false;
+
+        var r = result
+            .replace("\r", "")
+            .split("\r\n")
+            .filter((e) => e.split(",").length === 3)
+            .map((e) => {
+                var row = e.split(",");
+                return {
+                    Name: row[0],
+                    Surname: row[1],
+                    RegistrationNumber: row[2],
+                };
+            });
+        setCsvData(r);
+        console.log(r);
+        console.log(check);
         console.log(base64result);
-    
+
         let bodyContent = base64result;
         await setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID });
-        console.log(form) 
+        console.log(form);
     }
-    function submitUpload(){
+    function submitUpload() {
         PoliticalParty.addCsvMembers(form).then((e) => {
-            console.log(e)
+            console.log(e);
         });
     }
 
@@ -386,7 +416,7 @@ export const PoliticalPartyManagement = () => {
                         <DataTable
                             size="small"
                             scrollable={true}
-                            value={members}
+                            value={csvData}
                             dataKey="id"
                             paginator
                             rows={5}
@@ -405,8 +435,8 @@ export const PoliticalPartyManagement = () => {
                         >
                             <Column field="Name" header="Name"></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="ContactNumber" header="Contact"></Column>
-                            <Column field="Email" header="Email Address"></Column>
+                            {/* <Column field="ContactNumber" header="Contact"></Column> */}
+                            {/* <Column field="Email" header="Email Address"></Column> */}
                             <Column field="RegistrationNumber" header="Registration Number"></Column>
                         </DataTable>
                     </TabPanel>
