@@ -33,6 +33,7 @@ export const PoliticalPartyManagement = () => {
     var [executiveRoles, setExecutiveRoles] = useState([]);
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
     let [data, setData] = useState([]);
+    var [load, setLoad] = useState(false);
     var [form, setForm] = useState({
         File: "",
         FileName: "",
@@ -236,6 +237,7 @@ export const PoliticalPartyManagement = () => {
         });
     };
     async function onUploadHandler(e) {
+        setLoad(true);
         var file = e.target.files[0];
         const base64 = await convertBase64(file);
         var base64result = base64.split(",")[1];
@@ -243,9 +245,8 @@ export const PoliticalPartyManagement = () => {
         var check = false;
 
         var r = result
-            .replace("\r", "")
-            .split("\r\n")
-            .filter((e) => e.split(",").length === 3)
+            .split("\n")
+            .filter((e,i) => e.split(",").length === 3 && i != 0)
             .map((e) => {
                 var row = e.split(",");
                 return {
@@ -261,7 +262,7 @@ export const PoliticalPartyManagement = () => {
 
         let bodyContent = base64result;
         await setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID });
-        console.log(form);
+        await setLoad(false);
     }
     function submitUpload() {
         PoliticalParty.addCsvMembers(form).then((e) => {
@@ -413,13 +414,17 @@ export const PoliticalPartyManagement = () => {
                                 <Button onClick={submitUpload} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />
                             </React.Fragment>
                         </div>
+                        <div style={{ visibility: "hidden" }}>Space</div>
+                        <div style={{ visibility: "hidden" }}>Space</div>
                         <DataTable
                             size="small"
                             scrollable={true}
+                            scrollHeight="400px"
                             value={csvData}
                             dataKey="id"
-                            paginator
-                            rows={5}
+                            loading={load}
+                            // paginator
+                            // rows={5}
                             rowsPerPageOptions={[5, 10, 25]}
                             className="datatable-responsive"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
@@ -433,7 +438,7 @@ export const PoliticalPartyManagement = () => {
                             filterDisplay="Name"
                             globalFilterFields={["Name"]}
                         >
-                            <Column field="Name" header="Name"></Column>
+                            <Column field="Name" header="Name" sortable></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
                             {/* <Column field="ContactNumber" header="Contact"></Column> */}
                             {/* <Column field="Email" header="Email Address"></Column> */}
