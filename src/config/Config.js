@@ -1,4 +1,21 @@
-export var NET_IP = "http://20.87.43.104:84";
-export var MICRO_SERVICE_IP = "http://20.87.43.104:8084";
-export var LOCALHOST_NET_IP = "https://localhost:44317";
+import moment from 'moment'
 
+export var NET_IP = 'http://20.87.43.104:84'
+export var MICRO_SERVICE_IP = 'http://20.87.43.104:8084'
+export var LOCALHOST_NET_IP = 'https://localhost:44317'
+
+var dateOnly = ' Do MMMM YYYY'
+var timeOnly = ' HH:mm'
+var dateTime = ' Do MMMM YYYY HH:mm'
+
+export function getMomentDate(date) {
+  return moment(date).format(dateOnly)
+}
+
+export function getMomentTime(date) {
+  return moment(date).format(timeOnly)
+}
+
+export function getMomentDateTime(date) {
+  return moment(date).format(dateTime)
+}
