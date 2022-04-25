@@ -135,7 +135,7 @@ export const Objections = () => {
             },
             {
                 name: "Captured By",
-                value: selectedObjections?.CapturedBy,
+                value: selectedObjections?.RegisteredUserName,
             },
             {
                 name: "Objection Status",

@@ -34,10 +34,12 @@ export const PoliticalPartyManagement = () => {
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
     let [data, setData] = useState([]);
     var [load, setLoad] = useState(false);
+    var user = JSON.parse(localStorage.getItem("user"));
     var [form, setForm] = useState({
         File: "",
         FileName: "",
         PoliticalPartyID: "",
+        CreatedBy: user?.id?user.id:1,
     });
     var [csvData, setCsvData] = useState([]);
     var [execForm, setExecForm] = useState({
