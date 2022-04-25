@@ -22,7 +22,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
     var [SelectedObjectionType, setselectedObjectionType] = useState("Select an Objection Type");
     let [event, setEvent] = useState([]);
     var [selectedEvent, setSelectedEvent] = useState("Select an Event");
-
+    var user = JSON.parse(localStorage.getItem("user"));
     useEffect(() => {
         eventGroupService.getAllEventGroups().then((data) => {
             setEventGroup(data);
@@ -55,12 +55,12 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
         ObjectionReason: "Testing",
         Name: "",
         IDnumber: "",
-        Description: "",
+        ObjectionDescription: "",
         DateLodged: "",
         RegistrationNumber: "",
         SelectedObjectionType: null,
         Comment: "",
-        CapturedBy: 1,
+        CapturedBy: user?.id?user.id:1,
         ObjectionEntityID: 1,
     });
     var [eventgroupHolder, setEvenGroupHolder] = useState({
@@ -157,7 +157,7 @@ export default function AddObjections({ buttonName = "Save", buttonIcon = "pi pi
                                         <DropDown label="Objection Type" optionLabel="Name" placeholder="Select objection type" options={objectionType} onChange={(e) => objectionTypeHandler(e)} value={SelectedObjectionType} style={{ width: "100%" }} />
                                     </div>
                                     <div className="col-12  lg:col-4">
-                                        <InputTextArea rows="2" cols="61" label="Objection Description" value={form.Description} onChange={(e) => setForm({ ...form, Description: e.target.value })} />
+                                        <InputTextArea rows="2" cols="61" label="Objection Description" value={form.ObjectionDescription} onChange={(e) => setForm({ ...form, ObjectionDescription: e.target.value })} />
                                     </div>
                                     <div className="col-12  lg:col-4">
                                         <InputTextArea rows="2" cols="61" label="Comment" value={form.Comment} onChange={(e) => setForm({ ...form, Comment: e.target.value })} />

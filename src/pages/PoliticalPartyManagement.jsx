@@ -229,7 +229,7 @@ export const PoliticalPartyManagement = () => {
         let bodyContent = formdata;
 
         let reqOptions = {
-            url: "http://20.87.43.104:84/API/AddPoliticalPartyMembersCSV",
+            url: "http://20.87.43.104:84/API/CheckPoliticalPartyMembersCSV",
             method: "POST",
             headers: headersList,
             body: bodyContent,
