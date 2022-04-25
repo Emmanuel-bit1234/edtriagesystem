@@ -267,8 +267,21 @@ export const PoliticalPartyManagement = () => {
         await setLoad(false);
     }
     function submitUpload() {
-        PoliticalParty.addCsvMembers(form).then((e) => {
-            console.log(e);
+        PoliticalParty.addCsvMembers(form)
+        .then((e) => {
+            window.location.reload();
+            // console.log(e);
+            // setCsvData(e.NotRegistered.List);
+            return toast.current.show({
+                severity: e.StrResul,
+                summary: "Success Message",
+                detail: e.StrContent,
+                life: 4000,
+            });
+        })
+        .catch((e) => {
+            submittedForm = false;
+            return toast.current.show({ severity: "error", summary: "Error Message", detail: "Ooops, The is a technical problem,Please Try Again", life: 3000 });
         });
     }
 
