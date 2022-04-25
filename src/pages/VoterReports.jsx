@@ -18,6 +18,9 @@ export const VoterReports = () => {
         { name: "The Deceased Report", reportID: 3 },
         { name: "Underage Electors Report", reportID: 4 },
         { name: "Pending Transfers Report", reportID: 5 },
+        { name: "Disability Drill Down Report", reportID: 6 },
+
+        
     ];
 
     var [selectedOption, setSelectedOption] = useState(null);
@@ -298,7 +301,7 @@ export const VoterReports = () => {
                                 }
                             >
                                 {/* layout={layout} */}
-                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${LOCALHOST_NET_IP}/report/preview`} />
+                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}/report/preview`} />
                             </div>
                         </Worker>
                     ) : (
