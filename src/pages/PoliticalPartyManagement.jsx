@@ -533,8 +533,8 @@ export const PoliticalPartyManagement = () => {
                         >
                             <Column field="Name" header="Name"></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="ContactNumber" header="Contact"></Column>
-                            <Column field="Email" header="Email Address"></Column>
+                            {/* <Column field="ContactNumber" header="Contact"></Column>
+                            <Column field="Email" header="Email Address"></Column> */}
                             <Column field="RegistrationNumber" header="Registration Number"></Column>
                         </DataTable>
                     </TabPanel>
