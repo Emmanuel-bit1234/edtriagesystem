@@ -294,25 +294,29 @@ export const PoliticalPartyManagement = () => {
         return await proccess(bodyContent, file);
     }
     async function proccess(bodyContent, file) {
-        var f = { ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID, CreatedBy: user?.id ? user.id : 1 };
-        console.log(444, f);
-        setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID });
+        var formBody = { ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID, CreatedBy: user?.id ? user.id : 1 };
+        setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID, CreatedBy: user?.id ? user.id : 1 });
         setLoad(false);
-        checkregisteredMembers(f);
+        checkregisteredMembers(formBody);
     }
-    function checkregisteredMembers(f) {
-        console.log(f);
-        PoliticalParty.verifyRegisteredPartyMembersCsv(f)
+    function checkregisteredMembers(form) {
+        PoliticalParty.verifyRegisteredPartyMembersCsv(form)
             .then((e) => {
                 var registered = e?.object1.RegisteredVoters;
                 console.log("Registered", registered);
                 if (registered != null) {
                     setRegisterdMembers(registered);
                 }
+                if (registered == null) {
+                    setRegisterdMembers([]);
+                }
                 var Nonregistered = e?.object2.NonRegisteredVoters;
-                console.log("Non Registered", Nonregistered);
+                console.log("Not Registered", Nonregistered);
                 if (Nonregistered !== null) {
                     setNonRegisterdMembers(Nonregistered);
+                }
+                if (Nonregistered == null) {
+                    setNonRegisterdMembers([]);
                 }
             })
             .catch((e) => {
@@ -530,7 +534,7 @@ export const PoliticalPartyManagement = () => {
                                     <Column field="RegistrationNumber" header="Registration Number"></Column>
                                 </DataTable>
                             </TabPanel>
-                            <TabPanel header="Non Registered">
+                            <TabPanel header="Not Registered">
                                 <DataTable
                                     size="small"
                                     scrollable={true}
