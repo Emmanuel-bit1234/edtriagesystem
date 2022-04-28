@@ -6,6 +6,7 @@ export default function TextInput({placeholder="",label = "", type = "text", val
     return type === "text" ? (
         <div className="p-fluid">
             <label>{label}</label>
+            {/* <div style={{ visibility: "hidden" }}>LOGO</div>   */}
             <InputText placeholder={placeholder} value={value} onChange={onChange} disabled={disabled} />
             <small style={{ width: "100%" }} className="p-error">
                 {/* input error{" "} */}

@@ -128,7 +128,7 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
             header={
                 <>
                     <li className="pi pi-plus"> </li>
-                    <span>Add Party</span>
+                    <span> Add Party</span>
                 </>
             }
             footer={
@@ -169,6 +169,7 @@ export default function AddPoliticalParty({ setPoliticalParties, buttonName = "S
                                 <div className="grid">
                                     <div className="col-12  lg:col-4">
                                         <label htmlFor="description">Logo/Symbol</label> <br></br>
+                                        <div style={{ visibility: "hidden" }}>LOGO</div>  
                                         <React.Fragment>
                                             <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
                                             <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e.target)} style={{ display: "none" }}></input>

@@ -5,6 +5,7 @@ export default function InputTextArea ({placeholder="",label = "", type = "text"
     return (
         <div className="p-fluid">
             <label>{label}</label>
+            {/* <div style={{ visibility: "hidden" }}>LOGO</div>   */}
             <InputTextarea placeholder={placeholder} value={value} onChange={onChange} disabled={disabled} />
         </div>
     )   
