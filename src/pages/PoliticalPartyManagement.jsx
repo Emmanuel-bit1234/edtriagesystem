@@ -34,13 +34,14 @@ export const PoliticalPartyManagement = () => {
     var [selectedExecutiveRole, setSelectedExecutiveRole] = useState("Select an Executive Role");
     let [data, setData] = useState([]);
     var [load, setLoad] = useState(false);
+    var [allFiles, setAllFiles] = useState({ CSV: [] });
     var user = JSON.parse(localStorage.getItem("user"));
-    var [form, setForm] = useState({
-        File: "",
-        FileName: "",
-        PoliticalPartyID: "",
-        CreatedBy: user?.id ? user.id : 1,
-    });
+    // var [form, setForm] = useState({
+    //     File: "",
+    //     FileName: "",
+    //     PoliticalPartyID: "",
+    //     CreatedBy: user?.id ? user.id : 1,
+    // });
     var [csvData, setCsvData] = useState([]);
     var [registerdMembers, setRegisterdMembers] = useState();
     var [NonRegisterdMembers, setNonRegisterdMembers] = useState();
@@ -74,6 +75,11 @@ export const PoliticalPartyManagement = () => {
         PoliticalParty.getAllExecutiveRoles(id).then((data) => {
             setExecutiveRoles(data);
         });
+    }
+    function clearExecdata() {
+        setSelectedExecutiveRole("Select an Executive Role");
+        setData([]);
+        setRegistrationNumber("");
     }
     var submittedForm = false;
     function SubmitExecForm() {
@@ -269,39 +275,34 @@ export const PoliticalPartyManagement = () => {
     };
     async function onUploadHandler(e) {
         setLoad(true);
-        var file = e.target.files[0];
-        const base64 = await convertBase64(file);
-        var base64result = base64.split(",")[1];
-        //var result = await handleFiles(file);
-        // var check = false;
-
-        // var r = result
-        //     .split("\n")
-        //     .filter((e, i) => e.split(",").length === 3 && i != 0)
-        //     .map((e) => {
-        //         var row = e.split(",");
-        //         return {
-        //             Name: row[0],
-        //             Surname: row[1],
-        //             RegistrationNumber: row[2],
-        //         };
-        //     });
-        // setRegisterdMembers(r);
-        // console.log(r);
-        // console.log(check);
-        console.log(base64result);
-        let bodyContent = base64result;
-        return await proccess(bodyContent, file);
+        var files = [];
+        var file = e.target.files;
+        for (var i = 0; i < file.length; i++) {
+            console.log(`file ${i}:`, file[i]);
+            const base64 = await convertBase64(file[i]);
+            var base64result = base64.split(",")[1];
+            console.log(4444, base64result);
+            let bodyContent = base64result;
+            files.push({
+                File: bodyContent,
+                FileName: i + ".csv",
+                PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID,
+                CreatedBy: user?.id ? user.id : 1,
+            });
+        }
+        console.log(444, files);
+        proccess({ CSV: files });
     }
-    async function proccess(bodyContent, file) {
-        var formBody = { ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID, CreatedBy: user?.id ? user.id : 1 };
-        setForm({ ...form, FileName: file.name, File: bodyContent, PoliticalPartyID: SelectedPoliticalParty?.PoliticalPartyID, CreatedBy: user?.id ? user.id : 1 });
+    async function proccess(files) {
         setLoad(false);
-        checkregisteredMembers(formBody);
+        await checkregisteredMembers(files);
+        setAllFiles(files);
     }
-    function checkregisteredMembers(form) {
-        PoliticalParty.verifyRegisteredPartyMembersCsv(form)
+    function checkregisteredMembers(files) {
+        console.log(files);
+        PoliticalParty.verifyRegisteredPartyMembersCsv(files)
             .then((e) => {
+                console.log(e);
                 var registered = e?.object1.RegisteredVoters;
                 console.log("Registered", registered);
                 if (registered != null) {
@@ -325,19 +326,12 @@ export const PoliticalPartyManagement = () => {
             });
     }
     function submitUpload() {
-        PoliticalParty.addCsvMembers(form)
+        console.log("Testing", allFiles);
+        PoliticalParty.addCsvMembers(allFiles)
             .then((e) => {
                 setRegisterdMembers([]);
                 setNonRegisterdMembers([]);
-                setForm({
-                    File: "",
-                    FileName: "",
-                    PoliticalPartyID: "",
-                    CreatedBy: "",
-                });
-                // window.location.reload();
-                // console.log(e);
-                // setCsvData(e.NotRegistered.List);
+                setAllFiles({ CSV: [] });
                 toast.current.show({
                     severity: "success",
                     summary: "Success",
@@ -428,12 +422,6 @@ export const PoliticalPartyManagement = () => {
                     setShowEditDialog(false);
                     setRegisterdMembers([]);
                     setNonRegisterdMembers([]);
-                    setForm({
-                        File: "",
-                        FileName: "",
-                        PoliticalPartyID: "",
-                        CreatedBy: "",
-                    });
                 }}
             >
                 <TabView>
@@ -444,38 +432,70 @@ export const PoliticalPartyManagement = () => {
                         </DataTable>
                     </TabPanel>
                     <TabPanel header="Executive Members">
-                        <div className="grid">
-                            <div className="col-5  lg:col-1">
-                                <Button onClick={getExecData} className="p-button-success" icon="pi pi-search" label="Search"></Button>
+                        {data?.StrResult == "Success" || data?.StrResult == "Warning" ? (
+                            <div className="grid">
+                                <div className="col-16  lg:col-3">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                    <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
+                                </div>
+                                <div className="col-16  lg:col-3">
+                                    <TextInput label="First name" value={data?.Firstname} disabled />
+                                </div>
+                                <div className="col-16 lg:col-3">
+                                    <TextInput label="Surname" value={data?.Surname} disabled />
+                                </div>
+                                <div className="col-16  lg:col-3">
+                                    <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={execRoleHandler} label="Party Executive Role" />
+                                </div>
                             </div>
-                        </div>
-                        <div className="grid">
-                            <div className="col-16  lg:col-3">
-                                <div style={{ visibility: "hidden" }}>Search</div>
-                                <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
+                        ) : (
+                            <div className="grid">
+                                <div className="col-16  lg:col-3">
+                                    <div style={{ visibility: "hidden" }}>Search</div>
+                                    <InputText placeholder="Registration Number" value={registrationNumber} onInput={(e) => setRegistrationNumber(e.target.value)} style={{ width: "100%" }} />
+                                </div>
                             </div>
-                            <div className="col-16  lg:col-3">
-                                <TextInput label="First name" value={data?.Firstname} disabled />
+                        )}
+                        {selectedExecutiveRole != "Select an Executive Role" && data?.Firstname != null && (
+                            <div className="grid">
+                                <div className="col-6  lg:col-2">
+                                    <Button onClick={SubmitExecForm} label="Add as Excecutive Member" className="p-button-success" icon="pi pi-plus" type="submit" style={{ width: 250 }}  />
+                                    
+                                </div>
+                                <div className="col-6  lg:col-4">
+                                    <Button onClick={clearExecdata} label="Clear" style={{marginLeft:35}}></Button>
+                                </div>
                             </div>
-                            <div className="col-16 lg:col-3">
-                                <TextInput label="Surname" value={data?.Surname} disabled />
+                        )}
+                        {selectedExecutiveRole == "Select an Executive Role" && (
+                            <div>
+                                {registrationNumber != "" ? (
+                                    <div className="grid">
+                                        <div className="col-4  lg:col-1">
+                                            <Button onClick={getExecData} className="p-button-success" icon="pi pi-search" label="Search"></Button>
+                                        </div>
+                                        <div className="col-4  lg:col-1">
+                                            <Button onClick={clearExecdata} label="Clear"></Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid">
+                                        <div className="col-5  lg:col-1">
+                                            <Button disabled onClick={getExecData} className="p-button-success" icon="pi pi-search" label="Search"></Button>
+                                        </div>
+                                        <div className="col-5  lg:col-1">
+                                            <Button disabled onClick={clearExecdata} label="Clear"></Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="col-16  lg:col-3">
-                                <DropDown options={executiveRoles} optionLabel="Name" value={selectedExecutiveRole} onChange={execRoleHandler} label="Party Executive Role" />
-                            </div>
-                        </div>
-                        <div className="grid">
-                            <div className="col-5  lg:col-1">{selectedExecutiveRole != "Select an Executive Role" && data?.Firstname != null && <Button onClick={SubmitExecForm} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />}</div>
-                        </div>
+                        )}
                         <div style={{ visibility: "hidden" }}>Space</div>
                         <DataTable
                             size="small"
                             scrollable={true}
                             value={execMembers}
                             dataKey="id"
-                            // paginator
-                            // rows={5}
-                            // rowsPerPageOptions={[5, 10, 25]}
                             className="datatable-responsive"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
                             emptyMessage="No Executive Members found."
@@ -495,75 +515,70 @@ export const PoliticalPartyManagement = () => {
                     </TabPanel>
                     <TabPanel header="Members">
                         <div className="col">
-                            <label htmlFor="description">Upload a CSV</label>
+                            <label htmlFor="description">Upload CSV files</label>
                             <div style={{ visibility: "hidden" }}>Space</div>
                             <React.Fragment>
-                                <Button label={form.FileName.trim().length === 0 ? "Select a file" : form.FileName} onClick={onBtnClick} className="p-button-success mr-3" icon={form.FileName.trim().length === 0 ? "pi pi-plus" : ""} />
-                                <input ref={inputFileRef} type={"file"} onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
-                                {form.FileName.trim().length > 0 && <Button onClick={submitUpload} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />}
+                                <Button label="Select files" onClick={onBtnClick} className="mr-3" icon={"pi pi-plus"} />
+                                <input ref={inputFileRef} type={"file"} multiple onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
+                                {allFiles.CSV?.length > 0 && <Button onClick={submitUpload} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />}
                             </React.Fragment>
                         </div>
                         <div style={{ visibility: "hidden" }}>Space</div>
-                        {form.FileName.trim().length > 0 &&
-                        <TabView>
-                            <TabPanel header="Registered">
-                                <DataTable
-                                    size="small"
-                                    scrollable={true}
-                                    scrollHeight="400px"
-                                    value={registerdMembers} /// Display the response from thierry
-                                    dataKey="id"
-                                    loading={load}
-                                    // paginator
-                                    // rows={5}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                    className="datatable-responsive"
-                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
-                                    emptyMessage="No members found."
-                                    responsiveLayout="scroll"
-                                    selection={selectedMember}
-                                    onSelectionChange={(e) => setSelectedMember(e.value)}
-                                    resizableColumns
-                                    columnResizeMode="expand"
-                                    filters={filters}
-                                    filterDisplay="Name"
-                                    globalFilterFields={["Name"]}
-                                >
-                                    <Column field="Name" header="Name" sortable></Column>
-                                    <Column field="Surname" header="Surname" sortable></Column>
-                                    <Column field="RegistrationNumber" header="Registration Number"></Column>
-                                </DataTable>
-                            </TabPanel>
-                            <TabPanel header="Not Registered">
-                                <DataTable
-                                    size="small"
-                                    scrollable={true}
-                                    scrollHeight="400px"
-                                    value={NonRegisterdMembers} /// Display the response from thierry
-                                    dataKey="id"
-                                    loading={load}
-                                    // paginator
-                                    // rows={5}
-                                    rowsPerPageOptions={[5, 10, 25]}
-                                    className="datatable-responsive"
-                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
-                                    emptyMessage="No members found."
-                                    responsiveLayout="scroll"
-                                    selection={selectedMember}
-                                    onSelectionChange={(e) => setSelectedMember(e.value)}
-                                    resizableColumns
-                                    columnResizeMode="expand"
-                                    filters={filters}
-                                    filterDisplay="Name"
-                                    globalFilterFields={["Name"]}
-                                >
-                                    <Column field="Name" header="Name" sortable></Column>
-                                    <Column field="Surname" header="Surname" sortable></Column>
-                                    <Column field="RegistrationNumber" header="Registration Number"></Column>
-                                </DataTable>
-                            </TabPanel>
-                        </TabView>
-                         }
+                        {allFiles.CSV?.length > 0 && (
+                            <TabView>
+                                <TabPanel header="Registered">
+                                    <DataTable
+                                        size="small"
+                                        scrollable={true}
+                                        scrollHeight="400px"
+                                        value={registerdMembers}
+                                        dataKey="id"
+                                        loading={load}
+                                        rowsPerPageOptions={[5, 10, 25]}
+                                        className="datatable-responsive"
+                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                                        emptyMessage="No members found."
+                                        responsiveLayout="scroll"
+                                        selection={selectedMember}
+                                        onSelectionChange={(e) => setSelectedMember(e.value)}
+                                        resizableColumns
+                                        columnResizeMode="expand"
+                                        filters={filters}
+                                        filterDisplay="Name"
+                                        globalFilterFields={["Name"]}
+                                    >
+                                        <Column field="Name" header="Name" sortable></Column>
+                                        <Column field="Surname" header="Surname" sortable></Column>
+                                        <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                    </DataTable>
+                                </TabPanel>
+                                <TabPanel header="Not Registered">
+                                    <DataTable
+                                        size="small"
+                                        scrollable={true}
+                                        scrollHeight="400px"
+                                        value={NonRegisterdMembers}
+                                        loading={load}
+                                        rowsPerPageOptions={[5, 10, 25]}
+                                        className="datatable-responsive"
+                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                                        emptyMessage="No members found."
+                                        responsiveLayout="scroll"
+                                        selection={selectedMember}
+                                        onSelectionChange={(e) => setSelectedMember(e.value)}
+                                        resizableColumns
+                                        columnResizeMode="expand"
+                                        filters={filters}
+                                        filterDisplay="Name"
+                                        globalFilterFields={["Name"]}
+                                    >
+                                        <Column field="Name" header="Name" sortable></Column>
+                                        <Column field="Surname" header="Surname" sortable></Column>
+                                        <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                    </DataTable>
+                                </TabPanel>
+                            </TabView>
+                        )}
                     </TabPanel>
                 </TabView>
             </Dialog>
@@ -580,8 +595,6 @@ export const PoliticalPartyManagement = () => {
                 }}
                 onHide={(e) => {
                     setShowDialog(false);
-                    // setRegisterdMembers([]);
-                    // setNonRegisterdMembers([]);
                 }}
             >
                 <TabView>
@@ -597,9 +610,6 @@ export const PoliticalPartyManagement = () => {
                             scrollable={true}
                             value={execMembers}
                             dataKey="id"
-                            // paginator
-                            // rows={5}
-                            // rowsPerPageOptions={[5, 10, 25]}
                             className="datatable-responsive"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
                             emptyMessage="No Executive Members found."
@@ -624,8 +634,8 @@ export const PoliticalPartyManagement = () => {
                             value={members}
                             dataKey="id"
                             paginator
-                            rows={5}
-                            rowsPerPageOptions={[5, 10, 25]}
+                            rows={10}
+                            rowsPerPageOptions={[10, 20]}
                             className="datatable-responsive"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
                             emptyMessage="No members found."
@@ -640,8 +650,6 @@ export const PoliticalPartyManagement = () => {
                         >
                             <Column field="Name" header="Name"></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            {/* <Column field="ContactNumber" header="Contact"></Column>
-                            <Column field="Email" header="Email Address"></Column> */}
                             <Column field="RegistrationNumber" header="Registration Number"></Column>
                         </DataTable>
                     </TabPanel>
