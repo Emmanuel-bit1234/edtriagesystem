@@ -39,6 +39,7 @@ export const VoterAuditHistory = () => {
 
     var [data, setData] = useState([]);
     var [objection, setObjection] = useState([]);
+    var [anomalies, setAnomalies] = useState([]);
     var [selectedUser, setSelectedUser] = useState([]);
     var [activeUser, setActiveUser] = useState(null);
     var [idNumber, setIdNumber] = useState("");
@@ -146,6 +147,31 @@ export const VoterAuditHistory = () => {
             {
                 col1: "Date Captured:",
                 col2: getMomentDateTime(selectedUser?.DateRegistered_s),
+            },
+        ];
+    }
+
+    function AnomaliesDetails() {
+        return [
+            {
+                col1: "Rule Description",
+                col2: anomalies?.Rule_Description,
+            },
+            {
+                col1: "Rule Name",
+                col2: anomalies?.Rule_Name,
+            },
+            {
+                col1: "Status",
+                col2: anomalies?.Status,
+            },
+            {
+                col1: "Status Description",
+                col2: anomalies?.Status_Description,
+            },
+            {
+                col1: "Updated by",
+                col2: anomalies?.Updated_by,
             },
         ];
     }
@@ -296,6 +322,12 @@ export const VoterAuditHistory = () => {
                                                     setObjection(e);
                                                 });
                                             }
+                                            if (selectedUser?.IDNumber) {
+                                                objectionsService.getAllAnomalies(selectedUser?.IDNumber).then((e) => {
+                                                    console.log(e);
+                                                    setAnomalies(e);
+                                                });
+                                            }
                                         }}
                                         tooltip="Click to View"
                                         icon={"pi pi-eye"}
@@ -345,7 +377,18 @@ export const VoterAuditHistory = () => {
                                 ""
                             )}
 
-                            {selectedUser?.Status === true ? <TabPanel header="Anomalies">No Content</TabPanel> : ""}
+                            {selectedUser?.Status === true ? (
+                                <TabPanel header="Anomalies">
+                                    <DataTable  size="small" scrollable={true} value={anomalies} dataKey="id" responsiveLayout="scroll" style={{ width: "100%" }}>
+                                        <Column field="Rule_Description" header="Rule Description"></Column>
+                                        <Column field="Rule_Name" header="Rule Name"></Column>
+                                        <Column field="Status" header="Status"></Column>
+                                        <Column field="Updated_by" header="Updated By"></Column>
+                                    </DataTable>
+                                </TabPanel>
+                            ) : (
+                                ""
+                            )}
 
                             {selectedUser?.Status === true ? (
                                 <TabPanel header="Objections">
