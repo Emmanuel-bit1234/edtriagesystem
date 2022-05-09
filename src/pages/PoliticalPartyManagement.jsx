@@ -338,6 +338,7 @@ export const PoliticalPartyManagement = () => {
                     detail: e.StrContent,
                     life: 3000,
                 });
+                membersHandler();
                 return false;
             })
             .catch((e) => {
@@ -431,7 +432,7 @@ export const PoliticalPartyManagement = () => {
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Executive Members">
+                    <TabPanel header={"Executive Members - " + execMembers?.length}>
                         {data?.StrResult == "Success" || data?.StrResult == "Warning" ? (
                             <div className="grid">
                                 <div className="col-16  lg:col-3">
@@ -459,11 +460,10 @@ export const PoliticalPartyManagement = () => {
                         {selectedExecutiveRole != "Select an Executive Role" && data?.Firstname != null && (
                             <div className="grid">
                                 <div className="col-6  lg:col-2">
-                                    <Button onClick={SubmitExecForm} label="Add as Excecutive Member" className="p-button-success" icon="pi pi-plus" type="submit" style={{ width: 250 }}  />
-                                    
+                                    <Button onClick={SubmitExecForm} label="Add as Excecutive Member" className="p-button-success" icon="pi pi-plus" type="submit" style={{ width: 250 }} />
                                 </div>
                                 <div className="col-6  lg:col-4">
-                                    <Button onClick={clearExecdata} label="Clear" style={{marginLeft:35}}></Button>
+                                    <Button onClick={clearExecdata} label="Clear" style={{ marginLeft: 35 }}></Button>
                                 </div>
                             </div>
                         )}
@@ -513,71 +513,109 @@ export const PoliticalPartyManagement = () => {
                             <Column field="Role" header="Role"></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Members">
-                        <div className="col">
-                            <label htmlFor="description">Upload CSV files</label>
-                            <div style={{ visibility: "hidden" }}>Space</div>
-                            <React.Fragment>
-                                <Button label="Select files" onClick={onBtnClick} className="mr-3" icon={"pi pi-plus"} />
-                                <input ref={inputFileRef} type={"file"} multiple onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
-                                {allFiles.CSV?.length > 0 && <Button onClick={submitUpload} label="Save" className="p-button-success" icon="pi pi-plus" type="submit" />}
-                            </React.Fragment>
-                        </div>
-                        <div style={{ visibility: "hidden" }}>Space</div>
-                        {allFiles.CSV?.length > 0 && (
-                            <TabView>
-                                <TabPanel header="Registered">
-                                    <DataTable
-                                        size="small"
-                                        scrollable={true}
-                                        scrollHeight="400px"
-                                        value={registerdMembers}
-                                        dataKey="id"
-                                        loading={load}
-                                        rowsPerPageOptions={[5, 10, 25]}
-                                        className="datatable-responsive"
-                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
-                                        emptyMessage="No members found."
-                                        responsiveLayout="scroll"
-                                        selection={selectedMember}
-                                        onSelectionChange={(e) => setSelectedMember(e.value)}
-                                        resizableColumns
-                                        columnResizeMode="expand"
-                                        filters={filters}
-                                        filterDisplay="Name"
-                                        globalFilterFields={["Name"]}
-                                    >
-                                        <Column field="Name" header="Name" sortable></Column>
-                                        <Column field="Surname" header="Surname" sortable></Column>
-                                        <Column field="RegistrationNumber" header="Registration Number"></Column>
-                                    </DataTable>
-                                </TabPanel>
-                                <TabPanel header="Not Registered">
-                                    <DataTable
-                                        size="small"
-                                        scrollable={true}
-                                        scrollHeight="400px"
-                                        value={NonRegisterdMembers}
-                                        loading={load}
-                                        rowsPerPageOptions={[5, 10, 25]}
-                                        className="datatable-responsive"
-                                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
-                                        emptyMessage="No members found."
-                                        responsiveLayout="scroll"
-                                        selection={selectedMember}
-                                        onSelectionChange={(e) => setSelectedMember(e.value)}
-                                        resizableColumns
-                                        columnResizeMode="expand"
-                                        filters={filters}
-                                        filterDisplay="Name"
-                                        globalFilterFields={["Name"]}
-                                    >
-                                        <Column field="Name" header="Name" sortable></Column>
-                                        <Column field="Surname" header="Surname" sortable></Column>
-                                        <Column field="RegistrationNumber" header="Registration Number"></Column>
-                                    </DataTable>
-                                </TabPanel>
-                            </TabView>
+                    <TabPanel header={" Members - " + members?.length}> 
+                        {allFiles.CSV?.length == 0 ? (
+                            <div>
+                                <div className="col">
+                                    <label htmlFor="description">Upload CSV files</label>
+                                    <div style={{ visibility: "hidden" }}>Space</div>
+                                    <React.Fragment>
+                                        <Button label="Select files" onClick={onBtnClick} className="p-button-success mr-3" icon={"pi pi-plus"} />
+                                        <input ref={inputFileRef} type={"file"} multiple onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
+                                        {allFiles.CSV?.length > 0 && <Button onClick={submitUpload} label="Add all Registered Members" icon="pi pi-plus" type="submit" />}
+                                    </React.Fragment>
+                                </div>
+                                <div style={{ visibility: "hidden" }}>Space</div>
+                                <DataTable
+                                    size="small"
+                                    scrollable={true}
+                                    value={members}
+                                    dataKey="id"
+                                    paginator
+                                    rows={10}
+                                    rowsPerPageOptions={[10, 20]}
+                                    className="datatable-responsive"
+                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                                    emptyMessage="No members found."
+                                    responsiveLayout="scroll"
+                                    selection={selectedMember}
+                                    onSelectionChange={(e) => setSelectedMember(e.value)}
+                                    resizableColumns
+                                    columnResizeMode="expand"
+                                    filters={filters}
+                                    filterDisplay="Name"
+                                    globalFilterFields={["Name"]}
+                                >
+                                    <Column field="Name" header="Name"></Column>
+                                    <Column field="Surname" header="Surname" sortable></Column>
+                                    <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                </DataTable>
+                                <div style={{ visibility: "hidden" }}>Space</div>
+                            </div>
+                        ) : (
+                            <div className="col">
+                                <label htmlFor="description">Upload CSV files</label>
+                                <div style={{ visibility: "hidden" }}>Space</div>
+                                <React.Fragment>
+                                    <Button label="Select files" onClick={onBtnClick} className="p-button-success mr-3" icon={"pi pi-plus"} />
+                                    <input ref={inputFileRef} type={"file"} multiple onChange={(e) => onUploadHandler(e)} style={{ display: "none" }}></input>
+                                    {allFiles.CSV?.length > 0 && <Button onClick={submitUpload} label="Add all Registered Members" icon="pi pi-plus" type="submit" />}
+                                </React.Fragment>
+                                <div style={{ visibility: "hidden" }}>Space</div>
+                                <TabView>
+                                    <TabPanel header="Registered">
+                                        <DataTable
+                                            size="small"
+                                            scrollable={true}
+                                            scrollHeight="400px"
+                                            value={registerdMembers}
+                                            dataKey="id"
+                                            loading={load}
+                                            rowsPerPageOptions={[5, 10, 25]}
+                                            className="datatable-responsive"
+                                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                                            emptyMessage="No members found."
+                                            responsiveLayout="scroll"
+                                            selection={selectedMember}
+                                            onSelectionChange={(e) => setSelectedMember(e.value)}
+                                            resizableColumns
+                                            columnResizeMode="expand"
+                                            filters={filters}
+                                            filterDisplay="Name"
+                                            globalFilterFields={["Name"]}
+                                        >
+                                            <Column field="Name" header="Name" sortable></Column>
+                                            <Column field="Surname" header="Surname" sortable></Column>
+                                            <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                    <TabPanel header="Not Registered">
+                                        <DataTable
+                                            size="small"
+                                            scrollable={true}
+                                            scrollHeight="400px"
+                                            value={NonRegisterdMembers}
+                                            loading={load}
+                                            rowsPerPageOptions={[5, 10, 25]}
+                                            className="datatable-responsive"
+                                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Members"
+                                            emptyMessage="No members found."
+                                            responsiveLayout="scroll"
+                                            selection={selectedMember}
+                                            onSelectionChange={(e) => setSelectedMember(e.value)}
+                                            resizableColumns
+                                            columnResizeMode="expand"
+                                            filters={filters}
+                                            filterDisplay="Name"
+                                            globalFilterFields={["Name"]}
+                                        >
+                                            <Column field="Name" header="Name" sortable></Column>
+                                            <Column field="Surname" header="Surname" sortable></Column>
+                                            <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                        </DataTable>
+                                    </TabPanel>
+                                </TabView>
+                            </div>
                         )}
                     </TabPanel>
                 </TabView>
@@ -604,7 +642,7 @@ export const PoliticalPartyManagement = () => {
                             <Column body={(e) => e.value}></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Executive Members">
+                    <TabPanel header={"Executive Members - " + execMembers?.length}>
                         <DataTable
                             size="small"
                             scrollable={true}
@@ -627,7 +665,7 @@ export const PoliticalPartyManagement = () => {
                             <Column field="Role" header="Role"></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header="Members">
+                    <TabPanel header={"Members - " + members?.length}>
                         <DataTable
                             size="small"
                             scrollable={true}
