@@ -301,7 +301,7 @@ export const VoterReports = () => {
                                 }
                             >
                                 {/* layout={layout} */}
-                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}/report/preview`} />
+                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}Report/preview`} />
                             </div>
                         </Worker>
                     ) : (

@@ -546,9 +546,9 @@ export const PoliticalPartyManagement = () => {
                                     filterDisplay="Name"
                                     globalFilterFields={["Name"]}
                                 >
-                                    <Column field="Name" header="Name"></Column>
+                                    <Column field="Name" header="Name" sortable></Column>
                                     <Column field="Surname" header="Surname" sortable></Column>
-                                    <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                    <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
                                 </DataTable>
                                 <div style={{ visibility: "hidden" }}>Space</div>
                             </div>
@@ -586,7 +586,7 @@ export const PoliticalPartyManagement = () => {
                                         >
                                             <Column field="Name" header="Name" sortable></Column>
                                             <Column field="Surname" header="Surname" sortable></Column>
-                                            <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                            <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
                                         </DataTable>
                                     </TabPanel>
                                     <TabPanel header="Not Registered">
@@ -611,7 +611,7 @@ export const PoliticalPartyManagement = () => {
                                         >
                                             <Column field="Name" header="Name" sortable></Column>
                                             <Column field="Surname" header="Surname" sortable></Column>
-                                            <Column field="RegistrationNumber" header="Registration Number"></Column>
+                                            <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
                                         </DataTable>
                                     </TabPanel>
                                 </TabView>
@@ -686,9 +686,9 @@ export const PoliticalPartyManagement = () => {
                             filterDisplay="Name"
                             globalFilterFields={["Name"]}
                         >
-                            <Column field="Name" header="Name"></Column>
+                            <Column field="Name" header="Name" sortable></Column>
                             <Column field="Surname" header="Surname" sortable></Column>
-                            <Column field="RegistrationNumber" header="Registration Number"></Column>
+                            <Column field="RegistrationNumber" header="Registration Number" sortable></Column>
                         </DataTable>
                     </TabPanel>
                 </TabView>
