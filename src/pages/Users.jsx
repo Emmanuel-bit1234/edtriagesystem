@@ -228,16 +228,16 @@ export const Users = () => {
                 resizableColumns
                 columnResizeMode="expand"
             >
-                <Column field="email" header="Email" sortable body={(e) => e.user?.email}></Column>
-                <Column field="username" header="Username" body={(e) => e.user?.username}></Column>
+                <Column field="email" header="Email" sortable body={(e) =>(e?.appointment?.user?.email)}></Column>
+                <Column field="username" header="Username" body={(e) => e.appointment?.user?.username}></Column>
 
-                <Column header="Name & Surname " body={(e) => e.firstName + ",  " + e.surname}></Column>
+                <Column header="Name & Surname " body={(e) => e?.appointment?.firstName + ",  " + e?.appointment?.surname}></Column>
 
                 <Column
                     field="active"
                     header="Status"
                     body={(e) =>
-                        e.user.active === "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
+                        e?.appointment?.user?.active === "Y" ? <Button label="Active" style={{ textAlign: "center", height: "30px" }} className="p-button-success p-button-rounded" /> : <Button label="Not Active" style={{ textAlign: "center", height: "30px" }} className="p-button-danger p-button-rounded" />
                     }
                     sortable
                 ></Column>
@@ -250,7 +250,7 @@ export const Users = () => {
                             <Button
                                 onClick={(a) => {
                                     setShowViewDialog(true);
-                                    setSelectedUser(e);
+                                    setSelectedUser(e?.appointment);
                                 }}
                                 style={{ textAlign: "center", width: "30px", height: "30px" }}
                                 icon={"pi pi-eye"}
@@ -259,9 +259,9 @@ export const Users = () => {
                                 tooltip="Click to View"
                             />
                             {e.user?.active === "Y" ? (
-                                <Button onClick={(a) => deActivateHandler(e.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to De-Activate" />
+                                <Button onClick={(a) => deActivateHandler(e?.appointment?.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi-times"} className="p-button-danger p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to De-Activate" />
                             ) : (
-                                <Button onClick={(a) => activateHandler(e.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-success p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to Activate" />
+                                <Button onClick={(a) => activateHandler(e?.appointment?.user?.id)} style={{ textAlign: "center", width: "30px", height: "30px" }} icon={"pi pi- pi-check"} className="p-button-success p-button-rounded mr-2" tooltipOptions={{ position: "top" }} tooltip="Click to Activate" />
                             )}
                         </>
                     )}
