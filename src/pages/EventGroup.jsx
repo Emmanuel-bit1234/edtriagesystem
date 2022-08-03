@@ -102,7 +102,7 @@ export const EventGroup = () => {
             return toast.current.show({
                 severity: "error",
                 summary: "Error Message",
-                detail: "please fill the required field",
+                detail: "Please fill the required field",
                 life: 3000,
             });
         var id = selectedEventGroup?.EventGroupID;
