@@ -19,8 +19,7 @@ export const VoterReports = () => {
         { name: "Underage Electors Report", reportID: 4 },
         { name: "Pending Transfers Report", reportID: 5 },
         { name: "Disability Drill Down Report", reportID: 6 },
-
-        
+        { name: "Transaction Type Report", reportID: 7 },
     ];
 
     var [selectedOption, setSelectedOption] = useState(null);
