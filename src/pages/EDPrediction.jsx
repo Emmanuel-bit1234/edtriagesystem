@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
@@ -13,6 +13,7 @@ import PredictionAPI from "../service/predictionAPI";
 export const EDPrediction = (props) => {
 
     var prediction = new PredictionAPI();
+
 
     var [showPredictionForm, setshowPredictionForm] = useState(false);
 
@@ -78,6 +79,13 @@ export const EDPrediction = (props) => {
         BT: "",
         Chief_complain: ""
     });
+    useEffect(() => {
+        console.log("Test")
+        prediction.getAllPredictions().then((data) => {
+            console.log("ALL PREDICTIONS HERE:", data);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     function predict() {
         form.Sex = gender;
