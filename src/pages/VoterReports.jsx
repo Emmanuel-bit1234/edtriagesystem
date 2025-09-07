@@ -5,8 +5,6 @@ import { Toolbar } from "primereact/toolbar";
 import React, { useEffect, useRef, useState } from "react";
 import DelimitationServices from "../service/DelimitationServices";
 import ReportService from "../service/ReportService";
-import Viewer, { Worker, defaultLayout } from "@phuocng/react-pdf-viewer";
-import "@phuocng/react-pdf-viewer/cjs/react-pdf-viewer.css";
 import { LOCALHOST_NET_IP, NET_IP } from "../config/Config";
 import { Dialog } from "primereact/dialog";
 
@@ -163,9 +161,9 @@ export const VoterReports = () => {
             });
     }
 
-    const layout = (isSidebarOpened, container, main, toolbar, sidebar) => {
-        return defaultLayout(isSidebarOpened, container, main, toolbar(renderToolbar), sidebar);
-    };
+    // const layout = (isSidebarOpened, container, main, toolbar, sidebar) => {
+    //     return defaultLayout(isSidebarOpened, container, main, toolbar(renderToolbar), sidebar);
+    // };
     const renderToolbar = (toolbarSlot) => {
         return (
             <div
@@ -289,23 +287,8 @@ export const VoterReports = () => {
                         ></Toolbar>
                     </div>
 
-                    {reportLoaded == true ? (
-                        <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.13.216/build/pdf.worker.min.js">
-                            <div
-                                className="App"
-                                style={
-                                    {
-                                        // height: 900,
-                                    }
-                                }
-                            >
-                                {/* layout={layout} */}
-                                <Viewer zoomInButton={true} defaultScale={1} onDocumentLoad={console.log} fileUrl={`${NET_IP}Report/preview`} />
-                            </div>
-                        </Worker>
-                    ) : (
-                        ""
-                    )}
+
+
                 </div>
             </div>
         </div>

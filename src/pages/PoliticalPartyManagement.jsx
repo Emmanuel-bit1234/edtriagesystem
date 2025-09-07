@@ -14,7 +14,6 @@ import { Dialog } from "primereact/dialog";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Image } from "primereact/image";
 import PoliticalPartyService from "../service/PoliticalPartyService";
-import imageToBase64 from "image-to-base64/browser";
 import { FileUpload } from "primereact/fileupload";
 import { NET_IP } from "../config/Config";
 import axios from "axios";
@@ -513,7 +512,7 @@ export const PoliticalPartyManagement = () => {
                             <Column field="Role" header="Role"></Column>
                         </DataTable>
                     </TabPanel>
-                    <TabPanel header={" Members - " + members?.length}> 
+                    <TabPanel header={" Members - " + members?.length}>
                         {allFiles.CSV?.length == 0 ? (
                             <div>
                                 <div className="col">

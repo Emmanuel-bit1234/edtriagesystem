@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "./static/css/main.66d928f0.css",
-    "main.js": "./static/js/main.a1f7061d.js",
-    "static/js/804.954003df.chunk.js": "./static/js/804.954003df.chunk.js",
+    "main.css": "./static/css/main.4a0cf6c5.css",
+    "main.js": "./static/js/main.8c3556b6.js",
+    "static/js/193.cc538aea.chunk.js": "./static/js/193.cc538aea.chunk.js",
     "static/media/FlagOfLesotho.png": "./static/media/FlagOfLesotho.785fadd887c729e1fa80.png",
     "static/media/primeicons.svg": "./static/media/primeicons.c6e2053303524e39530c.svg",
     "static/media/primeicons.eot": "./static/media/primeicons.7fc4d8e224d1ff1b9c62.eot",
@@ -11,12 +11,12 @@
     "static/media/flags_responsive.png": "./static/media/flags_responsive.266bf78d57b6c463405e.png",
     "static/media/ieclogos.png": "./static/media/ieclogos.e8297279685c8cd3fb2f.png",
     "index.html": "./index.html",
-    "main.66d928f0.css.map": "./static/css/main.66d928f0.css.map",
-    "main.a1f7061d.js.map": "./static/js/main.a1f7061d.js.map",
-    "804.954003df.chunk.js.map": "./static/js/804.954003df.chunk.js.map"
+    "main.4a0cf6c5.css.map": "./static/css/main.4a0cf6c5.css.map",
+    "main.8c3556b6.js.map": "./static/js/main.8c3556b6.js.map",
+    "193.cc538aea.chunk.js.map": "./static/js/193.cc538aea.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.66d928f0.css",
-    "static/js/main.a1f7061d.js"
+    "static/css/main.4a0cf6c5.css",
+    "static/js/main.8c3556b6.js"
   ]
 }
