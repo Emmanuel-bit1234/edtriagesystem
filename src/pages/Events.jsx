@@ -237,8 +237,9 @@ export const Events = () => {
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
                                 <div className="grid">
+                                    
                                     <div className="col-12  lg:col-5">
-                                        <DropDown style={{ maxWidth: 300 }} label={"Event Group"} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} className="ml-4" />
+                                        <DropDown style={{ maxWidth: 300 }} optionLabel="Name" onChange={(e) => eventHandler(e)} options={eventGroup} value={form.eventGroup} className="ml-4" />
                                     </div>
                                     <div className="col-12  lg:col-5">
                                         <DropDown style={{ maxWidth: 300 }} label={"Event Type"} options={eventType} onChange={(e) => typeHandler(e)} optionLabel="Text" value={selectedEventType} className="ml-4" />

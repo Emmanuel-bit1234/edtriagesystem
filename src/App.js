@@ -8,6 +8,7 @@ import { AppMenu } from "./AppMenu";
 import { AppConfig } from "./AppConfig";
 
 import { Dashboard } from "./pages/Dashboard";
+import { EDPrediction } from "./pages/EDPrediction";
 import Login from "./pages/Login";
 
 import { Users } from "./pages/Users";
@@ -162,170 +163,174 @@ const App = () => {
 
     const menu = [
         {
-            label: "Home",
             items: [
+                // {
+                //     label: "Dashboard",
+                //     icon: "pi pi-fw pi-home",
+                //     to: "/",
+                // },
                 {
-                    label: "Dashboard",
+                    label: "Emergency Triage",
                     icon: "pi pi-fw pi-home",
-                    to: "/",
+                    to: "/EDPrediction",
                 },
-                {
-                    label: "Administration",
-                    icon: "pi pi-fw pi-folder-open",
-                    items: [
-                        {
-                            label: "Kit Configuration",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/kit-configuration",
-                        },
-                        {
-                            label: "Voter Allocation Params",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/voter-allocation-params",
-                        },
-                        {
-                            label: "User Management",
-                            icon: "pi pi-fw pi-user-edit",
-                            items: [
-                                {
-                                    label: "Users",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/users",
-                                },
-                                {
-                                    label: "User Groups",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/user-groups",
-                                },
-                            ],
-                        },
-                        {
-                            label: "System Parameters",
-                            icon: "pi pi-fw pi-cog",
-                            to: "/system-parameters",
-                        },
-                        {
-                            label: "Delimitation Management",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/delimitation-management",
-                        },
-                    ],
-                },
+                //     {
+                //         label: "Administration",
+                //         icon: "pi pi-fw pi-folder-open",
+                //         items: [
+                //             {
+                //                 label: "Kit Configuration",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/kit-configuration",
+                //             },
+                //             {
+                //                 label: "Voter Allocation Params",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/voter-allocation-params",
+                //             },
+                //             {
+                //                 label: "User Management",
+                //                 icon: "pi pi-fw pi-user-edit",
+                //                 items: [
+                //                     {
+                //                         label: "Users",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/users",
+                //                     },
+                //                     {
+                //                         label: "User Groups",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/user-groups",
+                //                     },
+                //                 ],
+                //             },
+                //             {
+                //                 label: "System Parameters",
+                //                 icon: "pi pi-fw pi-cog",
+                //                 to: "/system-parameters",
+                //             },
+                //             {
+                //                 label: "Delimitation Management",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/delimitation-management",
+                //             },
+                //         ],
+                //     },
 
-                {
-                    label: "Data Inspection",
-                    icon: "pi pi-fw pi-database",
-                    items: [
-                        {
-                            label: "Voter Data",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/voter-data",
-                        },
-                        {
-                            label: "Voter Audit History",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/voter-audit-history",
-                        },
-                    ],
-                },
-                {
-                    label: "Objection Management",
-                    icon: "pi pi-fw pi-database",
-                    items: [
-                        {
-                            label: "Objections",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/objections",
-                        },
-                        {
-                            label: "Adjudication",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/adjudication",
-                        },
-                    ],
-                },
-                {
-                    label: "Candidate Management",
-                    icon: "pi pi-fw pi-users",
+                //     {
+                //         label: "Data Inspection",
+                //         icon: "pi pi-fw pi-database",
+                //         items: [
+                //             {
+                //                 label: "Voter Data",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/voter-data",
+                //             },
+                //             {
+                //                 label: "Voter Audit History",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/voter-audit-history",
+                //             },
+                //         ],
+                //     },
+                //     {
+                //         label: "Objection Management",
+                //         icon: "pi pi-fw pi-database",
+                //         items: [
+                //             {
+                //                 label: "Objections",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/objections",
+                //             },
+                //             {
+                //                 label: "Adjudication",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/adjudication",
+                //             },
+                //         ],
+                //     },
+                //     {
+                //         label: "Candidate Management",
+                //         icon: "pi pi-fw pi-users",
 
-                    items: [
-                        {
-                            label: "Candidates",
-                            icon: "pi pi-fw pi-bookmark",
-                            items: [
-                                {
-                                    label: "Management",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/candidate-management",
-                                },
-                                {
-                                    label: "Reports",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/candidate-reports",
-                                },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    label: "Political Party Management",
-                    icon: "pi pi-fw pi-users",
-                    items: [
-                        {
-                            label: "Political Parties",
-                            icon: "pi pi-fw pi-bookmark",
-                            items: [
-                                {
-                                    label: "Management",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/political-party-management",
-                                },
-                                {
-                                    label: "Reports",
-                                    icon: "pi pi-fw pi-bookmark",
-                                    to: "/political-party-reports",
-                                },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    label: "Register Management",
-                    icon: "pi pi-fw pi-clone",
-                    items: [
-                        {
-                            label: "Event Group",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/event-group",
-                        },
-                        {
-                            label: "Event",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/event",
-                        },
-                    ],
-                },
-                {
-                    label: "Reports",
-                    icon: "pi pi-fw pi-clone",
-                    items: [
-                        {
-                            label: "Administration",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/administration-reports",
-                        },
-                        {
-                            label: "Voter",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/voter-reports",
-                        },
-                        {
-                            label: "Candidate",
-                            icon: "pi pi-fw pi-bookmark",
-                            to: "/candidate-reports",
-                        },
-                    ],
-                },
+                //         items: [
+                //             {
+                //                 label: "Candidates",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 items: [
+                //                     {
+                //                         label: "Management",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/candidate-management",
+                //                     },
+                //                     {
+                //                         label: "Reports",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/candidate-reports",
+                //                     },
+                //                 ],
+                //             },
+                //         ],
+                //     },
+                //     {
+                //         label: "Political Party Management",
+                //         icon: "pi pi-fw pi-users",
+                //         items: [
+                //             {
+                //                 label: "Political Parties",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 items: [
+                //                     {
+                //                         label: "Management",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/political-party-management",
+                //                     },
+                //                     {
+                //                         label: "Reports",
+                //                         icon: "pi pi-fw pi-bookmark",
+                //                         to: "/political-party-reports",
+                //                     },
+                //                 ],
+                //             },
+                //         ],
+                //     },
+                //     {
+                //         label: "Register Management",
+                //         icon: "pi pi-fw pi-clone",
+                //         items: [
+                //             {
+                //                 label: "Event Group",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/event-group",
+                //             },
+                //             {
+                //                 label: "Event",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/event",
+                //             },
+                //         ],
+                //     },
+                //     {
+                //         label: "Reports",
+                //         icon: "pi pi-fw pi-clone",
+                //         items: [
+                //             {
+                //                 label: "Administration",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/administration-reports",
+                //             },
+                //             {
+                //                 label: "Voter",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/voter-reports",
+                //             },
+                //             {
+                //                 label: "Candidate",
+                //                 icon: "pi pi-fw pi-bookmark",
+                //                 to: "/candidate-reports",
+                //             },
+                //         ],
+                //     },
             ],
         },
     ];
@@ -353,8 +358,8 @@ const App = () => {
 
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
-            {isLoggedIn === false ? (
-                <Route path="/" component={Login} />
+            {isLoggedIn === true ? (
+                <Route path="/EDPrediction" component={Login} />
             ) : (
                 <>
                     <Tooltip ref={copyTooltipRef} target=".block-action-copy" position="bottom" content="Copied to clipboard" event="focus" />
@@ -367,6 +372,7 @@ const App = () => {
                         <div className="layout-main">
                             <Route path="/" exact render={() => <Dashboard colorMode={layoutColorMode} />} />
                             <Route path="/users" component={Users} />
+                            <Route path="/EDPrediction" component={EDPrediction} />
                             <Route path="/user-groups" component={UserGroups} />
                             <Route path="/kit-configuration" component={KitConfiguration} />
                             <Route path="/voter-allocation-params" component={VoterAllocationParams} />
