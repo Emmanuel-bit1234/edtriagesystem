@@ -121,14 +121,14 @@ export const EDPrediction = (props) => {
                 <Toolbar
                     className="mb-4"
                     left={<div> <Button className="p-button-success mr-2" icon="pi pi-plus" label="Start Triage" onClick={(e) => setshowPredictionForm(true)} /></div>}
-                    right={
-                        <div>
-                            <span className="block mt-2 md:mt-0 p-input-icon-left">
-                                <i className="pi pi-search" />
-                                {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search Event Name" /> */}
-                            </span>
-                        </div>
-                    }
+                // right={
+                //     // <div>
+                //     //     <span className="block mt-2 md:mt-0 p-input-icon-left">
+                //     //         <i className="pi pi-search" />
+                //     //         {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search Event Name" /> */}
+                //     //     </span>
+                //     // </div>
+                // }
                 ></Toolbar>
             </div>
             <div className="col-12">
