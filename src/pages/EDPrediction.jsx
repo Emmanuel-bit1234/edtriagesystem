@@ -9,11 +9,12 @@ import InputTextArea from "../componets/InputTextArea";
 import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView } from "primereact/tabview";
 import PredictionAPI from "../service/predictionAPI";
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 export const EDPrediction = (props) => {
 
     var prediction = new PredictionAPI();
-
+    var [load, setLoad] = useState(false);
 
     var [showPredictionForm, setshowPredictionForm] = useState(false);
 
@@ -86,8 +87,10 @@ export const EDPrediction = (props) => {
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    var [predictionResults, setPredictionResults] = useState();
 
     function predict() {
+        setLoad(true);
         form.Sex = gender;
         form.Arrival_mode = arrivalMode;
         form.Injury = injury;
@@ -110,6 +113,8 @@ export const EDPrediction = (props) => {
 
         prediction.getPrediction(newForm).then((data) => {
             console.log(data);
+            setPredictionResults(data);
+            setLoad(false);
         });
 
     }
@@ -240,36 +245,89 @@ export const EDPrediction = (props) => {
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Systolic Blood Pressure in mmHg (60–240)" placeholder="Enter a SBP" value={form.SBP} onChange={(e) => {
+                                                    <TextInput label="Systolic Blood Pressure (60–240)" placeholder="Enter a SBP" value={form.SBP} onChange={(e) => {
                                                         const value = e.target.value.replace(/\D/g, '');
                                                         setForm({ ...form, SBP: value });
                                                     }} />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Diastolic Blood Pressure in mmHg (30–140)" placeholder="Enter a DBP" value={form.DBP} onChange={(e) => {
+                                                    <TextInput label="Diastolic Blood Pressure (30–140)" placeholder="Enter a DBP" value={form.DBP} onChange={(e) => {
                                                         const value = e.target.value.replace(/\D/g, '');
                                                         setForm({ ...form, DBP: value });
                                                     }} />
                                                 </div>
 
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Heart Rate in beats per minute (30–200)" placeholder="Enter a Heart Rate" value={form.HR} onChange={(e) => setForm({ ...form, HR: e.target.value })} />
+                                                    <TextInput label="Heart Rate in beats per min (30–200)" placeholder="Enter a Heart Rate" value={form.HR} onChange={(e) => setForm({ ...form, HR: e.target.value })} />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Respiratory Rate in breaths per minute (8–40)" placeholder="Enter a Respiratory Rate" value={form.RR} onChange={(e) => setForm({ ...form, RR: e.target.value })} />
+                                                    <TextInput label="Respiratory Rate in breaths per min (8–40)" placeholder="Enter a Respiratory Rate" value={form.RR} onChange={(e) => setForm({ ...form, RR: e.target.value })} />
                                                 </div>
 
                                                 <div className="col-12  lg:col-3">
                                                     <TextInput label="Body Temperature in °C (34.0–42.0)" placeholder="Enter a Body Temperature" value={form.BT} onChange={(e) => setForm({ ...form, BT: e.target.value })} />
                                                 </div>
                                                 <div className="col-12  lg:col-6">
-                                                    <InputTextArea label="Chief complain" placeholder="Enter a Body Temperature" value={form.Chief_complain} onChange={(e) => setForm({ ...form, Chief_complain: e.target.value })} />
+                                                    <InputTextArea label="Chief complain" placeholder="Enter a Chief Complain" value={form.Chief_complain} onChange={(e) => setForm({ ...form, Chief_complain: e.target.value })} />
                                                 </div>
+
                                             </div>
+                                            {predictionResults && (
+                                                <>
+                                                    <hr style={{ margin: "20px 0" }} />
+                                                    <strong className="big-text">Results</strong> <br /> <br />
+                                                    <span
+                                                        style={{
+                                                            display: "inline-block",
+                                                            textAlign: "center",
+                                                            padding: "0.5rem 1rem",
+                                                            borderRadius: "20px",
+                                                            backgroundColor: (() => {
+                                                                switch (predictionResults?.Ktas_Explained?.Title) {
+                                                                    case "Resuscitation":   // Level I
+                                                                        return "red";
+                                                                    case "Emergency":       // Level II
+                                                                        return "orange";
+                                                                    case "Urgent":          // Level III
+                                                                        return "yellow";
+                                                                    case "Less Urgent":     // Level IV
+                                                                        return "green";
+                                                                    case "Non-Urgent":      // Level V
+                                                                        return "blue";
+                                                                    default:
+                                                                        return "grey"; // fallback for unknown values
+                                                                }
+                                                            })(),
+                                                            color: "white",
+                                                            marginBottom: "0.5rem",
+                                                        }}
+                                                    >
+                                                        <b>{predictionResults?.Ktas_Explained?.Title}</b>
+                                                    </span>
+                                                    <br />
+                                                    <span>
+                                                        <strong>Explanation:</strong> {predictionResults?.Ktas_Explained?.Meaning}
+                                                    </span>
+                                                    <br />
+                                                    <span>
+                                                        <strong>Triage Target:</strong> {predictionResults?.Ktas_Explained?.Triage_target}
+                                                    </span>
+                                                    <br />
+                                                    <span>
+                                                        <strong>Model Used:</strong>{" "}
+                                                        {predictionResults?.Model?.replace(/^Model\s*\d+:\s*/, "")}
+                                                    </span>
+                                                </>
+                                            )}
                                         </TabPanel>
                                     </TabView>
                                 </form>
                             </div>
+                        </div>
+                        <div className="loading-container">
+                            {load && <div className="spinner-overlay">
+                                <ProgressSpinner />
+                            </div>}
                         </div>
                     </Dialog>
 
@@ -325,7 +383,7 @@ export const EDPrediction = (props) => {
                         ></Column>
                     </DataTable>
                 </div>
-            </div>
+            </div >
         </div >
     );
 };

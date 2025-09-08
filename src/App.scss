@@ -1,1 +1,16 @@
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.3); /* Optional: Add a semi-transparent background */
+    z-index: 1000; /* Ensure it appears on top */
+}
+
+.big-text {
+                                                    font-size: 24px}
 
