@@ -354,15 +354,7 @@ export const EDPrediction = (props) => {
                                                     <span>
                                                         <strong>Explanation:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
                                                     </span>
-                                                    <br />
-                                                    <span>
-                                                        <strong>Triage Target:</strong> {predictionResults?.data?.Ktas_Explained?.Triage_target}
-                                                    </span>
-                                                    <br />
-                                                    <span>
-                                                        <strong>Model Used:</strong>{" "}
-                                                        {predictionResults?.data?.Model?.replace(/^Model\s*\d+:\s*/, "")}
-                                                    </span>
+
                                                 </>
                                             )}
                                         </TabPanel>
@@ -396,6 +388,7 @@ export const EDPrediction = (props) => {
                         filterDisplay="menu"
                         globalFilterFields={["ktasExplained.Title", "ktasExplained.Meaning", "model"]}
                     >
+                        <Column field="patientNumber" header="Patient Number" sortable body={(item) => <b>{item.patientNumber}</b>}></Column>
                         <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
                         <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => (
                             <span
