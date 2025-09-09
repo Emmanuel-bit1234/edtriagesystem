@@ -347,20 +347,20 @@ export const EDPrediction = (props) => {
                                                             marginBottom: "0.5rem",
                                                         }}
                                                     >
-                                                        <b>{predictionResults?.Ktas_Explained?.Title}</b>
+                                                        <b>{predictionResults?.data?.Ktas_Explained?.Title}</b>
                                                     </span>
                                                     <br />
                                                     <span>
-                                                        <strong>Explanation:</strong> {predictionResults?.Ktas_Explained?.Meaning}
+                                                        <strong>Explanation:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
                                                     </span>
                                                     <br />
                                                     <span>
-                                                        <strong>Triage Target:</strong> {predictionResults?.Ktas_Explained?.Triage_target}
+                                                        <strong>Triage Target:</strong> {predictionResults?.data?.Ktas_Explained?.Triage_target}
                                                     </span>
                                                     <br />
                                                     <span>
                                                         <strong>Model Used:</strong>{" "}
-                                                        {predictionResults?.Model?.replace(/^Model\s*\d+:\s*/, "")}
+                                                        {predictionResults?.data?.Model?.replace(/^Model\s*\d+:\s*/, "")}
                                                     </span>
                                                 </>
                                             )}
@@ -397,12 +397,12 @@ export const EDPrediction = (props) => {
                     >
                         <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
                         <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => item.ktasExplained?.Title}></Column>
-                        <Column 
-                            field="ktasExplained.Meaning" 
-                            header="Prediction Meaning" 
-                            sortable 
+                        <Column
+                            field="ktasExplained.Meaning"
+                            header="Prediction Meaning"
+                            sortable
                             body={(item) => (
-                                <div 
+                                <div
                                     style={{
                                         maxWidth: '300px',
                                         wordWrap: 'break-word',
@@ -423,7 +423,7 @@ export const EDPrediction = (props) => {
                                 <>
                                     <Button
                                         onClick={(e) => {
-                                           console.log("Item",item)
+                                            console.log("Item", item)
                                         }}
                                         tooltip="Click to View"
                                         icon={"pi pi-eye"}
