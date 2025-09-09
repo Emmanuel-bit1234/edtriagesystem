@@ -10,6 +10,8 @@ import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView } from "primereact/tabview";
 import PredictionAPI from "../service/predictionAPI";
 import { ProgressSpinner } from 'primereact/progressspinner';
+import InputArea from "../componets/InputArea";
+import FloatInputArea from "../componets/FloatInputArea";
 
 export const EDPrediction = (props) => {
 
@@ -172,11 +174,14 @@ export const EDPrediction = (props) => {
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Age (18-120)" placeholder="Enter an Age" value={form.Age}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value.replace(/\D/g, '');
-                                                            setForm({ ...form, Age: value });
-                                                        }} />
+                                                    <InputArea
+                                                        label="Age (18-120)"
+                                                        placeholder="Enter an Age"
+                                                        value={form.Age}
+                                                        min={18}
+                                                        max={120}
+                                                        onChange={(e) => setForm({ ...form, Age: e.target.value })}
+                                                    />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
@@ -245,27 +250,55 @@ export const EDPrediction = (props) => {
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Systolic Blood Pressure (60–240)" placeholder="Enter a SBP" value={form.SBP} onChange={(e) => {
-                                                        const value = e.target.value.replace(/\D/g, '');
-                                                        setForm({ ...form, SBP: value });
-                                                    }} />
+                                                    <InputArea
+                                                        label="Systolic Blood Pressure (60–240)"
+                                                        placeholder="Enter a SBP"
+                                                        value={form.SBP}
+                                                        min={60}
+                                                        max={240}
+                                                        onChange={(e) => setForm({ ...form, SBP: e.target.value })}
+                                                    />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Diastolic Blood Pressure (30–140)" placeholder="Enter a DBP" value={form.DBP} onChange={(e) => {
-                                                        const value = e.target.value.replace(/\D/g, '');
-                                                        setForm({ ...form, DBP: value });
-                                                    }} />
+                                                    <InputArea
+                                                        label="Diastolic Blood Pressure (30–140)"
+                                                        placeholder="Enter a DBP"
+                                                        value={form.DBP}
+                                                        min={30}
+                                                        max={140}
+                                                        onChange={(e) => setForm({ ...form, DBP: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <InputArea
+                                                        label="Heart Rate in beats per min (30–200)"
+                                                        placeholder="Enter a Heart Rate"
+                                                        value={form.HR}
+                                                        min={30}
+                                                        max={200}
+                                                        onChange={(e) => setForm({ ...form, HR: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <InputArea
+                                                        label="Respiratory Rate in breaths per min (8–40)"
+                                                        placeholder="Enter a Respiratory Rate"
+                                                        value={form.RR}
+                                                        min={8}
+                                                        max={40}
+                                                        onChange={(e) => setForm({ ...form, RR: e.target.value })}
+                                                    />
                                                 </div>
 
                                                 <div className="col-12  lg:col-3">
-                                                    <TextInput label="Heart Rate in beats per min (30–200)" placeholder="Enter a Heart Rate" value={form.HR} onChange={(e) => setForm({ ...form, HR: e.target.value })} />
-                                                </div>
-                                                <div className="col-12  lg:col-3">
-                                                    <TextInput label="Respiratory Rate in breaths per min (8–40)" placeholder="Enter a Respiratory Rate" value={form.RR} onChange={(e) => setForm({ ...form, RR: e.target.value })} />
-                                                </div>
-
-                                                <div className="col-12  lg:col-3">
-                                                    <TextInput label="Body Temperature in °C (34.0–42.0)" placeholder="Enter a Body Temperature" value={form.BT} onChange={(e) => setForm({ ...form, BT: e.target.value })} />
+                                                    <FloatInputArea
+                                                        label="Body Temperature in °C (34.0–42.0)"
+                                                        placeholder="Enter a Body Temperature"
+                                                        value={form.BT}
+                                                        min={34.0}
+                                                        max={42.0}
+                                                        onChange={(e) => setForm({ ...form, BT: e.target.value })}
+                                                    />
                                                 </div>
                                                 <div className="col-12  lg:col-6">
                                                     <InputTextArea label="Chief complain" placeholder="Enter a Chief Complain" value={form.Chief_complain} onChange={(e) => setForm({ ...form, Chief_complain: e.target.value })} />
@@ -353,8 +386,6 @@ export const EDPrediction = (props) => {
                         <Column filterField="name" field="name" header="Prediction Level" sortable body={(item) => <b>{item.name}</b>}></Column>
                         <Column field="MinimumVotersPS" header="Prediction Title" sortable></Column>
                         <Column field="MinimumVotersPS" header="Prediction Meaning" sortable></Column>
-                        <Column field="MinimumVotersPS" header="Triage target" sortable></Column>
-
                         <Column
                             field="action"
                             header="Action"
