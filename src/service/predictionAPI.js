@@ -2,21 +2,19 @@ import axios from "axios";
 
 export default function PredictionAPI() {
     this.getPrediction = (data) => {
-        var url = "https://1c890312931d.ngrok-free.app/model1";
-        return axios.post(url, data).then((response) => response.data);
+        var url = "https://triagecdssproxy.vercel.app/predict";
+        return axios.post(url, data, {
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZW1tZWNoY29vbEBnbWFpbC5jb20iLCJpYXQiOjE3NTc0MjE5MzksImV4cCI6MTc1ODAyNjczOX0.vILxJe5W-587OWWKFh3RkGVQrs866v6Yci-4ICFcaGk'
+            }
+        }).then((response) => response.data);
     };
     this.getAllPredictions = () => {
-        var url = `https://1c890312931d.ngrok-free.app/get-predictions`;
-        return axios.get(url).then((response) => response.data);
-    };
-
-    this.getAllPredictions1 = async () => {
-        const requestOptions = {
-            method: "GET",
-            redirect: "follow",
-        };
-
-        const res = await fetch("https://1c890312931d.ngrok-free.app/get-predictions", requestOptions);
-        return await res.json();
+        var url = `https://triagecdssproxy.vercel.app/prediction-logs`;
+        return axios.get(url, {
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiZW1tZWNoY29vbEBnbWFpbC5jb20iLCJpYXQiOjE3NTc0MjE5MzksImV4cCI6MTc1ODAyNjczOX0.vILxJe5W-587OWWKFh3RkGVQrs866v6Yci-4ICFcaGk'
+            }
+        }).then((response) => response.data);
     };
 }

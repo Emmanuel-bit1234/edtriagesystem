@@ -17,6 +17,7 @@ export const EDPrediction = (props) => {
 
     var prediction = new PredictionAPI();
     var [load, setLoad] = useState(false);
+    var [allPredictions, setAllPredictions] = useState()
 
     var [showPredictionForm, setshowPredictionForm] = useState(false);
 
@@ -86,6 +87,7 @@ export const EDPrediction = (props) => {
         console.log("Test")
         prediction.getAllPredictions().then((data) => {
             console.log("ALL PREDICTIONS HERE:", data);
+            setAllPredictions(data?.logs)
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -160,6 +162,16 @@ export const EDPrediction = (props) => {
                                     <TabView>
                                         <TabPanel header="Triage">
                                             <div className="grid">
+                                                <div className="col-12  lg:col-3">
+                                                    <InputArea
+                                                        label="Patient Number"
+                                                        placeholder="Enter a Patient Number"
+                                                        value={form.patientNumber}
+                                                        min={1}
+                                                        max={1000000}
+                                                        onChange={(e) => setForm({ ...form, patientNumber: e.target.value })}
+                                                    />
+                                                </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
                                                         Gender
@@ -367,13 +379,13 @@ export const EDPrediction = (props) => {
                     <DataTable
                         size="small"
                         scrollable={true}
-                        //value={data}
+                        value={allPredictions}
                         dataKey="id"
                         paginator
                         rows={10}
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Voter Allocation Params"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Predictions"
                         emptyMessage="No predictions found."
                         //header={header}
                         responsiveLayout="scroll"
@@ -381,34 +393,42 @@ export const EDPrediction = (props) => {
                         columnResizeMode="expand"
                         //filters={filters}
                         filterDisplay="menu"
-                        globalFilterFields={["name"]}
+                        globalFilterFields={["ktasExplained.Title", "ktasExplained.Meaning", "model"]}
                     >
-                        <Column filterField="name" field="name" header="Prediction Level" sortable body={(item) => <b>{item.name}</b>}></Column>
-                        <Column field="MinimumVotersPS" header="Prediction Title" sortable></Column>
-                        <Column field="MinimumVotersPS" header="Prediction Meaning" sortable></Column>
+                        <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
+                        <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => item.ktasExplained?.Title}></Column>
+                        <Column 
+                            field="ktasExplained.Meaning" 
+                            header="Prediction Meaning" 
+                            sortable 
+                            body={(item) => (
+                                <div 
+                                    style={{
+                                        maxWidth: '300px',
+                                        wordWrap: 'break-word',
+                                        whiteSpace: 'pre-wrap',
+                                        lineHeight: '1.4'
+                                    }}
+                                    title={item.ktasExplained?.Meaning}
+                                >
+                                    {item.ktasExplained?.Meaning}
+                                </div>
+                            )}
+                        ></Column>
+                        <Column field="createdAt" header="Created At" sortable body={(item) => new Date(item.createdAt).toLocaleString()}></Column>
                         <Column
                             field="action"
                             header="Action"
                             body={(item) => (
                                 <>
                                     <Button
-                                        // onClick={(e) => {
-                                        //     setIsEdit(true);
-                                        //     setShowDialog(true);
-                                        // }}
-                                        tooltip="Click to Edit"
-                                        icon={"pi pi-pencil"}
-                                        className="p-button-success p-button-rounded mr-2"
-                                    />
-                                    {/* <Button
                                         onClick={(e) => {
-                                            setIsEdit(false);
-                                            setShowDialog(true);
+                                           console.log("Item",item)
                                         }}
                                         tooltip="Click to View"
                                         icon={"pi pi-eye"}
                                         className=" p-button-rounded mr-2"
-                                    /> */}
+                                    />
                                 </>
                             )}
                         ></Column>
