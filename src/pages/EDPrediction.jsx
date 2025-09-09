@@ -20,6 +20,8 @@ export const EDPrediction = (props) => {
     var [allPredictions, setAllPredictions] = useState()
 
     var [showPredictionForm, setshowPredictionForm] = useState(false);
+    var [showDetailsDialog, setShowDetailsDialog] = useState(false);
+    var [selectedPrediction, setSelectedPrediction] = useState(null);
 
     const Genders = [
         { name: "Male", value: 2 },
@@ -446,7 +448,8 @@ export const EDPrediction = (props) => {
                                 <>
                                     <Button
                                         onClick={(e) => {
-                                            console.log("Item", item)
+                                            setSelectedPrediction(item);
+                                            setShowDetailsDialog(true);
                                         }}
                                         tooltip="Click to View"
                                         icon={"pi pi-eye"}
@@ -458,6 +461,195 @@ export const EDPrediction = (props) => {
                     </DataTable>
                 </div>
             </div >
+
+            {/* Details Dialog */}
+            <Dialog
+                header="Prediction Details"
+                visible={showDetailsDialog}
+                style={{ width: "70%", maxWidth: "800px" }}
+                modal
+                onHide={() => {
+                    setShowDetailsDialog(false);
+                    setSelectedPrediction(null);
+                }}
+                footer={
+                    <Button 
+                        label="Close" 
+                        onClick={() => {
+                            setShowDetailsDialog(false);
+                            setSelectedPrediction(null);
+                        }} 
+                        className="p-button-secondary" 
+                    />
+                }
+            >
+                {selectedPrediction && (
+                    <div className="grid">
+                        {/* Patient Information */}
+                        <div className="col-12">
+                            <h4>Patient Information</h4>
+                            <div className="grid">
+                                <div className="col-6">
+                                    <strong>Patient Number:</strong> {selectedPrediction.patientNumber}
+                                </div>
+                                <div className="col-6">
+                                    <strong>Created At:</strong> {new Date(selectedPrediction.createdAt).toLocaleString()}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Input Parameters */}
+                        <div className="col-12">
+                            <h4>Input Parameters</h4>
+                            <div className="grid">
+                                <div className="col-6">
+                                    <strong>Age:</strong> {selectedPrediction.inputs?.Age} years
+                                </div>
+                                <div className="col-6">
+                                    <strong>Gender:</strong> {selectedPrediction.inputs?.Sex === 1 ? 'Female' : 'Male'}
+                                </div>
+                                <div className="col-6">
+                                    <strong>Arrival Mode:</strong> {
+                                        selectedPrediction.inputs?.Arrival_mode === 1 ? 'Walk-in (self-presented)' :
+                                        selectedPrediction.inputs?.Arrival_mode === 2 ? 'Transfer (from another facility)' :
+                                        selectedPrediction.inputs?.Arrival_mode === 3 ? 'Ambulance (EMS)' : 'Unknown'
+                                    }
+                                </div>
+                                <div className="col-6">
+                                    <strong>Injury Present:</strong> {selectedPrediction.inputs?.Injury === 1 ? 'Yes (trauma/injury)' : 'No (medical complaint)'}
+                                </div>
+                                <div className="col-6">
+                                    <strong>Mental Status:</strong> {
+                                        selectedPrediction.inputs?.Mental === 1 ? 'Alert (fully awake, oriented)' :
+                                        selectedPrediction.inputs?.Mental === 2 ? 'Voice (responds to verbal stimulus)' :
+                                        selectedPrediction.inputs?.Mental === 3 ? 'Pain (responds only to painful stimulus)' :
+                                        selectedPrediction.inputs?.Mental === 4 ? 'Unresponsive (no response to voice or pain)' : 'Unknown'
+                                    }
+                                </div>
+                                <div className="col-6">
+                                    <strong>Pain Present:</strong> {selectedPrediction.inputs?.Pain === 1 ? 'Yes' : 'No'}
+                                </div>
+                                <div className="col-6">
+                                    <strong>Pain Score (NRS):</strong> {selectedPrediction.inputs?.NRS_pain}/10
+                                </div>
+                                <div className="col-6">
+                                    <strong>Body Temperature:</strong> {selectedPrediction.inputs?.BT}°C
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Vital Signs */}
+                        <div className="col-12">
+                            <h4>Vital Signs</h4>
+                            <div className="grid">
+                                <div className="col-6">
+                                    <strong>Systolic BP:</strong> {selectedPrediction.inputs?.SBP} mmHg
+                                </div>
+                                <div className="col-6">
+                                    <strong>Diastolic BP:</strong> {selectedPrediction.inputs?.DBP} mmHg
+                                </div>
+                                <div className="col-6">
+                                    <strong>Heart Rate:</strong> {selectedPrediction.inputs?.HR} bpm
+                                </div>
+                                <div className="col-6">
+                                    <strong>Respiratory Rate:</strong> {selectedPrediction.inputs?.RR} breaths/min
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Chief Complaint */}
+                        <div className="col-12">
+                            <h4>Chief Complaint</h4>
+                            <p style={{ 
+                                padding: '10px', 
+                                backgroundColor: '#f8f9fa', 
+                                borderRadius: '4px',
+                                border: '1px solid #dee2e6'
+                            }}>
+                                {selectedPrediction.inputs?.Chief_complain}
+                            </p>
+                        </div>
+
+                        {/* Prediction Results */}
+                        <div className="col-12">
+                            <h4>Prediction Results</h4>
+                            <div className="grid">
+                                <div className="col-12">
+                                    <div style={{ 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        gap: '10px',
+                                        marginBottom: '10px'
+                                    }}>
+                                        <strong>KTAS Level:</strong>
+                                        <span
+                                            style={{
+                                                display: "inline-block",
+                                                textAlign: "center",
+                                                padding: "0.5rem 1rem",
+                                                borderRadius: "20px",
+                                                backgroundColor: (() => {
+                                                    switch (selectedPrediction.ktasExplained?.Title) {
+                                                        case "Resuscitation":   // Level I
+                                                            return "red";
+                                                        case "Emergency":       // Level II
+                                                            return "orange";
+                                                        case "Urgent":          // Level III
+                                                            return "yellow";
+                                                        case "Less Urgent":     // Level IV
+                                                            return "green";
+                                                        case "Non-Urgent":      // Level V
+                                                            return "blue";
+                                                        default:
+                                                            return "grey";
+                                                    }
+                                                })(),
+                                                color: "white",
+                                            }}
+                                        >
+                                            Level {selectedPrediction.ktasExplained?.Level} - {selectedPrediction.ktasExplained?.Title}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <strong>Explanation:</strong>
+                                    <p style={{ 
+                                        padding: '10px', 
+                                        backgroundColor: '#f8f9fa', 
+                                        borderRadius: '4px',
+                                        border: '1px solid #dee2e6',
+                                        marginTop: '5px'
+                                    }}>
+                                        {selectedPrediction.ktasExplained?.Meaning}
+                                    </p>
+                                </div>
+                                {/* <div className="col-12">
+                                    <strong>Triage Target:</strong> {selectedPrediction.ktasExplained?.Triage_target}
+                                </div>
+                                <div className="col-12">
+                                    <strong>Model Used:</strong> {selectedPrediction.model}
+                                </div> */}
+                                {/* <div className="col-12">
+                                    <strong>Prediction Confidence:</strong>
+                                    <div style={{ marginTop: '5px' }}>
+                                        {selectedPrediction.probs && selectedPrediction.probs.map((prob, index) => (
+                                            <span key={index} style={{ 
+                                                marginRight: '10px',
+                                                padding: '2px 8px',
+                                                backgroundColor: '#e9ecef',
+                                                borderRadius: '3px',
+                                                fontSize: '0.9em'
+                                            }}>
+                                                Level {index + 1}: {(parseFloat(prob) * 100).toFixed(1)}%
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div> */}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </Dialog>
         </div >
     );
 };
