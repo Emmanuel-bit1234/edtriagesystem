@@ -70,6 +70,7 @@ export const EDPrediction = (props) => {
 
     var [form, setForm] = useState({
         Sex: null,
+        patientNumber: "",
         Age: "",
         Arrival_mode: null,
         Injury: null,
@@ -328,7 +329,7 @@ export const EDPrediction = (props) => {
                                                             padding: "0.5rem 1rem",
                                                             borderRadius: "20px",
                                                             backgroundColor: (() => {
-                                                                switch (predictionResults?.Ktas_Explained?.Title) {
+                                                                switch (predictionResults?.data?.Ktas_Explained?.Title) {
                                                                     case "Resuscitation":   // Level I
                                                                         return "red";
                                                                     case "Emergency":       // Level II
@@ -396,7 +397,36 @@ export const EDPrediction = (props) => {
                         globalFilterFields={["ktasExplained.Title", "ktasExplained.Meaning", "model"]}
                     >
                         <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
-                        <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => item.ktasExplained?.Title}></Column>
+                        <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => (
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    textAlign: "center",
+                                    padding: "0.5rem 1rem",
+                                    borderRadius: "20px",
+                                    backgroundColor: (() => {
+                                        switch (item.ktasExplained?.Title) {
+                                            case "Resuscitation":   // Level I
+                                                return "red";
+                                            case "Emergency":       // Level II
+                                                return "orange";
+                                            case "Urgent":          // Level III
+                                                return "yellow";
+                                            case "Less Urgent":     // Level IV
+                                                return "green";
+                                            case "Non-Urgent":      // Level V
+                                                return "blue";
+                                            default:
+                                                return "grey"; // fallback for unknown values
+                                        }
+                                    })(),
+                                    color: "white",
+                                    marginBottom: "0.5rem",
+                                }}
+                            >
+                                {item.ktasExplained?.Title}
+                            </span>
+                        )}></Column>
                         <Column
                             field="ktasExplained.Meaning"
                             header="Prediction Meaning"
