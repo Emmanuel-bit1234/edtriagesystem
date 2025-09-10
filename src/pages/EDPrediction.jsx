@@ -94,6 +94,21 @@ export const EDPrediction = (props) => {
             console.log("ALL PREDICTIONS HERE:", data);
             setAllPredictions(data?.logs)
         });
+        
+        // Get nurse information from local storage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setForm(prevForm => ({
+                    ...prevForm,
+                    nurseName: userData.name || "",
+                    nurseId: userData.id || ""
+                }));
+            } catch (error) {
+                console.error("Error parsing user data from localStorage:", error);
+            }
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     var [predictionResults, setPredictionResults] = useState();
@@ -166,6 +181,20 @@ export const EDPrediction = (props) => {
                                 <form method="post">
                                     <TabView>
                                         <TabPanel header="Triage">
+                                            {/* Nurse Information Display */}
+                                            <div className="col-12 mb-3">
+                                                <div className="p-3" style={{ 
+                                                    backgroundColor: '#e3f2fd', 
+                                                    borderRadius: '8px', 
+                                                    border: '1px solid #bbdefb' 
+                                                }}>
+                                                    <h5 style={{ margin: '0 0 8px 0', color: '#1976d2' }}>Current Nurse</h5>
+                                                    <p style={{ margin: '0', color: '#424242' }}>
+                                                        <strong>Name:</strong> {form.nurseName || 'Not available'} | 
+                                                        <strong> ID:</strong> {form.nurseId || 'Not available'}
+                                                    </p>
+                                                </div>
+                                            </div>
                                             <div className="grid">
                                                 <div className="col-12  lg:col-3">
                                                     <InputArea
@@ -175,22 +204,6 @@ export const EDPrediction = (props) => {
                                                         min={1}
                                                         max={1000000}
                                                         onChange={(e) => setForm({ ...form, patientNumber: e.target.value })}
-                                                    />
-                                                </div>
-                                                <div className="col-12  lg:col-3">
-                                                    <InputArea
-                                                        label="Nurse Name"
-                                                        placeholder="Enter Nurse Name"
-                                                        value={form.nurseName}
-                                                        onChange={(e) => setForm({ ...form, nurseName: e.target.value })}
-                                                    />
-                                                </div>
-                                                <div className="col-12  lg:col-3">
-                                                    <InputArea
-                                                        label="Nurse ID"
-                                                        placeholder="Enter Nurse ID"
-                                                        value={form.nurseId}
-                                                        onChange={(e) => setForm({ ...form, nurseId: e.target.value })}
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">

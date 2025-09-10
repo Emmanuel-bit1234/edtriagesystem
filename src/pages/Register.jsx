@@ -108,6 +108,11 @@ const Register = () => {
                                             type="email"
                                             className="p-inputtext-lg p-d-block"
                                             onChange={(e) => setEmail(e.target.value)}
+                                            autoComplete="off"
+                                            data-form-type="other"
+                                            data-lpignore="true"
+                                            data-1p-ignore="true"
+                                            data-bwignore="true"
                                             required
                                         />
                                     </div>
