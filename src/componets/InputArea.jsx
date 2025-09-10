@@ -34,7 +34,7 @@ export default function InputArea({
 
     return (
         <div className="p-fluid">
-            <label>{label}</label>
+            <label><strong>{label}</strong></label>
             <InputText
                 placeholder={placeholder}
                 value={value}

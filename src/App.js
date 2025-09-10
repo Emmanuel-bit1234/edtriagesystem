@@ -5,7 +5,6 @@ import { CSSTransition } from "react-transition-group";
 
 import { AppTopbar } from "./AppTopbar";
 import { AppMenu } from "./AppMenu";
-import { AppConfig } from "./AppConfig";
 
 import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
@@ -412,7 +411,6 @@ const App = () => {
                 </>
             )}
 
-            <AppConfig rippleEffect={ripple} onRippleEffect={onRipple} inputStyle={inputStyle} onInputStyleChange={onInputStyleChange} layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} layoutColorMode={layoutColorMode} onColorModeChange={onColorModeChange} />
 
             <CSSTransition classNames="layout-mask" timeout={{ enter: 200, exit: 200 }} in={mobileMenuActive} unmountOnExit>
                 <div className="layout-mask p-component-overlay"></div>

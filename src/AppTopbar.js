@@ -1,17 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 import Cookies from "js-cookie";
 import PredictionAPI from "./service/predictionAPI";
+import ProfileDialog from "./componets/ProfileDialog";
 
 export const AppTopbar = (props) => {
     const predictionAPI = new PredictionAPI();
+    const [showProfileDialog, setShowProfileDialog] = useState(false);
     
     function Logout() {
         predictionAPI.logout();
         Cookies.set("LoggedIn", false);
         window.location.reload();
     }
+
+    const handleProfileClick = () => {
+        setShowProfileDialog(true);
+    };
 
     return (
         <div className="layout-topbar">
@@ -43,12 +49,17 @@ export const AppTopbar = (props) => {
                     </button>
                 </li>
                 <li>
-                    <button className="p-link layout-topbar-button" onClick={props.onMobileSubTopbarMenuClick}>
+                    <button className="p-link layout-topbar-button" onClick={handleProfileClick}>
                         <i className="pi pi-user" />
                         <span>Profile</span>
                     </button>
                 </li>
             </ul>
+            
+            <ProfileDialog 
+                visible={showProfileDialog} 
+                onHide={() => setShowProfileDialog(false)} 
+            />
         </div>
     );
 };

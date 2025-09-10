@@ -45,7 +45,7 @@ export default function FloatInputArea({
 
     return (
         <div className="p-fluid">
-            <label>{label}</label>
+            <label><strong>{label}</strong></label>
             <InputText
                 placeholder={placeholder}
                 value={value}

@@ -165,7 +165,7 @@ export const EDPrediction = (props) => {
                     <Dialog
                         header="Patient Triage"
                         visible={showPredictionForm}
-                        style={{ width: "80%", height: "100vh" }}
+                        style={{ width: "90%", height: "100vh" }}
                         modal
                         onHide={(e) => {
                             setshowPredictionForm(false);
@@ -208,7 +208,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Gender
+                                                        <strong>Gender</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setGender(e.value)}
@@ -231,7 +231,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Arrival mode
+                                                        <strong>Arrival mode</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setArrivalMode(e.value)}
@@ -244,7 +244,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Injury
+                                                        <strong>Injury</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setInjury(e.value)}
@@ -257,7 +257,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Mental Status
+                                                        <strong>Mental Status</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setMentalState(e.value)}
@@ -271,7 +271,7 @@ export const EDPrediction = (props) => {
 
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Pain
+                                                        <strong>Pain</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setPainPresent(e.value)}
@@ -284,7 +284,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <label>
-                                                        Pain score NRS
+                                                        <strong>Pain score NRS</strong>
                                                     </label>
                                                     <Dropdown
                                                         onChange={(e) => setPainScore(e.value)}
