@@ -8,7 +8,7 @@ import { useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Image } from 'primereact/image';
 import LesothoIcon from '../assets/images/ieclogos.png';
-import CoatOfArms from '../assets/images/FlagOfLesotho.png';
+import Logo from '../assets/images/Logo.jpg';
 import PredictionAPI from '../service/predictionAPI';
 import './login/Login.scss';
 
@@ -57,9 +57,9 @@ const LoginNew = () => {
             <div className="card-size">
                 <div>
                     <div className="box p-fluid p-grid">
-                        {/* <div className="p-field p-col-12">
-                            <img src={CoatOfArms} alt="Image" className="logo" />
-                        </div> */}
+                        <div className="p-field p-col-12">
+                            <img src={Logo} alt="Logo" className="logo" />
+                        </div>
                         <div className="p-field p-col-12 hide-small">
                             <Divider layout="vertical" />
                         </div>
