@@ -478,7 +478,7 @@ export const EDPrediction = (props) => {
                         ></Column>
                         <Column 
                             field="createdAt" 
-                            header="Created At" 
+                            header="Created Date" 
                             sortable 
                             body={(item) => (
                                 <div
@@ -548,7 +548,7 @@ export const EDPrediction = (props) => {
                                     <strong>Patient Number:</strong> {selectedPrediction.patientNumber}
                                 </div>
                                 <div className="col-6">
-                                    <strong>Created At:</strong> {new Date(selectedPrediction.createdAt).toLocaleString()}
+                                    <strong>Created Date:</strong> {new Date(selectedPrediction.createdAt).toLocaleString()}
                                 </div>
                             </div>
                         </div>
