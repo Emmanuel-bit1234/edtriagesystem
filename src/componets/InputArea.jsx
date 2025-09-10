@@ -9,6 +9,7 @@ export default function InputArea({
     disabled = false,
     min = null,   // ✅ new props
     max = null,   // ✅ new props
+    hint = "",    // ✅ new prop for hints
 }) {
     // While typing: keep only digits, allow empty
     const handleChange = (e) => {
@@ -44,6 +45,11 @@ export default function InputArea({
                 pattern="\d*"
                 maxLength={String(max ?? "").length} // prevent typing beyond max digits
             />
+            {hint && (
+                <small style={{ width: "100%", color: "#6c757d", fontSize: "0.875rem" }}>
+                    {hint}
+                </small>
+            )}
             <small style={{ width: "100%" }} className="p-error">
                 {/* input error */}
             </small>

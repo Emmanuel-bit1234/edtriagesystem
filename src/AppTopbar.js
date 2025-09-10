@@ -2,9 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 import Cookies from "js-cookie";
+import PredictionAPI from "./service/predictionAPI";
 
 export const AppTopbar = (props) => {
+    const predictionAPI = new PredictionAPI();
+    
     function Logout() {
+        predictionAPI.logout();
         Cookies.set("LoggedIn", false);
         window.location.reload();
     }

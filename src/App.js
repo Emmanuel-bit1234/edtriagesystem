@@ -10,6 +10,8 @@ import { AppConfig } from "./AppConfig";
 import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
 import Login from "./pages/Login";
+import LoginNew from "./pages/LoginNew";
+import Register from "./pages/Register";
 
 import { Users } from "./pages/Users";
 import { SystemParameters } from "./pages/SystemParameters";
@@ -42,6 +44,7 @@ import Cookies from "js-cookie";
 import VoterAllocationParams from "./pages/VoterAllocationParams";
 import { AdministrationReports } from "./pages/AdministrationReports";
 import { VoterReports } from "./pages/VoterReports";
+import PredictionAPI from "./service/predictionAPI";
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState("static");
@@ -55,6 +58,7 @@ const App = () => {
     const copyTooltipRef = useRef();
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const predictionAPI = new PredictionAPI();
 
     PrimeReact.ripple = true;
 
@@ -62,14 +66,20 @@ const App = () => {
     let mobileTopbarMenuClick = false;
 
     useEffect(() => {
-        var loginValue = Cookies.get("LoggedIn");
-        var errors = ["null", "false", "undefined", null, false, undefined];
-        if (errors.includes(loginValue)) {
-            Cookies.set("LoggedIn", false);
-            setIsLoggedIn(false);
-        } else {
-            setIsLoggedIn(true);
-        }
+        // Check authentication using the new API
+        const checkAuth = () => {
+            const isAuthenticated = predictionAPI.isAuthenticated();
+            setIsLoggedIn(isAuthenticated);
+            
+            // Also update cookies for backward compatibility
+            if (isAuthenticated) {
+                Cookies.set("LoggedIn", true);
+            } else {
+                Cookies.set("LoggedIn", false);
+            }
+        };
+        
+        checkAuth();
 
         if (mobileMenuActive) {
             addClass(document.body, "body-overflow-hidden");
@@ -358,8 +368,13 @@ const App = () => {
 
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
-            {isLoggedIn === true ? (
-                <Route path="/EDPrediction" component={Login} />
+            {isLoggedIn === false ? (
+                <>
+                    <Route path="/login" component={LoginNew} />
+                    <Route path="/register" component={Register} />
+                    <Route path="/" exact component={LoginNew} />
+                    <Route path="*" component={LoginNew} />
+                </>
             ) : (
                 <>
                     <Tooltip ref={copyTooltipRef} target=".block-action-copy" position="bottom" content="Copied to clipboard" event="focus" />

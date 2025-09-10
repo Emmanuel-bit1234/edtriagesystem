@@ -84,7 +84,9 @@ export const EDPrediction = (props) => {
         HR: "",
         RR: "",
         BT: "",
-        Chief_complain: ""
+        Chief_complain: "",
+        nurseName: "",
+        nurseId: ""
     });
     useEffect(() => {
         console.log("Test")
@@ -173,6 +175,22 @@ export const EDPrediction = (props) => {
                                                         min={1}
                                                         max={1000000}
                                                         onChange={(e) => setForm({ ...form, patientNumber: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <InputArea
+                                                        label="Nurse Name"
+                                                        placeholder="Enter Nurse Name"
+                                                        value={form.nurseName}
+                                                        onChange={(e) => setForm({ ...form, nurseName: e.target.value })}
+                                                    />
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <InputArea
+                                                        label="Nurse ID"
+                                                        placeholder="Enter Nurse ID"
+                                                        value={form.nurseId}
+                                                        onChange={(e) => setForm({ ...form, nurseId: e.target.value })}
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
@@ -271,6 +289,7 @@ export const EDPrediction = (props) => {
                                                         value={form.SBP}
                                                         min={60}
                                                         max={240}
+                                                        hint="Typical adult normal ≈ 90–120."
                                                         onChange={(e) => setForm({ ...form, SBP: e.target.value })}
                                                     />
                                                 </div>
@@ -281,6 +300,7 @@ export const EDPrediction = (props) => {
                                                         value={form.DBP}
                                                         min={30}
                                                         max={140}
+                                                        hint="Typical adult normal ≈ 60–80."
                                                         onChange={(e) => setForm({ ...form, DBP: e.target.value })}
                                                     />
                                                 </div>
@@ -291,6 +311,7 @@ export const EDPrediction = (props) => {
                                                         value={form.HR}
                                                         min={30}
                                                         max={200}
+                                                        hint="Typical adult resting ≈ 60–100 bpm."
                                                         onChange={(e) => setForm({ ...form, HR: e.target.value })}
                                                     />
                                                 </div>
@@ -301,6 +322,7 @@ export const EDPrediction = (props) => {
                                                         value={form.RR}
                                                         min={8}
                                                         max={40}
+                                                        hint="Typical adult resting ≈ 12–20."
                                                         onChange={(e) => setForm({ ...form, RR: e.target.value })}
                                                     />
                                                 </div>
@@ -312,6 +334,7 @@ export const EDPrediction = (props) => {
                                                         value={form.BT}
                                                         min={34.0}
                                                         max={42.0}
+                                                        hint="Typical normal ≈ 36.5–37.5 °C."
                                                         onChange={(e) => setForm({ ...form, BT: e.target.value })}
                                                     />
                                                 </div>
@@ -440,7 +463,26 @@ export const EDPrediction = (props) => {
                                 </div>
                             )}
                         ></Column>
-                        <Column field="createdAt" header="Created At" sortable body={(item) => new Date(item.createdAt).toLocaleString()}></Column>
+                        <Column 
+                            field="createdAt" 
+                            header="Created At" 
+                            sortable 
+                            body={(item) => (
+                                <div
+                                    style={{
+                                        maxWidth: '200px',
+                                        wordWrap: 'break-word',
+                                        whiteSpace: 'pre-wrap',
+                                        lineHeight: '1.4'
+                                    }}
+                                    title={new Date(item.createdAt).toLocaleString()}
+                                >
+                                    {new Date(item.createdAt).toLocaleString()}
+                                </div>
+                            )}
+                        ></Column>
+                        <Column field="user.name" header="Nurse" sortable body={(item) => <b>{item.user.name}</b>}></Column>
+                        <Column field="user.id" header="Nurse ID" sortable body={(item) => <b>{item.user.id}</b>}></Column>
                         <Column
                             field="action"
                             header="Action"
@@ -466,20 +508,20 @@ export const EDPrediction = (props) => {
             <Dialog
                 header="Prediction Details"
                 visible={showDetailsDialog}
-                style={{ width: "70%", maxWidth: "800px" }}
+                style={{ width: "90%", maxWidth: "800px" }}
                 modal
                 onHide={() => {
                     setShowDetailsDialog(false);
                     setSelectedPrediction(null);
                 }}
                 footer={
-                    <Button 
-                        label="Close" 
+                    <Button
+                        label="Close"
                         onClick={() => {
                             setShowDetailsDialog(false);
                             setSelectedPrediction(null);
-                        }} 
-                        className="p-button-secondary" 
+                        }}
+                        className="p-button-secondary"
                     />
                 }
             >
@@ -498,6 +540,19 @@ export const EDPrediction = (props) => {
                             </div>
                         </div>
 
+                        {/* Nurse Information */}
+                        <div className="col-12">
+                            <h4>Nurse Information</h4>
+                            <div className="grid">
+                                <div className="col-6">
+                                    <strong>Nurse Name:</strong> {selectedPrediction.user?.name || 'N/A'}
+                                </div>
+                                <div className="col-6">
+                                    <strong>Nurse ID:</strong> {selectedPrediction.user?.id || 'N/A'}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Input Parameters */}
                         <div className="col-12">
                             <h4>Input Parameters</h4>
@@ -511,8 +566,8 @@ export const EDPrediction = (props) => {
                                 <div className="col-6">
                                     <strong>Arrival Mode:</strong> {
                                         selectedPrediction.inputs?.Arrival_mode === 1 ? 'Walk-in (self-presented)' :
-                                        selectedPrediction.inputs?.Arrival_mode === 2 ? 'Transfer (from another facility)' :
-                                        selectedPrediction.inputs?.Arrival_mode === 3 ? 'Ambulance (EMS)' : 'Unknown'
+                                            selectedPrediction.inputs?.Arrival_mode === 2 ? 'Transfer (from another facility)' :
+                                                selectedPrediction.inputs?.Arrival_mode === 3 ? 'Ambulance (EMS)' : 'Unknown'
                                     }
                                 </div>
                                 <div className="col-6">
@@ -521,9 +576,9 @@ export const EDPrediction = (props) => {
                                 <div className="col-6">
                                     <strong>Mental Status:</strong> {
                                         selectedPrediction.inputs?.Mental === 1 ? 'Alert (fully awake, oriented)' :
-                                        selectedPrediction.inputs?.Mental === 2 ? 'Voice (responds to verbal stimulus)' :
-                                        selectedPrediction.inputs?.Mental === 3 ? 'Pain (responds only to painful stimulus)' :
-                                        selectedPrediction.inputs?.Mental === 4 ? 'Unresponsive (no response to voice or pain)' : 'Unknown'
+                                            selectedPrediction.inputs?.Mental === 2 ? 'Voice (responds to verbal stimulus)' :
+                                                selectedPrediction.inputs?.Mental === 3 ? 'Pain (responds only to painful stimulus)' :
+                                                    selectedPrediction.inputs?.Mental === 4 ? 'Unresponsive (no response to voice or pain)' : 'Unknown'
                                     }
                                 </div>
                                 <div className="col-6">
@@ -560,9 +615,9 @@ export const EDPrediction = (props) => {
                         {/* Chief Complaint */}
                         <div className="col-12">
                             <h4>Chief Complaint</h4>
-                            <p style={{ 
-                                padding: '10px', 
-                                backgroundColor: '#f8f9fa', 
+                            <p style={{
+                                padding: '10px',
+                                backgroundColor: '#f8f9fa',
                                 borderRadius: '4px',
                                 border: '1px solid #dee2e6'
                             }}>
@@ -575,9 +630,9 @@ export const EDPrediction = (props) => {
                             <h4>Prediction Results</h4>
                             <div className="grid">
                                 <div className="col-12">
-                                    <div style={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         gap: '10px',
                                         marginBottom: '10px'
                                     }}>
@@ -613,9 +668,9 @@ export const EDPrediction = (props) => {
                                 </div>
                                 <div className="col-12">
                                     <strong>Explanation:</strong>
-                                    <p style={{ 
-                                        padding: '10px', 
-                                        backgroundColor: '#f8f9fa', 
+                                    <p style={{
+                                        padding: '10px',
+                                        backgroundColor: '#f8f9fa',
                                         borderRadius: '4px',
                                         border: '1px solid #dee2e6',
                                         marginTop: '5px'

@@ -9,6 +9,7 @@ export default function FloatInputArea({
     disabled = false,
     min = null,
     max = null,
+    hint = "",    // ✅ new prop for hints
 }) {
     // Allow digits and one decimal point while typing
     const handleChange = (e) => {
@@ -53,6 +54,11 @@ export default function FloatInputArea({
                 disabled={disabled}
                 inputMode="decimal"   // numeric keypad with dot on mobile
             />
+            {hint && (
+                <small style={{ width: "100%", color: "#6c757d", fontSize: "0.875rem" }}>
+                    {hint}
+                </small>
+            )}
             <small style={{ width: "100%" }} className="p-error" />
         </div>
     );
