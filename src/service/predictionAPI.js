@@ -40,7 +40,7 @@ export default function PredictionAPI() {
     };
 
     this.register = (name, email, password) => {
-        var url = "http://localhost:3000/auth/register";
+        var url = "https://triagecdssproxy.vercel.app/auth/register";
         return axios.post(url, { name, email, password })
             .then((response) => {
                 if (response.data.token) {

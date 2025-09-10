@@ -15,6 +15,7 @@ import './login/Login.scss';
 const LoginNew = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const toast = useRef(null);
     const history = useHistory();
@@ -69,30 +70,41 @@ const LoginNew = () => {
                             <div className="Card">
                                 <form onSubmit={handleLogin}>
                                     <div className="p-field my-3">
-                                        <span className="p-float-label">
-                                            <InputText
-                                                id="email"
-                                                value={email}
-                                                type="email"
-                                                className="p-inputtext-lg p-d-block p-mt-5"
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                required
-                                            />
-                                            <label htmlFor="email">Email</label>
-                                        </span>
+                                        <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Email</label>
+                                        <InputText
+                                            id="email"
+                                            value={email}
+                                            type="email"
+                                            className="p-inputtext-lg p-d-block"
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                        />
                                     </div>
                                     <div className="p-field my-3">
-                                        <span className="p-float-label">
+                                        <label htmlFor="password" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password</label>
+                                        <div style={{ position: 'relative' }}>
                                             <InputText
                                                 id="password"
                                                 value={password}
-                                                type="password"
-                                                className="p-inputtext-lg p-d-block p-mt-5"
+                                                type={showPassword ? "text" : "password"}
+                                                className="p-inputtext-lg p-d-block"
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 required
+                                                style={{ paddingRight: '40px' }}
                                             />
-                                            <label htmlFor="password">Password</label>
-                                        </span>
+                                            <i 
+                                                className={`pi ${showPassword ? 'pi-eye-slash' : 'pi-eye'}`}
+                                                style={{ 
+                                                    cursor: 'pointer',
+                                                    position: 'absolute',
+                                                    right: '12px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    color: '#6c757d'
+                                                }}
+                                                onClick={() => setShowPassword(!showPassword)}
+                                            />
+                                        </div>
                                     </div>
 
                                     <Button
