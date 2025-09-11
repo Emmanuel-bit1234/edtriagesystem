@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Chart } from "primereact/chart";
 import { Card } from "primereact/card";
 import { Skeleton } from "primereact/skeleton";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
 import PredictionAPI from "../service/predictionAPI";
 
 export const Dashboard = (props) => {
@@ -14,6 +16,7 @@ export const Dashboard = (props) => {
     const [chartOptions, setChartOptions] = useState(null);
     const [genderChartData, setGenderChartData] = useState(null);
     const [genderChartOptions, setGenderChartOptions] = useState(null);
+    const [showTriageLevelsModal, setShowTriageLevelsModal] = useState(false);
 
     const predictionAPI = new PredictionAPI();
 
@@ -219,32 +222,49 @@ export const Dashboard = (props) => {
             
             {/* Statistics Cards */}
             <div className="col-12 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="flex flex-column align-items-center">
-                        <i className="pi pi-chart-line text-4xl text-blue-500 mb-3"></i>
-                        <div className="text-2xl font-bold text-900">{stats?.totalPredictions || 0}</div>
-                        <div className="text-600">Total Predictions</div>
+                <Card className="text-center h-full" style={{ minHeight: '120px' }}>
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-2">
+                        <i className="pi pi-chart-line text-3xl text-blue-500 mb-2"></i>
+                        <div className="text-xl font-bold text-900">{stats?.totalPredictions || 0}</div>
+                        <div className="text-800 text-sm">Total Predictions</div>
                     </div>
                 </Card>
             </div>
 
             <div className="col-12 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="flex flex-column align-items-center">
-                        <i className="pi pi-users text-4xl text-green-500 mb-3"></i>
-                        <div className="text-2xl font-bold text-900">
-                            {stats?.levelDistribution ? Object.keys(stats.levelDistribution).length : 0}
+                <div 
+                    className="cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105 h-full"
+                    onClick={() => {
+                        console.log('Triage Levels card clicked!');
+                        setShowTriageLevelsModal(true);
+                    }}
+                    style={{ 
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease-in-out',
+                        minHeight: '120px'
+                    }}
+                >
+                    <Card className="text-center h-full" style={{ minHeight: '120px' }}>
+                        <div className="flex flex-column align-items-center h-full justify-content-center p-2">
+                            <i className="pi pi-users text-3xl text-green-500 mb-2"></i>
+                            <div className="text-xl font-bold text-900">
+                                {stats?.levelDistribution ? Object.keys(stats.levelDistribution).length : 0}
+                            </div>
+                            <div className="text-800 text-sm">Triage Levels</div>
+                            <div className="text-xs text-500 mt-1">
+                                <i className="pi pi-info-circle mr-1"></i>
+                                Click to view
+                            </div>
                         </div>
-                        <div className="text-600">Triage Levels</div>
-                    </div>
-                </Card>
+                    </Card>
+                </div>
             </div>
 
             <div className="col-12 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="flex flex-column align-items-center">
-                        <i className="pi pi-exclamation-triangle text-4xl text-orange-500 mb-3"></i>
-                        <div className="text-2xl font-bold text-900">
+                <Card className="text-center h-full" style={{ minHeight: '120px' }}>
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-2">
+                        <i className="pi pi-exclamation-triangle text-3xl text-orange-500 mb-2"></i>
+                        <div className="text-xl font-bold text-900">
                             {stats?.levelDistribution ? 
                                 Object.entries(stats.levelDistribution).reduce((max, [level, count]) => 
                                     count > max.count ? { level, count } : max, 
@@ -252,19 +272,19 @@ export const Dashboard = (props) => {
                                 ).level : '0'
                             }
                         </div>
-                        <div className="text-600">Most Common Level</div>
+                        <div className="text-800 text-sm">Most Common Level</div>
                     </div>
                 </Card>
             </div>
 
             <div className="col-12 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="flex flex-column align-items-center">
-                        <i className="pi pi-clock text-4xl text-purple-500 mb-3"></i>
-                        <div className="text-2xl font-bold text-900">
+                <Card className="text-center h-full" style={{ minHeight: '120px' }}>
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-2">
+                        <i className="pi pi-clock text-3xl text-purple-500 mb-2"></i>
+                        <div className="text-xl font-bold text-900">
                             {last24hStats?.count || 0}
                         </div>
-                        <div className="text-600">Last 24 Hours</div>
+                        <div className="text-800 text-sm">Last 24 Hours</div>
                     </div>
                 </Card>
             </div>
@@ -356,6 +376,108 @@ export const Dashboard = (props) => {
                     </div>
                 </Card>
             </div>
+
+            {/* Triage Levels Modal */}
+            <Dialog
+                header="Triage Levels Details"
+                visible={showTriageLevelsModal}
+                style={{ width: '50vw' }}
+                onHide={() => {
+                    console.log('Modal closing...');
+                    setShowTriageLevelsModal(false);
+                }}
+                maximizable
+                modal
+                className="p-fluid"
+            >
+                <div className="grid">
+                    <div className="col-12">
+                        <div className="text-center mb-4">
+                            <i className="pi pi-info-circle text-4xl text-blue-500 mb-3"></i>
+                            <h3 className="text-2xl font-bold text-900 mb-2">Triage Level Distribution</h3>
+                            <p className="text-600">Detailed breakdown of all triage levels and their patient counts</p>
+                        </div>
+                    </div>
+                    
+                    {stats?.levelDistribution ? (
+                        <>
+                            <div className="col-12">
+                                <div className="grid">
+                                    {Object.entries(stats.levelDistribution)
+                                        .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                                        .map(([level, count]) => {
+                                            const percentage = stats.totalPredictions > 0 ? 
+                                                Math.round((count / stats.totalPredictions) * 100) : 0;
+                                            return (
+                                                <div key={level} className="col-12 md:col-6 lg:col-4">
+                                                    <div className="p-3 border-1 border-200 border-round mb-3 hover:shadow-2 transition-all transition-duration-200">
+                                                        <div className="flex align-items-center justify-content-between mb-2">
+                                                            <div className="flex align-items-center">
+                                                                <div className="w-3rem h-3rem border-round bg-blue-100 flex align-items-center justify-content-center mr-3">
+                                                                    <span className="text-lg font-bold text-blue-600">{level}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-bold text-900">Level {level}</div>
+                                                                    <div className="text-sm text-600">Triage Level</div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="text-2xl font-bold text-900">{count}</div>
+                                                                <div className="text-sm text-600">patients</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex justify-content-between align-items-center">
+                                                            <div className="text-sm text-500">
+                                                                {percentage}% of total
+                                                            </div>
+                                                            <div className="w-full bg-gray-200 border-round" style={{ height: '4px' }}>
+                                                                <div 
+                                                                    className="bg-blue-500 border-round transition-all transition-duration-500"
+                                                                    style={{ 
+                                                                        width: `${percentage}%`, 
+                                                                        height: '100%' 
+                                                                    }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            </div>
+                            
+                            <div className="col-12">
+                                <div className="p-3 bg-blue-50 border-1 border-blue-200 border-round">
+                                    <div className="flex align-items-center justify-content-between">
+                                        <div>
+                                            <div className="font-bold text-900 text-lg">Total Patients</div>
+                                            <div className="text-600">Across all triage levels</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-3xl font-bold text-blue-600">{stats.totalPredictions}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="col-12 text-center p-4">
+                            <i className="pi pi-info-circle text-4xl text-gray-400 mb-3"></i>
+                            <p className="text-600 text-lg">No triage level data available</p>
+                        </div>
+                    )}
+                </div>
+                
+                <div className="flex justify-content-end mt-4">
+                    <Button 
+                        label="Close" 
+                        icon="pi pi-times" 
+                        onClick={() => setShowTriageLevelsModal(false)}
+                        className="p-button-outlined"
+                    />
+                </div>
+            </Dialog>
         </div>
     );
 };
