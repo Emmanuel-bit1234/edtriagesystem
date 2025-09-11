@@ -44,16 +44,19 @@ export const Dashboard = (props) => {
                         {
                             data: values,
                             backgroundColor: [
-                                '#42A5F5',
-                                '#66BB6A',
-                                '#FFA726',
-                                '#EF5350',
-                                '#AB47BC',
-                                '#26A69A',
-                                '#FFCA28',
-                                '#8D6E63'
+                                '#3B82F6', // Blue - Level 1
+                                '#10B981', // Green - Level 2
+                                '#F59E0B', // Amber - Level 3
+                                '#EF4444', // Red - Level 4
+                                '#8B5CF6', // Purple - Level 5
+                                '#06B6D4', // Cyan - Level 6
+                                '#F97316', // Orange - Level 7
+                                '#84CC16'  // Lime - Level 8
                             ],
-                            borderWidth: 0
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            hoverBorderWidth: 3,
+                            hoverOffset: 8
                         }
                     ]
                 });
@@ -61,11 +64,38 @@ export const Dashboard = (props) => {
                 setChartOptions({
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 20,
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
                         }
                     },
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    spacing: 2
                 });
             }
 
@@ -77,10 +107,13 @@ export const Dashboard = (props) => {
                         {
                             data: [genderData.male || 0, genderData.female || 0],
                             backgroundColor: [
-                                '#42A5F5',
-                                '#FF69B4'
+                                '#3B82F6', // Professional blue for male
+                                '#EC4899'  // Professional pink for female
                             ],
-                            borderWidth: 0
+                            borderColor: '#ffffff',
+                            borderWidth: 3,
+                            hoverBorderWidth: 4,
+                            hoverOffset: 10
                         }
                     ]
                 });
@@ -88,11 +121,37 @@ export const Dashboard = (props) => {
                 setGenderChartOptions({
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 25,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${context.parsed} patients (${percentage}%)`;
+                                }
+                            }
                         }
                     },
                     responsive: true,
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    spacing: 3
                 });
             }
         } catch (err) {
@@ -213,40 +272,52 @@ export const Dashboard = (props) => {
 
             {/* Level Distribution Chart */}
             <div className="col-12 lg:col-6">
-                <Card title="Triage Level Distribution">
-                    <div style={{ height: '300px' }}>
-                        {chartData && chartOptions ? (
-                            <Chart 
-                                type="doughnut" 
-                                data={chartData} 
-                                options={chartOptions}
-                            />
-                        ) : (
-                            <div className="text-center p-4">
-                                <i className="pi pi-chart-pie text-4xl text-gray-400 mb-3"></i>
-                                <p>No data available for chart</p>
-                            </div>
-                        )}
+                <Card 
+                    title="Triage Level Distribution" 
+                    className="h-full"
+                    style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                >
+                    <div className="p-3">
+                        <div style={{ height: '320px', position: 'relative' }}>
+                            {chartData && chartOptions ? (
+                                <Chart 
+                                    type="doughnut" 
+                                    data={chartData} 
+                                    options={chartOptions}
+                                />
+                            ) : (
+                                <div className="text-center p-4 h-full flex flex-column align-items-center justify-content-center">
+                                    <i className="pi pi-chart-pie text-6xl text-gray-300 mb-3"></i>
+                                    <p className="text-gray-500 text-lg">No data available for chart</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </Card>
             </div>
 
             {/* Gender Distribution Chart */}
             <div className="col-12 lg:col-6">
-                <Card title="Patient Gender Distribution">
-                    <div style={{ height: '300px' }}>
-                        {genderChartData && genderChartOptions ? (
-                            <Chart 
-                                type="pie" 
-                                data={genderChartData} 
-                                options={genderChartOptions}
-                            />
-                        ) : (
-                            <div className="text-center p-4">
-                                <i className="pi pi-chart-pie text-4xl text-gray-400 mb-3"></i>
-                                <p>No gender data available</p>
-                            </div>
-                        )}
+                <Card 
+                    title="Patient Gender Distribution" 
+                    className="h-full"
+                    style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                >
+                    <div className="p-3">
+                        <div style={{ height: '320px', position: 'relative' }}>
+                            {genderChartData && genderChartOptions ? (
+                                <Chart 
+                                    type="pie" 
+                                    data={genderChartData} 
+                                    options={genderChartOptions}
+                                />
+                            ) : (
+                                <div className="text-center p-4 h-full flex flex-column align-items-center justify-content-center">
+                                    <i className="pi pi-chart-pie text-6xl text-gray-300 mb-3"></i>
+                                    <p className="text-gray-500 text-lg">No gender data available</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </Card>
             </div>
