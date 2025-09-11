@@ -26,6 +26,27 @@ export default function PredictionAPI() {
         }).then((response) => response.data);
     };
 
+    this.getStatsSummary = () => {
+        var url = `https://triagecdssproxy.vercel.app/prediction-logs/stats/summary`;
+        return axios.get(url, {
+            headers: getAuthHeaders()
+        }).then((response) => response.data);
+    };
+
+    this.getLast24HoursStats = () => {
+        var url = `https://triagecdssproxy.vercel.app/prediction-logs/stats/last-24h`;
+        return axios.get(url, {
+            headers: getAuthHeaders()
+        }).then((response) => response.data);
+    };
+
+    this.getGenderStats = () => {
+        var url = `https://triagecdssproxy.vercel.app/prediction-logs/stats/patient-gender`;
+        return axios.get(url, {
+            headers: getAuthHeaders()
+        }).then((response) => response.data);
+    };
+
     // New authentication methods
     this.login = (email, password) => {
         var url = "https://triagecdssproxy.vercel.app/auth/login";

@@ -427,6 +427,7 @@ export const EDPrediction = (props) => {
                         globalFilterFields={["ktasExplained.Title", "ktasExplained.Meaning", "model"]}
                     >
                         <Column field="patientNumber" header="Patient Number" sortable body={(item) => <b>{item.patientNumber}</b>}></Column>
+                        <Column field="gender" header="Gender" sortable body={(item) => <b>{item.inputs?.Sex === 1 ? 'Female' : 'Male'}</b>}></Column>
                         <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
                         <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => (
                             <span

@@ -173,11 +173,11 @@ const App = () => {
     const menu = [
         {
             items: [
-                // {
-                //     label: "Dashboard",
-                //     icon: "pi pi-fw pi-home",
-                //     to: "/",
-                // },
+                {
+                    label: "Dashboard",
+                    icon: "pi pi-fw pi-chart-bar",
+                    to: "/",
+                },
                 {
                     label: "Emergency Triage",
                     icon: "pi pi-fw pi-home",
