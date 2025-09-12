@@ -12,6 +12,8 @@ import PredictionAPI from "../service/predictionAPI";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import InputArea from "../componets/InputArea";
 import FloatInputArea from "../componets/FloatInputArea";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { InputText } from "primereact/inputtext";
 
 export const EDPrediction = (props) => {
 
@@ -88,13 +90,28 @@ export const EDPrediction = (props) => {
         nurseName: "",
         nurseId: ""
     });
+    const onGlobalFilterChange = (e) => {
+        const value = e.target.value;
+        let _filters1 = { ...filters };
+        _filters1["global"].value = value;
+        setFilters(_filters1);
+        setGlobalFilterValue(value);
+    };
+    const [globalFilterValue, setGlobalFilterValue] = useState("");
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: {
+            operator: FilterOperator.AND,
+            constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+        },
+    });
     useEffect(() => {
         console.log("Test")
         prediction.getAllPredictions().then((data) => {
             console.log("ALL PREDICTIONS HERE:", data);
             setAllPredictions(data?.logs)
         });
-        
+
         // Get nurse information from local storage
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -150,14 +167,16 @@ export const EDPrediction = (props) => {
                 <Toolbar
                     className="mb-4"
                     left={<div> <Button className="p-button-success mr-2" icon="pi pi-plus" label="Start Triage" onClick={(e) => setshowPredictionForm(true)} /></div>}
-                // right={
-                //     // <div>
-                //     //     <span className="block mt-2 md:mt-0 p-input-icon-left">
-                //     //         <i className="pi pi-search" />
-                //     //         {/* <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search Event Name" /> */}
-                //     //     </span>
-                //     // </div>
-                // }
+                    right={
+                        <div>
+                            <span className="block mt-2 md:mt-0 p-input-icon-left">
+                                <i className="pi pi-search" />
+                                <InputText placeholder="Search..." value={globalFilterValue}
+                                    onChange={onGlobalFilterChange}
+                                />
+                            </span>
+                        </div>
+                    }
                 ></Toolbar>
             </div>
             <div className="col-12">
@@ -169,6 +188,13 @@ export const EDPrediction = (props) => {
                         modal
                         onHide={(e) => {
                             setshowPredictionForm(false);
+                            // Refresh all predictions when dialog is closed
+                            setLoad(true);
+                            prediction.getAllPredictions().then((data) => {
+                                console.log("Refreshed predictions:", data);
+                                setAllPredictions(data?.logs);
+                                setLoad(false);
+                            });
                         }}
                         footer={
                             <>
@@ -183,14 +209,14 @@ export const EDPrediction = (props) => {
                                         <TabPanel header="Triage">
                                             {/* Nurse Information Display */}
                                             <div className="col-12 mb-3">
-                                                <div className="p-3" style={{ 
-                                                    backgroundColor: '#e3f2fd', 
-                                                    borderRadius: '8px', 
-                                                    border: '1px solid #bbdefb' 
+                                                <div className="p-3" style={{
+                                                    backgroundColor: '#e3f2fd',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid #bbdefb'
                                                 }}>
                                                     <h5 style={{ margin: '0 0 8px 0', color: '#1976d2' }}>Current Nurse</h5>
                                                     <p style={{ margin: '0', color: '#424242' }}>
-                                                        <strong>Name:</strong> {form.nurseName || 'Not available'} | 
+                                                        <strong>Name:</strong> {form.nurseName || 'Not available'} |
                                                         <strong> ID:</strong> {form.nurseId || 'Not available'}
                                                     </p>
                                                 </div>
@@ -413,8 +439,8 @@ export const EDPrediction = (props) => {
                         value={allPredictions}
                         dataKey="id"
                         paginator
-                        rows={10}
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rows={9}
+                        rowsPerPageOptions={[9, 18, 27]}
                         className="datatable-responsive"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} Predictions"
                         emptyMessage="No predictions found."
@@ -422,9 +448,9 @@ export const EDPrediction = (props) => {
                         responsiveLayout="scroll"
                         resizableColumns
                         columnResizeMode="expand"
-                        //filters={filters}
+                        filters={filters}
                         filterDisplay="menu"
-                        globalFilterFields={["ktasExplained.Title", "ktasExplained.Meaning", "model"]}
+                        globalFilterFields={["ktasExplained.Title", "patientNumber", "user.name"]}
                     >
                         <Column field="patientNumber" header="Patient Number" sortable body={(item) => <b>{item.patientNumber}</b>}></Column>
                         <Column field="gender" header="Gender" sortable body={(item) => <b>{item.inputs?.Sex === 1 ? 'Female' : 'Male'}</b>}></Column>
@@ -477,10 +503,10 @@ export const EDPrediction = (props) => {
                                 </div>
                             )}
                         ></Column>
-                        <Column 
-                            field="createdAt" 
-                            header="Created Date" 
-                            sortable 
+                        <Column
+                            field="createdAt"
+                            header="Created Date"
+                            sortable
                             body={(item) => (
                                 <div
                                     style={{
