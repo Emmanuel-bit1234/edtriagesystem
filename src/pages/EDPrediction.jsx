@@ -228,7 +228,7 @@ export const EDPrediction = (props) => {
                                                         placeholder="Enter a Patient Number"
                                                         value={form.patientNumber}
                                                         min={1}
-                                                        max={1000000}
+                                                        max={999999999}
                                                         onChange={(e) => setForm({ ...form, patientNumber: e.target.value })}
                                                     />
                                                 </div>
