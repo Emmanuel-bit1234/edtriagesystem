@@ -392,7 +392,7 @@ export const Dashboard = (props) => {
             <Dialog
                 header="Triage Levels Details"
                 visible={showTriageLevelsModal}
-                style={{ width: '50vw' }}
+                style={{ width: '90vw', maxWidth: '600px' }}
                 onHide={() => {
                     console.log('Modal closing...');
                     setShowTriageLevelsModal(false);
