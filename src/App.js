@@ -43,6 +43,7 @@ import Cookies from "js-cookie";
 import VoterAllocationParams from "./pages/VoterAllocationParams";
 import { AdministrationReports } from "./pages/AdministrationReports";
 import { VoterReports } from "./pages/VoterReports";
+import { NurseReport } from "./pages/NurseReport";
 import PredictionAPI from "./service/predictionAPI";
 
 const App = () => {
@@ -182,6 +183,11 @@ const App = () => {
                     label: "Emergency Triage",
                     icon: "pi pi-fw pi-home",
                     to: "/EDPrediction",
+                },
+                {
+                    label: "Nurse Report",
+                    icon: "pi pi-fw pi-chart-line",
+                    to: "/nurse-report",
                 },
                 //     {
                 //         label: "Administration",
@@ -406,6 +412,7 @@ const App = () => {
                             <Route path="/administration-reports" component={AdministrationReports} />
                             <Route path="/voter-reports" component={VoterReports} />
                             <Route path="/candidate-reports" component={CandidateReports} />
+                            <Route path="/nurse-report" component={NurseReport} />
                         </div>
                     </div>
                 </>

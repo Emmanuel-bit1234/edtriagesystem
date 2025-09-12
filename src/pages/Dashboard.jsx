@@ -38,7 +38,18 @@ export const Dashboard = (props) => {
             
             // Prepare chart data for level distribution
             if (summaryData.levelDistribution) {
-                const labels = Object.keys(summaryData.levelDistribution).map(level => `Level ${level}`);
+                const getKTASDisplay = (level) => {
+                    const names = {
+                        1: 'Resuscitation',
+                        2: 'Emergency',
+                        3: 'Urgent',
+                        4: 'Less Urgent',
+                        5: 'Non-Urgent'
+                    };
+                    return `${level}: (${names[level] || 'Unknown'})`;
+                };
+                
+                const labels = Object.keys(summaryData.levelDistribution).map(level => getKTASDisplay(parseInt(level)));
                 const values = Object.values(summaryData.levelDistribution);
                 
                 setChartData({

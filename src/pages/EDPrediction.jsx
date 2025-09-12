@@ -106,9 +106,9 @@ export const EDPrediction = (props) => {
         },
     });
     useEffect(() => {
-        console.log("Test")
+        //console.log("Test")
         prediction.getAllPredictions().then((data) => {
-            console.log("ALL PREDICTIONS HERE:", data);
+            //("ALL PREDICTIONS HERE:", data);
             setAllPredictions(data?.logs)
         });
 
@@ -150,10 +150,10 @@ export const EDPrediction = (props) => {
                 error = true;
             }
         });
-        console.log(newForm)
+        //console.log(newForm)
 
         prediction.getPrediction(newForm).then((data) => {
-            console.log(data);
+            //console.log(data);
             setPredictionResults(data);
             setLoad(false);
         });
@@ -191,7 +191,7 @@ export const EDPrediction = (props) => {
                             // Refresh all predictions when dialog is closed
                             setLoad(true);
                             prediction.getAllPredictions().then((data) => {
-                                console.log("Refreshed predictions:", data);
+                                //console.log("Refreshed predictions:", data);
                                 setAllPredictions(data?.logs);
                                 setLoad(false);
                             });
@@ -702,7 +702,7 @@ export const EDPrediction = (props) => {
                                                 color: "white",
                                             }}
                                         >
-                                            Level {selectedPrediction.ktasExplained?.Level} - {selectedPrediction.ktasExplained?.Title}
+                                            {selectedPrediction.ktasExplained?.Level}: ({selectedPrediction.ktasExplained?.Title})
                                         </span>
                                     </div>
                                 </div>
@@ -727,17 +727,30 @@ export const EDPrediction = (props) => {
                                 {/* <div className="col-12">
                                     <strong>Prediction Confidence:</strong>
                                     <div style={{ marginTop: '5px' }}>
-                                        {selectedPrediction.probs && selectedPrediction.probs.map((prob, index) => (
-                                            <span key={index} style={{ 
-                                                marginRight: '10px',
-                                                padding: '2px 8px',
-                                                backgroundColor: '#e9ecef',
-                                                borderRadius: '3px',
-                                                fontSize: '0.9em'
-                                            }}>
-                                                Level {index + 1}: {(parseFloat(prob) * 100).toFixed(1)}%
-                                            </span>
-                                        ))}
+                                        {selectedPrediction.probs && selectedPrediction.probs.map((prob, index) => {
+                                            const getKTASDisplay = (level) => {
+                                                const names = {
+                                                    1: 'Resuscitation',
+                                                    2: 'Emergency',
+                                                    3: 'Urgent',
+                                                    4: 'Less Urgent',
+                                                    5: 'Non-Urgent'
+                                                };
+                                                return `${level}: (${names[level] || 'Unknown'})`;
+                                            };
+                                            
+                                            return (
+                                                <span key={index} style={{ 
+                                                    marginRight: '10px',
+                                                    padding: '2px 8px',
+                                                    backgroundColor: '#e9ecef',
+                                                    borderRadius: '3px',
+                                                    fontSize: '0.9em'
+                                                }}>
+                                                    {getKTASDisplay(index + 1)}: {(parseFloat(prob) * 100).toFixed(1)}%
+                                                </span>
+                                            );
+                                        })}
                                     </div>
                                 </div> */}
                             </div>
