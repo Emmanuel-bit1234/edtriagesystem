@@ -306,7 +306,7 @@ export const NurseReport = (props) => {
     // Summary cards
     const SummaryCards = () => (
         <div className="grid">
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center">
                     <div className="text-6xl font-bold text-blue-500 mb-2">
                         {reportData?.summary?.totalPatients || 0}
@@ -314,7 +314,7 @@ export const NurseReport = (props) => {
                     <div className="text-600">Total Patients</div>
                 </Card>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center">
                     <div className="text-6xl font-bold text-red-500 mb-2">
                         {reportData?.summary?.criticalPatients || 0}
@@ -322,7 +322,7 @@ export const NurseReport = (props) => {
                     <div className="text-600">Critical Patients</div>
                 </Card>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center">
                     <div className="text-6xl font-bold text-orange-500 mb-2">
                         {reportData?.summary?.mostCommonLevel || 0}
@@ -330,7 +330,7 @@ export const NurseReport = (props) => {
                     <div className="text-600">Most Common KTAS Level</div>
                 </Card>
             </div>
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center">
                     <div className="text-6xl font-bold text-green-500 mb-2">
                         {reportData?.summary?.lowUrgencyPatients || 0}

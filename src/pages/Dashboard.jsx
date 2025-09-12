@@ -182,16 +182,16 @@ export const Dashboard = (props) => {
                 <div className="col-12">
                     <Card>
                         <div className="grid">
-                            <div className="col-12 md:col-6 lg:col-3">
+                            <div className="col-6 md:col-6 lg:col-3">
                                 <Skeleton height="100px" />
                             </div>
-                            <div className="col-12 md:col-6 lg:col-3">
+                            <div className="col-6 md:col-6 lg:col-3">
                                 <Skeleton height="100px" />
                             </div>
-                            <div className="col-12 md:col-6 lg:col-3">
+                            <div className="col-6 md:col-6 lg:col-3">
                                 <Skeleton height="100px" />
                             </div>
-                            <div className="col-12 md:col-6 lg:col-3">
+                            <div className="col-6 md:col-6 lg:col-3">
                                 <Skeleton height="100px" />
                             </div>
                         </div>
@@ -232,7 +232,7 @@ export const Dashboard = (props) => {
             </div> */}
             
             {/* Statistics Cards */}
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center h-full" style={{ minHeight: '120px' }}>
                     <div className="flex flex-column align-items-center h-full justify-content-center p-2">
                         <i className="pi pi-chart-line text-3xl text-blue-500 mb-2"></i>
@@ -242,7 +242,7 @@ export const Dashboard = (props) => {
                 </Card>
             </div>
 
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <div 
                     className="cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105 h-full"
                     onClick={() => {
@@ -271,7 +271,7 @@ export const Dashboard = (props) => {
                 </div>
             </div>
 
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center h-full" style={{ minHeight: '120px' }}>
                     <div className="flex flex-column align-items-center h-full justify-content-center p-2">
                         <i className="pi pi-exclamation-triangle text-3xl text-orange-500 mb-2"></i>
@@ -288,7 +288,7 @@ export const Dashboard = (props) => {
                 </Card>
             </div>
 
-            <div className="col-12 md:col-6 lg:col-3">
+            <div className="col-6 md:col-6 lg:col-3">
                 <Card className="text-center h-full" style={{ minHeight: '120px' }}>
                     <div className="flex flex-column align-items-center h-full justify-content-center p-2">
                         <i className="pi pi-clock text-3xl text-purple-500 mb-2"></i>
