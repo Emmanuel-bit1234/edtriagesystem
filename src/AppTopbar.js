@@ -23,6 +23,7 @@ export const AppTopbar = (props) => {
         <div className="layout-topbar">
             <Link to="/" className="layout-topbar-logo">
                 {/* <img src={props.layoutColorMode === 'light' ? 'assets/layout/images/logo-dark.svg' : 'assets/layout/images/logo-white.svg'} alt="logo"/> */}
+                <i className="pi pi-shield mr-2" style={{ fontSize: '1.2rem', color: '#ffffff' }}></i>
                 <span>EMERGENCY DEPARTMENT</span>
             </Link>
 
