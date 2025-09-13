@@ -165,11 +165,11 @@ export const NurseReport = (props) => {
                     data.summary.levelDistribution['5'] || 0
                 ],
                 backgroundColor: [
-                    '#EF4444', // Red - Level 1 (Resuscitation)
-                    '#F97316', // Orange - Level 2 (Emergency)
-                    '#F59E0B', // Amber - Level 3 (Urgent)
-                    '#10B981', // Green - Level 4 (Less Urgent)
-                    '#3B82F6'  // Blue - Level 5 (Non-Urgent)
+                    '#DC2626', // Red - Level 1 (Resuscitation) - Most Critical
+                    '#EA580C', // Orange - Level 2 (Emergency) - Very Urgent
+                    '#EAB308', // Yellow - Level 3 (Urgent) - Urgent
+                    '#16A34A', // Green - Level 4 (Less Urgent) - Less Urgent
+                    '#2563EB'  // Blue - Level 5 (Non-Urgent) - Least Urgent
                 ],
                 borderColor: '#ffffff',
                 borderWidth: 2,
@@ -231,48 +231,56 @@ export const NurseReport = (props) => {
                     labels: {
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        padding: 20,
+                        padding: 25,
                         font: {
-                            size: 12,
-                            weight: '500'
+                            size: 13,
+                            weight: '600'
                         }
                     }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     titleColor: '#ffffff',
                     bodyColor: '#ffffff',
                     borderColor: '#ffffff',
                     borderWidth: 1,
-                    cornerRadius: 8,
+                    cornerRadius: 12,
                     displayColors: true,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13,
+                        weight: '500'
+                    },
                     callbacks: {
                         label: function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((context.parsed / total) * 100).toFixed(1);
-                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                            const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                            return `${context.label}: ${context.parsed} patients (${percentage}%)`;
                         }
                     }
                 }
             },
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '60%',
-            spacing: 2
+            cutout: '65%',
+            spacing: 3
         });
     };
 
 
-    // Get KTAS level color (matching EDPrediction colors)
+    // Get KTAS level color (matching Dashboard colors)
     const getKTASColor = (level) => {
         const colors = {
-            1: 'red',      // Resuscitation
-            2: 'orange',   // Emergency
-            3: 'yellow',   // Urgent
-            4: 'green',    // Less Urgent
-            5: 'blue'      // Non-Urgent
+            1: '#DC2626',  // Red - Resuscitation (Most Critical)
+            2: '#EA580C',  // Orange - Emergency (Very Urgent)
+            3: '#EAB308',  // Yellow - Urgent
+            4: '#16A34A',  // Green - Less Urgent
+            5: '#2563EB'   // Blue - Non-Urgent (Least Urgent)
         };
-        return colors[level] || 'grey';
+        return colors[level] || '#6B7280';
     };
 
     // Get KTAS level name
@@ -307,35 +315,63 @@ export const NurseReport = (props) => {
     const SummaryCards = () => (
         <div className="grid">
             <div className="col-6 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="text-6xl font-bold text-blue-500 mb-2">
-                        {reportData?.summary?.totalPatients || 0}
+                <Card 
+                    className="text-center h-full cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105" 
+                    style={{ minHeight: '140px' }}
+                >
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-3">
+                        <i className="pi pi-users text-4xl text-blue-500 mb-3"></i>
+                        <div className="text-4xl font-bold text-900 mb-2">
+                            {reportData?.summary?.totalPatients || 0}
+                        </div>
+                        <div className="text-600 font-medium">Total Patients</div>
+                        <div className="text-xs text-500 mt-1">All triage levels</div>
                     </div>
-                    <div className="text-600">Total Patients</div>
                 </Card>
             </div>
             <div className="col-6 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="text-6xl font-bold text-red-500 mb-2">
-                        {reportData?.summary?.criticalPatients || 0}
+                <Card 
+                    className="text-center h-full cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105" 
+                    style={{ minHeight: '140px' }}
+                >
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-3">
+                        <i className="pi pi-exclamation-triangle text-4xl text-red-500 mb-3"></i>
+                        <div className="text-4xl font-bold text-900 mb-2">
+                            {reportData?.summary?.criticalPatients || 0}
+                        </div>
+                        <div className="text-600 font-medium">Critical Patients</div>
+                        <div className="text-xs text-500 mt-1">Level 1 & 2</div>
                     </div>
-                    <div className="text-600">Critical Patients</div>
                 </Card>
             </div>
             <div className="col-6 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="text-6xl font-bold text-orange-500 mb-2">
-                        {reportData?.summary?.mostCommonLevel || 0}
+                <Card 
+                    className="text-center h-full cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105" 
+                    style={{ minHeight: '140px' }}
+                >
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-3">
+                        <i className="pi pi-chart-bar text-4xl text-orange-500 mb-3"></i>
+                        <div className="text-4xl font-bold text-900 mb-2">
+                            {reportData?.summary?.mostCommonLevel || 0}
+                        </div>
+                        <div className="text-600 font-medium">Most Common Level</div>
+                        <div className="text-xs text-500 mt-1">KTAS Level</div>
                     </div>
-                    <div className="text-600">Most Common KTAS Level</div>
                 </Card>
             </div>
             <div className="col-6 md:col-6 lg:col-3">
-                <Card className="text-center">
-                    <div className="text-6xl font-bold text-green-500 mb-2">
-                        {reportData?.summary?.lowUrgencyPatients || 0}
+                <Card 
+                    className="text-center h-full cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105" 
+                    style={{ minHeight: '140px' }}
+                >
+                    <div className="flex flex-column align-items-center h-full justify-content-center p-3">
+                        <i className="pi pi-check-circle text-4xl text-green-500 mb-3"></i>
+                        <div className="text-4xl font-bold text-900 mb-2">
+                            {reportData?.summary?.lowUrgencyPatients || 0}
+                        </div>
+                        <div className="text-600 font-medium">Low Urgency</div>
+                        <div className="text-xs text-500 mt-1">Level 4 & 5</div>
                     </div>
-                    <div className="text-600">Low Urgency Patients</div>
                 </Card>
             </div>
         </div>
@@ -354,7 +390,11 @@ export const NurseReport = (props) => {
                     style={{ 
                         backgroundColor: getKTASColor(rowData.level),
                         color: 'white',
-                        border: 'none'
+                        border: 'none',
+                        fontWeight: '700',
+                        fontSize: '0.95rem',
+                        padding: '0.75rem 1.25rem',
+                        borderRadius: '0.5rem'
                     }}
                 />
             )} />
@@ -365,50 +405,83 @@ export const NurseReport = (props) => {
 
     // Top complaints table
     const TopComplaintsTable = () => (
-        <DataTable value={reportData?.insights?.topChiefComplaints || []} className="p-datatable-sm">
-            <Column field="complaint" header="Chief Complaint" />
-            <Column field="count" header="Count" />
+        <DataTable 
+            value={reportData?.insights?.topChiefComplaints || []} 
+            className="p-datatable-sm"
+            emptyMessage="No chief complaints data available"
+        >
+            <Column 
+                field="complaint" 
+                header="Chief Complaint" 
+                body={(rowData) => (
+                    <div className="flex align-items-center">
+                        <i className="pi pi-file text-blue-500 mr-2"></i>
+                        <span className="font-medium">{rowData.complaint}</span>
+                    </div>
+                )}
+            />
+            <Column 
+                field="count" 
+                header="Count" 
+                body={(rowData) => (
+                    <Badge 
+                        value={rowData.count} 
+                        severity="info" 
+                        style={{ fontSize: '0.875rem', fontWeight: '600' }}
+                    />
+                )}
+            />
         </DataTable>
     );
 
     // Vital signs ranges
     const VitalSignsCard = () => (
-        <Card title="Vital Signs Ranges" className="h-full">
-            <div className="grid">
-                <div className="col-6">
-                    <div className="text-center p-3 border-round border-1 surface-border">
-                        <div className="text-2xl font-bold text-blue-500">Blood Pressure</div>
-                        <div className="text-600">
-                            {reportData?.insights?.vitalSignsRanges?.bloodPressure?.min || 0} - {reportData?.insights?.vitalSignsRanges?.bloodPressure?.max || 0}
+        <Card 
+            title="Vital Signs Ranges" 
+            className="h-full"
+            style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+        >
+            <div className="p-3">
+                <div className="grid">
+                    <div className="col-6">
+                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                            <i className="pi pi-heart text-3xl text-blue-500 mb-2"></i>
+                            <div className="text-xl font-bold text-900 mb-2">Blood Pressure</div>
+                            <div className="text-600 font-medium">
+                                {reportData?.insights?.vitalSignsRanges?.bloodPressure?.min || 0} - {reportData?.insights?.vitalSignsRanges?.bloodPressure?.max || 0}
+                            </div>
+                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bloodPressure?.avg || 0}</div>
                         </div>
-                        <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bloodPressure?.avg || 0}</div>
                     </div>
-                </div>
-                <div className="col-6">
-                    <div className="text-center p-3 border-round border-1 surface-border">
-                        <div className="text-2xl font-bold text-green-500">Heart Rate</div>
-                        <div className="text-600">
-                            {reportData?.insights?.vitalSignsRanges?.heartRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.heartRate?.max || 0}
+                    <div className="col-6">
+                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                            <i className="pi pi-heart text-3xl text-green-500 mb-2"></i>
+                            <div className="text-xl font-bold text-900 mb-2">Heart Rate</div>
+                            <div className="text-600 font-medium">
+                                {reportData?.insights?.vitalSignsRanges?.heartRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.heartRate?.max || 0}
+                            </div>
+                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.heartRate?.avg || 0}</div>
                         </div>
-                        <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.heartRate?.avg || 0}</div>
                     </div>
-                </div>
-                <div className="col-6">
-                    <div className="text-center p-3 border-round border-1 surface-border">
-                        <div className="text-2xl font-bold text-orange-500">Respiratory Rate</div>
-                        <div className="text-600">
-                            {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.max || 0}
+                    <div className="col-6">
+                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                            <i className="pi pi-wind text-3xl text-orange-500 mb-2"></i>
+                            <div className="text-xl font-bold text-900 mb-2">Respiratory Rate</div>
+                            <div className="text-600 font-medium">
+                                {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.max || 0}
+                            </div>
+                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.avg || 0}</div>
                         </div>
-                        <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.avg || 0}</div>
                     </div>
-                </div>
-                <div className="col-6">
-                    <div className="text-center p-3 border-round border-1 surface-border">
-                        <div className="text-2xl font-bold text-purple-500">Temperature</div>
-                        <div className="text-600">
-                            {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.min || 0}°C - {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.max || 0}°C
+                    <div className="col-6">
+                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                            <i className="pi pi-thermometer text-3xl text-purple-500 mb-2"></i>
+                            <div className="text-xl font-bold text-900 mb-2">Body Temperature</div>
+                            <div className="text-600 font-medium">
+                                {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.min || 0}°C - {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.max || 0}°C
+                            </div>
+                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.avg || 0}°C</div>
                         </div>
-                        <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.avg || 0}°C</div>
                     </div>
                 </div>
             </div>
@@ -417,16 +490,29 @@ export const NurseReport = (props) => {
 
     // Risk factors
     const RiskFactorsCard = () => (
-        <Card title="Risk Factors" className="h-full">
-            <div className="grid">
-                {Object.entries(reportData?.insights?.riskFactors || {}).map(([factor, count]) => (
-                    <div key={factor} className="col-6">
-                        <div className="flex align-items-center justify-content-between p-2 border-round border-1 surface-border">
-                            <span className="capitalize">{factor.replace(/([A-Z])/g, ' $1').trim()}</span>
-                            <Badge value={count} severity={count > 0 ? 'warning' : 'success'} />
+        <Card 
+            title="Risk Factors" 
+            className="h-full"
+            style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+        >
+            <div className="p-3">
+                <div className="grid">
+                    {Object.entries(reportData?.insights?.riskFactors || {}).map(([factor, count]) => (
+                        <div key={factor} className="col-6">
+                            <div className="flex align-items-center justify-content-between p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                                <div className="flex align-items-center">
+                                    <i className="pi pi-exclamation-triangle text-orange-500 mr-2"></i>
+                                    <span className="capitalize font-medium">{factor.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                </div>
+                                <Badge 
+                                    value={count} 
+                                    severity={count > 0 ? 'warning' : 'success'} 
+                                    style={{ fontSize: '0.875rem', fontWeight: '600' }}
+                                />
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </Card>
     );
@@ -500,13 +586,13 @@ export const NurseReport = (props) => {
                         <div className="flex align-items-center justify-content-between w-full">
                             <div>
                                 <h2 className="m-0 text-2xl">Nurse Performance Report - {reportData.nurse.name}</h2>
-                                <p className="text-600 text-sm m-0">
+                                <p className="text-600 text-lg m-0">
                                     {selectedDate 
                                         ? `Daily Report - ${formatDateForDisplay(selectedDate)}`
                                         : 'Overall Performance Report'
                                     }
                                 </p>
-                                <p className="text-500 text-xs m-0">
+                                <p className="text-500 text-sm m-0">
                                     Email: {reportData.nurse.email}
                                 </p>
                             </div>
@@ -520,8 +606,26 @@ export const NurseReport = (props) => {
                     )}
 
                     {loading && (
-                        <div className="flex justify-content-center align-items-center" style={{ height: '200px' }}>
-                            <ProgressSpinner />
+                        <div className="flex flex-column justify-content-center align-items-center" style={{ height: '300px' }}>
+                            <ProgressSpinner size="50px" />
+                            <div className="mt-3 text-center">
+                                <h4 className="text-900 mb-2">Generating Report</h4>
+                                <p className="text-600">Please wait while we process the data...</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {!reportData && !loading && !error && (
+                        <div className="flex flex-column justify-content-center align-items-center" style={{ height: '400px' }}>
+                            <i className="pi pi-chart-line text-6xl text-gray-300 mb-4"></i>
+                            <h3 className="text-2xl font-bold text-900 mb-2">No Report Data</h3>
+                            <p className="text-600 text-center mb-4">
+                                Select a nurse and click "Generate Report" to view performance analytics
+                            </p>
+                            <div className="text-sm text-500">
+                                <i className="pi pi-info-circle mr-2"></i>
+                                Choose a nurse from the dropdown above to get started
+                            </div>
                         </div>
                     )}
 
@@ -538,13 +642,27 @@ export const NurseReport = (props) => {
                                 <TabPanel header="Overview" leftIcon="pi pi-chart-bar">
                                     <div className="grid">
                                         <div className="col-12 lg:col-6">
-                                            <Card title="KTAS Level Distribution" className="h-full">
-                                                <Chart type="doughnut" data={chartData.levelDistribution} options={chartOptions} style={{ height: '300px' }} />
+                                            <Card 
+                                                title="KTAS Level Distribution" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <div style={{ height: '320px', position: 'relative' }}>
+                                                        <Chart type="doughnut" data={chartData.levelDistribution} options={chartOptions} />
+                                                    </div>
+                                                </div>
                                             </Card>
                                         </div>
                                         <div className="col-12 lg:col-6">
-                                            <Card title="Level Distribution Details" className="h-full">
-                                                <LevelDistributionTable />
+                                            <Card 
+                                                title="Level Distribution Details" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <LevelDistributionTable />
+                                                </div>
                                             </Card>
                                         </div>
                                     </div>
@@ -553,24 +671,46 @@ export const NurseReport = (props) => {
                                 <TabPanel header="Demographics" leftIcon="pi pi-users">
                                     <div className="grid">
                                         <div className="col-12 lg:col-4">
-                                            <Card title="Gender Distribution" className="h-full">
-                                                <Chart type="pie" data={chartData.genderDistribution} options={chartOptions} style={{ height: '250px' }} />
+                                            <Card 
+                                                title="Gender Distribution" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <div style={{ height: '280px', position: 'relative' }}>
+                                                        <Chart type="pie" data={chartData.genderDistribution} options={chartOptions} />
+                                                    </div>
+                                                </div>
                                             </Card>
                                         </div>
                                         <div className="col-12 lg:col-4">
-                                            <Card title="Age Groups" className="h-full">
-                                                <Chart type="pie" data={chartData.ageGroups} options={chartOptions} style={{ height: '250px' }} />
+                                            <Card 
+                                                title="Age Groups" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <div style={{ height: '280px', position: 'relative' }}>
+                                                        <Chart type="pie" data={chartData.ageGroups} options={chartOptions} />
+                                                    </div>
+                                                </div>
                                             </Card>
                                         </div>
                                         <div className="col-12 lg:col-4">
-                                            <Card title="Arrival Modes" className="h-full">
-                                                <div className="text-center">
-                                                    {Object.entries(reportData.demographics.arrivalModeDistribution || {}).map(([mode, count]) => (
-                                                        <div key={mode} className="mb-3 p-3 border-round border-1 surface-border">
-                                                            <div className="text-xl font-bold">{count}</div>
-                                                            <div className="text-600">{getArrivalModeName(parseInt(mode))}</div>
-                                                        </div>
-                                                    ))}
+                                            <Card 
+                                                title="Arrival Modes" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <div className="text-center">
+                                                        {Object.entries(reportData.demographics.arrivalModeDistribution || {}).map(([mode, count]) => (
+                                                            <div key={mode} className="mb-3 p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                                                                <div className="text-2xl font-bold text-900">{count}</div>
+                                                                <div className="text-600 font-medium">{getArrivalModeName(parseInt(mode))}</div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </Card>
                                         </div>
@@ -581,8 +721,14 @@ export const NurseReport = (props) => {
                                 <TabPanel header="Insights" leftIcon="pi pi-lightbulb">
                                     <div className="grid">
                                         <div className="col-12 lg:col-6">
-                                            <Card title="Top Chief Complaints" className="h-full">
-                                                <TopComplaintsTable />
+                                            <Card 
+                                                title="Top Chief Complaints" 
+                                                className="h-full"
+                                                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                                            >
+                                                <div className="p-3">
+                                                    <TopComplaintsTable />
+                                                </div>
                                             </Card>
                                         </div>
                                         <div className="col-12 lg:col-6">

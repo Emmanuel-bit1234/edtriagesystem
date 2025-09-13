@@ -58,14 +58,14 @@ export const Dashboard = (props) => {
                         {
                             data: values,
                             backgroundColor: [
-                                '#3B82F6', // Blue - Level 1
-                                '#10B981', // Green - Level 2
-                                '#F59E0B', // Amber - Level 3
-                                '#EF4444', // Red - Level 4
-                                '#8B5CF6', // Purple - Level 5
-                                '#06B6D4', // Cyan - Level 6
-                                '#F97316', // Orange - Level 7
-                                '#84CC16'  // Lime - Level 8
+                                '#DC2626', // Red - Level 1 (Resuscitation) - Most Critical
+                                '#EA580C', // Orange - Level 2 (Emergency) - Very Urgent
+                                '#EAB308', // Yellow - Level 3 (Urgent) - Urgent
+                                '#16A34A', // Green - Level 4 (Less Urgent) - Less Urgent
+                                '#2563EB', // Blue - Level 5 (Non-Urgent) - Least Urgent
+                                '#7C3AED', // Purple - Level 6 (if exists)
+                                '#DC2626', // Red - Level 7 (if exists)
+                                '#059669'  // Emerald - Level 8 (if exists)
                             ],
                             borderColor: '#ffffff',
                             borderWidth: 2,
@@ -360,15 +360,27 @@ export const Dashboard = (props) => {
                         {stats?.levelDistribution ? 
                             Object.entries(stats.levelDistribution)
                                 .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                                .map(([level, count]) => (
-                                    <div key={level} className="col-12 md:col-6 lg:col-3">
-                                        <div className="flex justify-content-between align-items-center p-2 border-1 border-200 border-round mb-2">
-                                            <div className="flex align-items-center">
-                                                <div className="w-2rem h-2rem border-round bg-blue-100 flex align-items-center justify-content-center mr-3">
-                                                    <span className="text-sm font-bold text-blue-600">{level}</span>
+                                .map(([level, count]) => {
+                                    const getLevelColor = (level) => {
+                                        const colors = {
+                                            1: { bg: 'bg-red-100', text: 'text-red-600' },
+                                            2: { bg: 'bg-orange-100', text: 'text-orange-600' },
+                                            3: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
+                                            4: { bg: 'bg-green-100', text: 'text-green-600' },
+                                            5: { bg: 'bg-blue-100', text: 'text-blue-600' }
+                                        };
+                                        return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600' };
+                                    };
+                                    const levelColor = getLevelColor(level);
+                                    return (
+                                        <div key={level} className="col-12 md:col-6 lg:col-3">
+                                            <div className="flex justify-content-between align-items-center p-2 border-1 border-200 border-round mb-2">
+                                                <div className="flex align-items-center">
+                                                    <div className={`w-2rem h-2rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}>
+                                                        <span className={`text-sm font-bold ${levelColor.text}`}>{level}</span>
+                                                    </div>
+                                                    <span className="font-medium">Level {level}</span>
                                                 </div>
-                                                <span className="font-medium">Level {level}</span>
-                                            </div>
                                             <div className="flex align-items-center">
                                                 <span className="font-bold text-900 mr-2">{count}</span>
                                                 <span className="text-600 text-sm">
@@ -378,7 +390,8 @@ export const Dashboard = (props) => {
                                             </div>
                                         </div>
                                     </div>
-                                )) : 
+                                    );
+                                }) : 
                             <div className="col-12 text-center p-4">
                                 <i className="pi pi-info-circle text-2xl text-gray-400 mb-2"></i>
                                 <p className="text-600">No level data available</p>
@@ -419,13 +432,24 @@ export const Dashboard = (props) => {
                                         .map(([level, count]) => {
                                             const percentage = stats.totalPredictions > 0 ? 
                                                 Math.round((count / stats.totalPredictions) * 100) : 0;
+                                            const getLevelColor = (level) => {
+                                                const colors = {
+                                                    1: { bg: 'bg-red-100', text: 'text-red-600', progress: 'bg-red-500' },
+                                                    2: { bg: 'bg-orange-100', text: 'text-orange-600', progress: 'bg-orange-500' },
+                                                    3: { bg: 'bg-yellow-100', text: 'text-yellow-600', progress: 'bg-yellow-500' },
+                                                    4: { bg: 'bg-green-100', text: 'text-green-600', progress: 'bg-green-500' },
+                                                    5: { bg: 'bg-blue-100', text: 'text-blue-600', progress: 'bg-blue-500' }
+                                                };
+                                                return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600', progress: 'bg-gray-500' };
+                                            };
+                                            const levelColor = getLevelColor(level);
                                             return (
                                                 <div key={level} className="col-12 md:col-6 lg:col-4">
                                                     <div className="p-3 border-1 border-200 border-round mb-3 hover:shadow-2 transition-all transition-duration-200">
                                                         <div className="flex align-items-center justify-content-between mb-2">
                                                             <div className="flex align-items-center">
-                                                                <div className="w-3rem h-3rem border-round bg-blue-100 flex align-items-center justify-content-center mr-3">
-                                                                    <span className="text-lg font-bold text-blue-600">{level}</span>
+                                                                <div className={`w-3rem h-3rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}>
+                                                                    <span className={`text-lg font-bold ${levelColor.text}`}>{level}</span>
                                                                 </div>
                                                                 <div>
                                                                     <div className="font-bold text-900">Level {level}</div>
@@ -443,7 +467,7 @@ export const Dashboard = (props) => {
                                                             </div>
                                                             <div className="w-full bg-gray-200 border-round" style={{ height: '4px' }}>
                                                                 <div 
-                                                                    className="bg-blue-500 border-round transition-all transition-duration-500"
+                                                                    className={`${levelColor.progress} border-round transition-all transition-duration-500`}
                                                                     style={{ 
                                                                         width: `${percentage}%`, 
                                                                         height: '100%' 
