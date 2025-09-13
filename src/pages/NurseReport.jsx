@@ -539,6 +539,10 @@ export const NurseReport = (props) => {
                 placeholder="Select Nurse"
                 className="w-full md:w-20rem mb-3 md:mb-0 md:mr-3"
                 disabled={loadingNurses}
+                filter
+                filterBy="name"
+                showClear
+                filterPlaceholder="Search nurses..."
             />
             <div className="flex align-items-center w-full md:w-auto mb-3 md:mb-0 md:mr-3">
                 <Calendar
