@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { Image } from 'primereact/image';
 import Logo from '../assets/images/Logo.jpg';
 import PredictionAPI from '../service/predictionAPI';
-import './login/Login.scss';
 
 const Register = () => {
     const [name, setName] = useState('');
@@ -22,6 +21,16 @@ const Register = () => {
     const toast = useRef(null);
     const history = useHistory();
     const predictionAPI = new PredictionAPI();
+
+    useEffect(() => {
+        // Add class to body to prevent scrolling
+        document.body.classList.add('register-page');
+        
+        // Cleanup function to remove class when component unmounts
+        return () => {
+            document.body.classList.remove('register-page');
+        };
+    }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -70,6 +79,7 @@ const Register = () => {
     };
 
     const goToLogin = () => {
+        console.log('Navigating to login page...');
         history.push('/login');
     };
 
@@ -182,11 +192,13 @@ const Register = () => {
 
                                 <div className="p-mt-3 p-text-center">
                                     <p>Already have an account? 
-                                        <Button 
-                                            label="Login here" 
+                                        <a 
+                                            href="#/login" 
                                             className="p-button-link p-ml-2" 
-                                            onClick={goToLogin}
-                                        />
+                                            style={{ textDecoration: 'none', color: '#007ad9', cursor: 'pointer' }}
+                                        >
+                                            Login here
+                                        </a>
                                     </p>
                                 </div>
                             </div>

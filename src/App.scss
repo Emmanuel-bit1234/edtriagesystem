@@ -12,5 +12,94 @@
 }
 
 .big-text {
-                                                    font-size: 24px}
+    font-size: 24px;
+}
+
+/* Login and Register Page Styles */
+.card-size {
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    position: relative;
+    width: 100%;
+}
+
+.box {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+}
+
+.logo {
+    max-width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto 1rem auto;
+}
+
+.Card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.hide-small {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .hide-small {
+        display: block;
+    }
+}
+
+/* Prevent scrolling on login/register pages */
+body.login-page,
+body.register-page {
+    overflow: hidden;
+    height: 100vh;
+    position: relative;
+}
+
+/* Mobile topbar button positioning */
+@media (max-width: 991px) {
+    .layout-topbar {
+        display: flex !important;
+        align-items: center;
+        flex-direction: row;
+        
+        .layout-menu-button {
+            order: 1 !important;
+            margin-left: 0;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .layout-topbar-logo {
+            order: 2 !important;
+            flex: 1;
+            text-align: center;
+            margin: 0 1rem;
+        }
+        
+        .layout-topbar-button {
+            order: 3 !important;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .layout-topbar-button:last-child {
+            margin-right: 0;
+        }
+    }
+}
 

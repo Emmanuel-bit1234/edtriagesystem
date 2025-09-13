@@ -1,87 +1,101 @@
-import React from "react";
-import { Dialog } from "primereact/dialog";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import PredictionAPI from "../service/predictionAPI";
-import Cookies from "js-cookie";
+import React, { useState, useEffect } from 'react';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
 
 const ProfileDialog = ({ visible, onHide }) => {
-    const predictionAPI = new PredictionAPI();
-    
-    // Get user data from localStorage
-    const getUserData = () => {
-        try {
-            const userData = JSON.parse(localStorage.getItem("user"));
-            return userData || {};
-        } catch (error) {
-            console.error("Error parsing user data from localStorage:", error);
-            return {};
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        if (visible) {
+            loadUserProfile();
         }
-    };
+    }, [visible]);
 
-    const userData = getUserData();
-
-    // Logout function
-    const handleLogout = () => {
-        predictionAPI.logout();
-        Cookies.set("LoggedIn", false);
-        window.location.reload();
-    };
-
-    // Format user details for display
-    const getUserDetails = () => {
-        return [
-            {
-                col1: "Name",
-                col2: userData.name || userData.firstName || "N/A",
-                col3: "Email",
-                col4: userData.email || userData.emailAddress || "N/A",
-            },
-            {
-                col1: "Nurse ID",
-                col2: userData.id || userData.nurseId || "N/A",
-                col3: "",
-                col4: "",
-            },
-        ];
+    const loadUserProfile = () => {
+        try {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                const userData = JSON.parse(storedUser);
+                setUser(userData);
+            }
+        } catch (error) {
+            console.error('Error loading user profile:', error);
+        }
     };
 
     return (
         <Dialog
-            draggable={false}
-            onHide={onHide}
+            header="User Profile"
             visible={visible}
-            style={{ width: "50%", height: "auto" }}
+            style={{ width: '90vw', maxWidth: '400px' }}
+            onHide={onHide}
             modal
-            header={
-                <h6>
-                    {`User Profile - ${userData.name || userData.firstName || "User"}`}
-                </h6>
-            }
+            className="p-fluid"
         >
-            <DataTable
-                size="small"
-                scrollable={true}
-                dataKey="col1"
-                className="datatable-responsive"
-                responsiveLayout="scroll"
-                resizableColumns
-                columnResizeMode="expand"
-                value={getUserDetails()}
-            >
-                <Column field="col1" body={(e) => <b>{e.col1}</b>}></Column>
-                <Column field="col2"></Column>
-                <Column field="col3" body={(e) => <b>{e.col3}</b>}></Column>
-                <Column field="col4"></Column>
-            </DataTable>
+            {user ? (
+                <div className="grid">
+                    <div className="col-12">
+                        <div className="field">
+                            <label htmlFor="name">Name</label>
+                            <InputText
+                                id="name"
+                                value={user.name || ''}
+                                disabled
+                                placeholder="User name"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="col-12">
+                        <div className="field">
+                            <label htmlFor="email">Email</label>
+                            <InputText
+                                id="email"
+                                value={user.email || ''}
+                                disabled
+                                placeholder="User email"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="col-12">
+                        <div className="field">
+                            <label htmlFor="role">Role</label>
+                            <InputText
+                                id="role"
+                                value={user.role || 'Nurse'}
+                                disabled
+                                placeholder="User role"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div className="col-12">
+                        <div className="field">
+                            <label htmlFor="id">User ID</label>
+                            <InputText
+                                id="id"
+                                value={user.id || ''}
+                                disabled
+                                placeholder="User ID"
+                            />
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="text-center p-4">
+                    <i className="pi pi-user text-4xl text-gray-400 mb-3"></i>
+                    <p className="text-gray-500">No profile information available</p>
+                </div>
+            )}
             
-            <div className="flex justify-content-end mt-3">
-                <Button 
-                    label="Logout" 
-                    icon="pi pi-sign-out" 
-                    className="p-button-danger" 
-                    onClick={handleLogout}
+            <div className="flex justify-content-end mt-4">
+                <Button
+                    label="Close"
+                    icon="pi pi-times"
+                    onClick={onHide}
+                    className="p-button-secondary"
                 />
             </div>
         </Dialog>

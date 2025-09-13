@@ -1,6 +1,5 @@
 import React from 'react'
 import { InputText } from 'primereact/inputtext'
-import './login/Login.scss'
 import { Card } from 'primereact/card'
 import { Image } from 'primereact/image'
 import { Divider } from 'primereact/divider'

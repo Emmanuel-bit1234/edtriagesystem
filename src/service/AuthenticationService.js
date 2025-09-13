@@ -1,12 +1,7 @@
 import axios from "axios";
-import GenderService from "./GenderService";
-var genderService = new GenderService();
 
 class AuthenticationService {
     signin = (username, password) => {
-        genderService.getAllGender().then((genders) => {
-            localStorage.setItem("genders", JSON.stringify(genders));
-        });
 
         return axios
             .post("http://20.87.43.104:8084/api/auth/signin", { username, password })

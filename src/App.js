@@ -12,19 +12,6 @@ import Login from "./pages/Login";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
 
-import { Users } from "./pages/Users";
-import { SystemParameters } from "./pages/SystemParameters";
-import { PoliticalPartyManagement } from "./pages/PoliticalPartyManagement";
-import { CandidateManagement } from "./pages/CandidateManagement";
-import { CandidateReports } from "./pages/CandidateReports";
-import { Events } from "./pages/Events";
-import { EventGroup } from "./pages/EventGroup";
-import { VoterAuditHistory } from "./pages/VoterAuditHistory";
-import { VoterData } from "./pages/VoterData";
-import { Objections } from "./pages/Objections";
-import { DelimitationManagement } from "./pages/DelimitationManagement";
-import { PoliticalPartyReports } from "./pages/PoliticalPartyReports";
-import { Adjudication } from "./pages/Adjudication";
 
 import PrimeReact from "primereact/api";
 import { Tooltip } from "primereact/tooltip";
@@ -32,17 +19,9 @@ import { Tooltip } from "primereact/tooltip";
 import "primereact/resources/primereact.css";
 import "primeicons/primeicons.css";
 import "primeflex/primeflex.css";
-import "prismjs/themes/prism-coy.css";
-import "./assets/demo/flags/flags.css";
-import "./assets/demo/Demos.scss";
 import "./assets/layout/layout.scss";
 import "./App.scss";
-import { KitConfiguration } from "./pages/KitConfiguration";
-import { UserGroups } from "./pages/UserGroups";
 import Cookies from "js-cookie";
-import VoterAllocationParams from "./pages/VoterAllocationParams";
-import { AdministrationReports } from "./pages/AdministrationReports";
-import { VoterReports } from "./pages/VoterReports";
 import { NurseReport } from "./pages/NurseReport";
 import PredictionAPI from "./service/predictionAPI";
 
@@ -69,6 +48,9 @@ const App = () => {
         // Check authentication using the new API
         const checkAuth = () => {
             const isAuthenticated = predictionAPI.isAuthenticated();
+            console.log('Auth check - isAuthenticated:', isAuthenticated);
+            console.log('Auth token in localStorage:', localStorage.getItem('authToken'));
+            console.log('Setting isLoggedIn to:', isAuthenticated);
             setIsLoggedIn(isAuthenticated);
             
             // Also update cookies for backward compatibility
@@ -375,9 +357,9 @@ const App = () => {
         <div className={wrapperClass} onClick={onWrapperClick}>
             {isLoggedIn === false ? (
                 <>
+                    <Route path="/" exact component={LoginNew} />
                     <Route path="/login" component={LoginNew} />
                     <Route path="/register" component={Register} />
-                    <Route path="/" exact component={LoginNew} />
                     <Route path="*" component={LoginNew} />
                 </>
             ) : (
@@ -391,27 +373,7 @@ const App = () => {
                     <div className="layout-main-container">
                         <div className="layout-main">
                             <Route path="/" exact render={() => <Dashboard colorMode={layoutColorMode} />} />
-                            <Route path="/users" component={Users} />
                             <Route path="/EDPrediction" component={EDPrediction} />
-                            <Route path="/user-groups" component={UserGroups} />
-                            <Route path="/kit-configuration" component={KitConfiguration} />
-                            <Route path="/voter-allocation-params" component={VoterAllocationParams} />
-                            <Route path="/system-parameters" component={SystemParameters} />
-                            <Route path="/delimitation-management" component={DelimitationManagement} />
-                            <Route path="/voter-data" component={VoterData} />
-                            <Route path="/voter-audit-history" component={VoterAuditHistory} />
-                            <Route path="/objections" component={Objections} />
-                            <Route path="/political-party-management" component={PoliticalPartyManagement} />
-                            <Route path="/political-party-reports" component={PoliticalPartyReports} />
-                            <Route path="/candidate-management" component={CandidateManagement} />
-                            <Route path="/candidate-reports" component={CandidateReports} />
-                            <Route path="/event" component={Events} />
-                            <Route path="/event-group" component={EventGroup} />
-                            <Route path="/adjudication" component={Adjudication} />
-
-                            <Route path="/administration-reports" component={AdministrationReports} />
-                            <Route path="/voter-reports" component={VoterReports} />
-                            <Route path="/candidate-reports" component={CandidateReports} />
                             <Route path="/nurse-report" component={NurseReport} />
                         </div>
                     </div>
