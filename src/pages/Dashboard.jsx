@@ -363,7 +363,11 @@ export const Dashboard = (props) => {
                                 .map(([level, count]) => {
                                     const getLevelColor = (level) => {
                                         const colors = {
-                                            1: { bg: 'bg-red-100', text: 'text-red-600' },
+                                            1: { 
+                                                bg: 'bg-red-600', 
+                                                text: 'text-white',
+                                                style: { backgroundColor: '#DC2626', color: 'white' }
+                                            },
                                             2: { bg: 'bg-orange-100', text: 'text-orange-600' },
                                             3: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
                                             4: { bg: 'bg-green-100', text: 'text-green-600' },
@@ -376,7 +380,10 @@ export const Dashboard = (props) => {
                                         <div key={level} className="col-12 md:col-6 lg:col-3">
                                             <div className="flex justify-content-between align-items-center p-2 border-1 border-200 border-round mb-2">
                                                 <div className="flex align-items-center">
-                                                    <div className={`w-2rem h-2rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}>
+                                                    <div 
+                                                        className={`w-2rem h-2rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}
+                                                        style={levelColor.style || {}}
+                                                    >
                                                         <span className={`text-sm font-bold ${levelColor.text}`}>{level}</span>
                                                     </div>
                                                     <span className="font-medium">Level {level}</span>
@@ -434,7 +441,12 @@ export const Dashboard = (props) => {
                                                 Math.round((count / stats.totalPredictions) * 100) : 0;
                                             const getLevelColor = (level) => {
                                                 const colors = {
-                                                    1: { bg: 'bg-red-100', text: 'text-red-600', progress: 'bg-red-500' },
+                                                    1: { 
+                                                        bg: 'bg-red-600', 
+                                                        text: 'text-white', 
+                                                        progress: 'bg-red-600',
+                                                        style: { backgroundColor: '#DC2626', color: 'white' }
+                                                    },
                                                     2: { bg: 'bg-orange-100', text: 'text-orange-600', progress: 'bg-orange-500' },
                                                     3: { bg: 'bg-yellow-100', text: 'text-yellow-600', progress: 'bg-yellow-500' },
                                                     4: { bg: 'bg-green-100', text: 'text-green-600', progress: 'bg-green-500' },
@@ -448,7 +460,10 @@ export const Dashboard = (props) => {
                                                     <div className="p-3 border-1 border-200 border-round mb-3 hover:shadow-2 transition-all transition-duration-200">
                                                         <div className="flex align-items-center justify-content-between mb-2">
                                                             <div className="flex align-items-center">
-                                                                <div className={`w-3rem h-3rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}>
+                                                                <div 
+                                                                    className={`w-3rem h-3rem border-round ${levelColor.bg} flex align-items-center justify-content-center mr-3`}
+                                                                    style={levelColor.style || {}}
+                                                                >
                                                                     <span className={`text-lg font-bold ${levelColor.text}`}>{level}</span>
                                                                 </div>
                                                                 <div>
@@ -470,7 +485,8 @@ export const Dashboard = (props) => {
                                                                     className={`${levelColor.progress} border-round transition-all transition-duration-500`}
                                                                     style={{ 
                                                                         width: `${percentage}%`, 
-                                                                        height: '100%' 
+                                                                        height: '100%',
+                                                                        backgroundColor: levelColor.style?.backgroundColor || undefined
                                                                     }}
                                                                 ></div>
                                                             </div>

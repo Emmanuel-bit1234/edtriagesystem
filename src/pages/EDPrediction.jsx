@@ -416,7 +416,7 @@ export const EDPrediction = (props) => {
                                                     </span>
                                                     <br />
                                                     <span>
-                                                        <strong>Explanation:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
+                                                        <strong>Explanation:</strong> <strong>{predictionResults?.data?.Ktas_Explained?.Meaning}</strong>
                                                     </span>
 
                                                 </>
@@ -451,6 +451,12 @@ export const EDPrediction = (props) => {
                         filters={filters}
                         filterDisplay="menu"
                         globalFilterFields={["ktasExplained.Title", "patientNumber", "user.name"]}
+                        onRowClick={(e) => {
+                            setSelectedPrediction(e.data);
+                            setShowDetailsDialog(true);
+                        }}
+                        selectionMode="single"
+                        metaKeySelection={false}
                     >
                         <Column field="patientNumber" header="Patient Number" sortable body={(item) => <b>{item.patientNumber}</b>}></Column>
                         <Column field="gender" header="Gender" sortable body={(item) => <b>{item.inputs?.Sex === 1 ? 'Female' : 'Male'}</b>}></Column>
@@ -480,9 +486,11 @@ export const EDPrediction = (props) => {
                                     })(),
                                     color: "white",
                                     marginBottom: "0.5rem",
+                                    fontWeight: "bold",
+                                    fontSize: "0.9rem"
                                 }}
                             >
-                                {item.ktasExplained?.Title}
+                                <b>{item.ktasExplained?.Title}</b>
                             </span>
                         )}></Column>
                         <Column
@@ -700,9 +708,11 @@ export const EDPrediction = (props) => {
                                                     }
                                                 })(),
                                                 color: "white",
+                                                fontWeight: "bold",
+                                                fontSize: "0.9rem"
                                             }}
                                         >
-                                            {selectedPrediction.ktasExplained?.Level}: ({selectedPrediction.ktasExplained?.Title})
+                                            <b>{selectedPrediction.ktasExplained?.Level}: ({selectedPrediction.ktasExplained?.Title})</b>
                                         </span>
                                     </div>
                                 </div>
