@@ -48,9 +48,6 @@ const App = () => {
         // Check authentication using the new API
         const checkAuth = () => {
             const isAuthenticated = predictionAPI.isAuthenticated();
-            console.log('Auth check - isAuthenticated:', isAuthenticated);
-            console.log('Auth token in localStorage:', localStorage.getItem('authToken'));
-            console.log('Setting isLoggedIn to:', isAuthenticated);
             setIsLoggedIn(isAuthenticated);
             
             // Also update cookies for backward compatibility

@@ -20,46 +20,43 @@ export const AppTopbar = (props) => {
     };
 
     return (
-        <div className="layout-topbar" style={{ display: 'flex', alignItems: 'center' }}>
-            <button 
-                type="button" 
-                className="p-link layout-menu-button layout-topbar-button" 
-                onClick={props.onToggleMenuClick}
-                style={{ order: 1, marginRight: '1rem' }}
-            >
-                <i className="pi pi-bars" />
-            </button>
+        <div className="layout-topbar custom-topbar">
+            <div className="topbar-left">
+                <button 
+                    type="button" 
+                    className="p-link layout-menu-button layout-topbar-button" 
+                    onClick={props.onToggleMenuClick}
+                >
+                    <i className="pi pi-bars" />
+                </button>
+            </div>
 
-            <Link 
-                to="/" 
-                className="layout-topbar-logo"
-                style={{ order: 2, flex: 1, textAlign: 'center', margin: '0 1rem' }}
-            >
-                <i className="pi pi-shield mr-2" style={{ fontSize: '1.2rem', color: '#ffffff' }}></i>
-                <span>EMERGENCY DEPARTMENT</span>
-            </Link>
+            <div className="topbar-center">
+                <Link to="/" className="layout-topbar-logo">
+                    <i className="pi pi-shield mr-2" style={{ fontSize: '1.2rem', color: '#ffffff' }}></i>
+                    <span>EMERGENCY DEPARTMENT</span>
+                </Link>
+            </div>
 
-            {/* Profile Button */}
-            <button 
-                type="button" 
-                className="p-link layout-topbar-button" 
-                onClick={handleProfileClick}
-                style={{ order: 3, marginLeft: '0.5rem' }}
-            >
-                <i className="pi pi-user" />
-                <span className="lg:inline hidden">Profile</span>
-            </button>
+            <div className="topbar-right">
+                <button 
+                    type="button" 
+                    className="p-link layout-topbar-button" 
+                    onClick={handleProfileClick}
+                >
+                    <i className="pi pi-user" />
+                    <span className="lg:inline hidden">Profile</span>
+                </button>
 
-            {/* Logout Button */}
-            <button 
-                type="button" 
-                className="p-link layout-topbar-button" 
-                onClick={Logout}
-                style={{ order: 3, marginLeft: '0.5rem' }}
-            >
-                <i className="pi pi-sign-out" />
-                <span className="lg:inline hidden">Logout</span>
-            </button>
+                <button 
+                    type="button" 
+                    className="p-link layout-topbar-button" 
+                    onClick={Logout}
+                >
+                    <i className="pi pi-sign-out" />
+                    <span className="lg:inline hidden">Logout</span>
+                </button>
+            </div>
             
             <ProfileDialog 
                 visible={showProfileDialog} 

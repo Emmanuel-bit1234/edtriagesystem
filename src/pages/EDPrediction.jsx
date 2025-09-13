@@ -106,7 +106,6 @@ export const EDPrediction = (props) => {
         },
     });
     useEffect(() => {
-        //console.log("Test")
         prediction.getAllPredictions().then((data) => {
             //("ALL PREDICTIONS HERE:", data);
             setAllPredictions(data?.logs)
@@ -150,10 +149,8 @@ export const EDPrediction = (props) => {
                 error = true;
             }
         });
-        //console.log(newForm)
 
         prediction.getPrediction(newForm).then((data) => {
-            //console.log(data);
             setPredictionResults(data);
             setLoad(false);
         });
@@ -191,7 +188,6 @@ export const EDPrediction = (props) => {
                             // Refresh all predictions when dialog is closed
                             setLoad(true);
                             prediction.getAllPredictions().then((data) => {
-                                //console.log("Refreshed predictions:", data);
                                 setAllPredictions(data?.logs);
                                 setLoad(false);
                             });

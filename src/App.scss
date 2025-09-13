@@ -70,35 +70,53 @@ body.register-page {
     position: relative;
 }
 
-/* Mobile topbar button positioning */
-@media (max-width: 991px) {
-    .layout-topbar {
-        display: flex !important;
+/* Custom topbar layout */
+.custom-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    
+    .topbar-left {
+        display: flex;
         align-items: center;
-        flex-direction: row;
+        flex-shrink: 0;
+    }
+    
+    .topbar-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+}
+
+/* Override original layout CSS */
+@media (max-width: 991px) {
+    .layout-topbar.custom-topbar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
         
-        .layout-menu-button {
-            order: 1 !important;
-            margin-left: 0;
-            margin-right: 1rem;
-            flex-shrink: 0;
+        .topbar-left {
+            order: 1;
         }
         
-        .layout-topbar-logo {
-            order: 2 !important;
+        .topbar-center {
+            order: 2;
             flex: 1;
-            text-align: center;
-            margin: 0 1rem;
         }
         
-        .layout-topbar-button {
-            order: 3 !important;
-            margin-left: 0.5rem;
-            flex-shrink: 0;
-        }
-        
-        .layout-topbar-button:last-child {
-            margin-right: 0;
+        .topbar-right {
+            order: 3;
         }
     }
 }

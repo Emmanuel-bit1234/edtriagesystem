@@ -36,7 +36,6 @@ class Login extends React.Component {
         window.location.reload()
       },
       (error) => {
-        console.log('Login fail: error = { ' + error.toString() + ' }')
         this.setState({
           error: 'Please check your username / password and try again.',
         })

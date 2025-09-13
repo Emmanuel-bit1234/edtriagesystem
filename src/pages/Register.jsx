@@ -79,7 +79,6 @@ const Register = () => {
     };
 
     const goToLogin = () => {
-        console.log('Navigating to login page...');
         history.push('/login');
     };
 

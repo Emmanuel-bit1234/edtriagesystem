@@ -88,9 +88,6 @@ export const NurseReport = (props) => {
             
             if (selectedDate) {
                 const dateStr = selectedDate.toISOString().split('T')[0];
-                console.log('Selected date:', selectedDate);
-                console.log('Date string being sent:', dateStr);
-                console.log('Today:', new Date().toISOString().split('T')[0]);
                 params.append('date', dateStr);
             }
             
@@ -102,8 +99,6 @@ export const NurseReport = (props) => {
                 headers: getAuthHeaders()
             });
             
-            console.log('Response data:', response.data);
-            console.log('Report period:', response.data.report?.period);
             
             setReportData(response.data.report);
             prepareCharts(response.data.report);

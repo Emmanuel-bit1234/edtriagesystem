@@ -36,9 +36,6 @@ const LoginNew = () => {
 
         try {
             const result = await predictionAPI.login(email, password);
-            console.log('Login result:', result);
-            console.log('Auth token stored:', localStorage.getItem('authToken'));
-            console.log('User stored:', localStorage.getItem('user'));
             
             toast.current.show({
                 severity: 'success',
@@ -63,20 +60,13 @@ const LoginNew = () => {
     };
 
     const goToRegister = () => {
-        console.log('Current location:', window.location.href);
-        console.log('Current pathname:', window.location.pathname);
-        console.log('Current hash:', window.location.hash);
-        
         // Check if we're already on register page
         if (window.location.hash === '#/register' || window.location.pathname === '/register') {
-            console.log('Already on register page, no need to navigate');
             return;
         }
         
-        console.log('Navigating to register page...');
         try {
             history.push('/register');
-            console.log('Navigation successful');
         } catch (error) {
             console.error('Navigation error:', error);
             // Fallback to window.location with hash

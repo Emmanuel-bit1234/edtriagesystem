@@ -246,7 +246,6 @@ export const Dashboard = (props) => {
                 <div 
                     className="cursor-pointer transition-all transition-duration-200 hover:shadow-4 hover:scale-105 h-full"
                     onClick={() => {
-                        console.log('Triage Levels card clicked!');
                         setShowTriageLevelsModal(true);
                     }}
                     style={{ 
@@ -414,7 +413,6 @@ export const Dashboard = (props) => {
                 visible={showTriageLevelsModal}
                 style={{ width: '90vw', maxWidth: '600px' }}
                 onHide={() => {
-                    console.log('Modal closing...');
                     setShowTriageLevelsModal(false);
                 }}
                 maximizable
