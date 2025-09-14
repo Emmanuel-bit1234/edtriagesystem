@@ -38,23 +38,25 @@ export const AppTopbar = (props) => {
                 </Link>
             </div>
 
-            <div className="topbar-right">
+            <div className="topbar-right" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1.5rem' }}>
                 <button 
                     type="button" 
                     className="p-link layout-topbar-button" 
                     onClick={handleProfileClick}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
                 >
                     <i className="pi pi-user" />
-                    <span className="lg:inline hidden">Profile</span>
+                    <span className="lg:inline hidden"></span>
                 </button>
 
                 <button 
                     type="button" 
                     className="p-link layout-topbar-button" 
                     onClick={Logout}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
                 >
                     <i className="pi pi-sign-out" />
-                    <span className="lg:inline hidden">Logout</span>
+                    <span className="lg:inline hidden"></span>
                 </button>
             </div>
             
