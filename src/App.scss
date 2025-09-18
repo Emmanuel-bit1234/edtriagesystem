@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #c41e3a 0%, #a01a30 100%);
     padding: 2rem;
     position: relative;
     width: 100%;
@@ -46,10 +46,11 @@
 }
 
 .Card {
-    background: #f8f9fa;
+    background: #fef7f7;
     border-radius: 8px;
     padding: 1.5rem;
     margin-top: 1rem;
+    border: 1px solid #f5c6c6;
 }
 
 .hide-small {
