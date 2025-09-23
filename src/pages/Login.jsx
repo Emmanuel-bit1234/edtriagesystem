@@ -17,8 +17,49 @@ class Login extends React.Component {
       username: '',
       password: '',
       error: '',
+      emailError: '',
+    }
+    this.emailValidationTimeout = null;
+  }
+
+  // Email validation function
+  validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Debounced email validation
+  debouncedEmailValidation = (usernameValue) => {
+    clearTimeout(this.emailValidationTimeout);
+    this.emailValidationTimeout = setTimeout(() => {
+      if (usernameValue && !this.validateEmail(usernameValue)) {
+        this.setState({ emailError: 'Please enter a valid email address' });
+      } else {
+        this.setState({ emailError: '' });
+      }
+    }, 500); // Wait 500ms after user stops typing
+  };
+
+  // Handle username change with debounced validation
+  handleUsernameChange = (e) => {
+    const usernameValue = e.target.value;
+    this.setState({ username: usernameValue });
+    this.debouncedEmailValidation(usernameValue);
+  };
+
+  // Cleanup timeout on component unmount
+  componentWillUnmount() {
+    if (this.emailValidationTimeout) {
+      clearTimeout(this.emailValidationTimeout);
     }
   }
+
+  // Check if form is valid
+  isFormValid = () => {
+    return this.state.username.trim() !== '' && 
+           this.validateEmail(this.state.username) && 
+           this.state.password.trim() !== '';
+  };
 
   doLogin = async (event) => {
     event.preventDefault()
@@ -70,15 +111,19 @@ class Login extends React.Component {
                 <div className="Card">
                   <div className="p-field my-3">
                     <span className="p-float-labe">
-                      <label htmlFor="username">Username</label>
+                      <label htmlFor="username">Username (Email)</label>
                       <InputText
                         id="username"
                         value={this.state.username}
-                        className="p-inputtext-lg p-d-block p-mt-5"
-                        onChange={(e) =>
-                          this.setState({ username: e.target.value })
-                        }
+                        type="email"
+                        className={`p-inputtext-lg p-d-block p-mt-5 ${this.state.emailError ? 'p-invalid' : ''}`}
+                        onChange={this.handleUsernameChange}
                       />
+                      {this.state.emailError && (
+                        <small className="p-error" style={{ color: '#e24c4c', fontSize: '0.875rem', display: 'block', marginTop: '4px' }}>
+                          {this.state.emailError}
+                        </small>
+                      )}
                       {/* <label htmlFor="username">Username</label> */}
                     </span>
                   </div>
@@ -104,6 +149,7 @@ class Login extends React.Component {
                     icon="pi pi-unlock"
                     iconPos="right"
                     onClick={this.doLogin}
+                    disabled={!this.isFormValid()}
                   />
                 </div>
               </div>

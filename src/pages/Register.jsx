@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -18,9 +18,51 @@ const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [emailError, setEmailError] = useState('');
     const toast = useRef(null);
     const history = useHistory();
     const predictionAPI = new PredictionAPI();
+
+    // Email validation function
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Debounced email validation
+    const debouncedEmailValidation = useCallback(
+        (() => {
+            let timeoutId;
+            return (emailValue) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    if (emailValue && !validateEmail(emailValue)) {
+                        setEmailError('Please enter a valid email address');
+                    } else {
+                        setEmailError('');
+                    }
+                }, 500); // Wait 500ms after user stops typing
+            };
+        })(),
+        []
+    );
+
+    // Handle email change with debounced validation
+    const handleEmailChange = (e) => {
+        const emailValue = e.target.value;
+        setEmail(emailValue);
+        debouncedEmailValidation(emailValue);
+    };
+
+    // Check if form is valid
+    const isFormValid = () => {
+        return name.trim() !== '' && 
+               email.trim() !== '' && 
+               validateEmail(email) && 
+               password.length >= 6 && 
+               confirmPassword.trim() !== '' && 
+               password === confirmPassword;
+    };
 
     useEffect(() => {
         // Add class to body to prevent scrolling
@@ -115,8 +157,8 @@ const Register = () => {
                                             id="email"
                                             value={email}
                                             type="email"
-                                            className="p-inputtext-lg p-d-block"
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            className={`p-inputtext-lg p-d-block ${emailError ? 'p-invalid' : ''}`}
+                                            onChange={handleEmailChange}
                                             autoComplete="off"
                                             data-form-type="other"
                                             data-lpignore="true"
@@ -124,6 +166,11 @@ const Register = () => {
                                             data-bwignore="true"
                                             required
                                         />
+                                        {emailError && (
+                                            <small className="p-error" style={{ color: '#e24c4c', fontSize: '0.875rem', display: 'block', marginTop: '4px' }}>
+                                                {emailError}
+                                            </small>
+                                        )}
                                     </div>
                                     <div className="p-field my-3">
                                         <label htmlFor="password" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password</label>
@@ -185,7 +232,7 @@ const Register = () => {
                                         iconPos="right"
                                         type="submit"
                                         loading={loading}
-                                        disabled={loading}
+                                        disabled={loading || !isFormValid()}
                                     />
                                 </form>
 
