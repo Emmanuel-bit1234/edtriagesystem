@@ -129,6 +129,60 @@ export const EDPrediction = (props) => {
     }, []);
     var [predictionResults, setPredictionResults] = useState();
 
+    // Function to reset all form data and state
+    const resetForm = () => {
+        setGender(undefined);
+        setPainPresent(undefined);
+        setPainScore(undefined);
+        setArrivalMode(undefined);
+        setInjury(undefined);
+        setMentalState(undefined);
+        setPredictionResults(null);
+        
+        // Reset form to initial state but preserve nurse info
+        setForm({
+            Sex: null,
+            patientNumber: "",
+            Age: "",
+            Arrival_mode: null,
+            Injury: null,
+            Mental: null,
+            Pain: null,
+            NRS_pain: null,
+            SBP: "",
+            DBP: "",
+            HR: "",
+            RR: "",
+            BT: "",
+            Chief_complain: "",
+            nurseName: form.nurseName, // Preserve nurse info
+            nurseId: form.nurseId      // Preserve nurse info
+        });
+    };
+
+    // Function to validate if all required fields are filled and no prediction exists yet
+    const isFormValid = () => {
+        const allFieldsFilled = (
+            form.patientNumber.trim() !== "" &&
+            gender !== undefined &&
+            form.Age.trim() !== "" &&
+            arrivalMode !== undefined &&
+            injury !== undefined &&
+            mentalState !== undefined &&
+            painPresent !== undefined &&
+            painScore !== undefined &&
+            form.SBP.trim() !== "" &&
+            form.DBP.trim() !== "" &&
+            form.HR.trim() !== "" &&
+            form.RR.trim() !== "" &&
+            form.BT.trim() !== "" &&
+            form.Chief_complain.trim() !== ""
+        );
+        
+        // Disable if fields are not filled OR if prediction already exists
+        return allFieldsFilled && !predictionResults;
+    };
+
     function predict() {
         setLoad(true);
         form.Sex = gender;
@@ -163,7 +217,11 @@ export const EDPrediction = (props) => {
             <div className="">
                 <Toolbar
                     className="mb-4"
-                    left={<div> <Button className="p-button-success mr-2" icon="pi pi-plus" label="Start Triage" onClick={(e) => setshowPredictionForm(true)} /></div>}
+                    left={<div> <Button className="p-button-success mr-2" icon="pi pi-plus" label="Start Triage" onClick={(e) => {
+                        setshowPredictionForm(true);
+                        // Reset all form data when starting new triage
+                        resetForm();
+                    }} /></div>}
                     right={
                         <div>
                             <span className="block mt-2 md:mt-0 p-input-icon-left">
@@ -185,6 +243,8 @@ export const EDPrediction = (props) => {
                         modal
                         onHide={(e) => {
                             setshowPredictionForm(false);
+                            // Reset all form data when dialog is closed
+                            resetForm();
                             // Refresh all predictions when dialog is closed
                             setLoad(true);
                             prediction.getAllPredictions().then((data) => {
@@ -194,7 +254,13 @@ export const EDPrediction = (props) => {
                         }}
                         footer={
                             <>
-                                <Button label="Predict" onClick={predict} className="p-button-success" type="submit" />
+                                <Button 
+                                    label="Predict" 
+                                    onClick={predict} 
+                                    className="p-button-success" 
+                                    type="submit" 
+                                    disabled={!isFormValid()}
+                                />
                             </>
                         }
                     >
