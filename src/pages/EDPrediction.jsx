@@ -448,39 +448,63 @@ export const EDPrediction = (props) => {
                                             {predictionResults && (
                                                 <>
                                                     <hr style={{ margin: "20px 0" }} />
-                                                    <strong className="big-text">Results</strong> <br /> <br />
-                                                    <span
-                                                        style={{
-                                                            display: "inline-block",
-                                                            textAlign: "center",
-                                                            padding: "0.5rem 1rem",
-                                                            borderRadius: "20px",
-                                                            backgroundColor: (() => {
-                                                                switch (predictionResults?.data?.Ktas_Explained?.Title) {
-                                                                    case "Resuscitation":   // Level I
-                                                                        return "red";
-                                                                    case "Emergency":       // Level II
-                                                                        return "orange";
-                                                                    case "Urgent":          // Level III
-                                                                        return "yellow";
-                                                                    case "Less Urgent":     // Level IV
-                                                                        return "green";
-                                                                    case "Non-Urgent":      // Level V
-                                                                        return "blue";
-                                                                    default:
-                                                                        return "grey"; // fallback for unknown values
-                                                                }
-                                                            })(),
-                                                            color: "white",
-                                                            marginBottom: "0.5rem",
-                                                        }}
-                                                    >
-                                                        <b>{predictionResults?.data?.Ktas_Explained?.Title}</b>
-                                                    </span>
-                                                    <br />
-                                                    <span>
-                                                        <strong>Explanation:</strong> <strong>{predictionResults?.data?.Ktas_Explained?.Meaning}</strong>
-                                                    </span>
+                                                    <strong className="big-text">Triage Prediction Results</strong> <br /> <br />
+                                                    
+                                                    {/* Main Prediction Badge */}
+                                                    <div className="text-center mb-4">
+                                                        <span
+                                                            style={{
+                                                                display: "inline-block",
+                                                                textAlign: "center",
+                                                                padding: "0.8rem 1.5rem",
+                                                                borderRadius: "25px",
+                                                                backgroundColor: (() => {
+                                                                    switch (predictionResults?.data?.Ktas_Explained?.Title) {
+                                                                        case "Resuscitation":   // Level I
+                                                                            return "#dc3545";
+                                                                        case "Emergency":       // Level II
+                                                                            return "#fd7e14";
+                                                                        case "Urgent":          // Level III
+                                                                            return "#ffc107";
+                                                                        case "Less Urgent":     // Level IV
+                                                                            return "#28a745";
+                                                                        case "Non-Urgent":      // Level V
+                                                                            return "#007bff";
+                                                                        default:
+                                                                            return "#6c757d";
+                                                                    }
+                                                                })(),
+                                                                color: "white",
+                                                                fontSize: "1.2rem",
+                                                                fontWeight: "bold",
+                                                                boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+                                                            }}
+                                                        >
+                                                            <i className="pi pi-exclamation-triangle mr-2"></i>
+                                                            {predictionResults?.data?.Ktas_Explained?.Title}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Clinical Reasoning - Always show */}
+                                                    <div className="mb-3">
+                                                        <div style={{ textAlign: 'center' }}>
+                                                            <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                                            <div className="p-3" style={{ 
+                                                                backgroundColor: "#e7f3ff", 
+                                                                borderRadius: "8px", 
+                                                                border: "1px solid #b3d9ff",
+                                                                maxWidth: '600px',
+                                                                margin: '0 auto'
+                                                            }}>
+                                                                <div className="mb-2">
+                                                                    <strong>Why Level {predictionResults?.data?.Ktas_Explained?.Level} Classification:</strong>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Primary Assessment:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
                                                 </>
                                             )}
@@ -736,96 +760,325 @@ export const EDPrediction = (props) => {
                             </p>
                         </div>
 
-                        {/* Prediction Results */}
+                        {/* Enhanced Prediction Results */}
                         <div className="col-12">
-                            <h4>Prediction Results</h4>
-                            <div className="grid">
-                                <div className="col-12">
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                        marginBottom: '10px'
-                                    }}>
-                                        <strong>KTAS Level:</strong>
-                                        <span
-                                            style={{
-                                                display: "inline-block",
-                                                textAlign: "center",
-                                                padding: "0.5rem 1rem",
-                                                borderRadius: "20px",
-                                                backgroundColor: (() => {
-                                                    switch (selectedPrediction.ktasExplained?.Title) {
-                                                        case "Resuscitation":   // Level I
-                                                            return "red";
-                                                        case "Emergency":       // Level II
-                                                            return "orange";
-                                                        case "Urgent":          // Level III
-                                                            return "yellow";
-                                                        case "Less Urgent":     // Level IV
-                                                            return "green";
-                                                        case "Non-Urgent":      // Level V
-                                                            return "blue";
-                                                        default:
-                                                            return "grey";
-                                                    }
-                                                })(),
-                                                color: "white",
-                                                fontWeight: "bold",
-                                                fontSize: "0.9rem"
-                                            }}
-                                        >
-                                            <b>{selectedPrediction.ktasExplained?.Level}: ({selectedPrediction.ktasExplained?.Title})</b>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <strong>Explanation:</strong>
-                                    <p style={{
-                                        padding: '10px',
-                                        backgroundColor: '#f8f9fa',
-                                        borderRadius: '4px',
-                                        border: '1px solid #dee2e6',
-                                        marginTop: '5px'
-                                    }}>
-                                        {selectedPrediction.ktasExplained?.Meaning}
-                                    </p>
-                                </div>
-                                {/* <div className="col-12">
-                                    <strong>Triage Target:</strong> {selectedPrediction.ktasExplained?.Triage_target}
-                                </div>
-                                <div className="col-12">
-                                    <strong>Model Used:</strong> {selectedPrediction.model}
-                                </div> */}
-                                {/* <div className="col-12">
-                                    <strong>Prediction Confidence:</strong>
-                                    <div style={{ marginTop: '5px' }}>
-                                        {selectedPrediction.probs && selectedPrediction.probs.map((prob, index) => {
-                                            const getKTASDisplay = (level) => {
-                                                const names = {
-                                                    1: 'Resuscitation',
-                                                    2: 'Emergency',
-                                                    3: 'Urgent',
-                                                    4: 'Less Urgent',
-                                                    5: 'Non-Urgent'
-                                                };
-                                                return `${level}: (${names[level] || 'Unknown'})`;
-                                            };
-                                            
-                                            return (
-                                                <span key={index} style={{ 
-                                                    marginRight: '10px',
-                                                    padding: '2px 8px',
-                                                    backgroundColor: '#e9ecef',
-                                                    borderRadius: '3px',
-                                                    fontSize: '0.9em'
-                                                }}>
-                                                    {getKTASDisplay(index + 1)}: {(parseFloat(prob) * 100).toFixed(1)}%
-                                                </span>
-                                            );
-                                        })}
-                                    </div>
-                                </div> */}
+                            <h4>Triage Prediction Results</h4>
+                            
+                            {/* Main Prediction Badge */}
+                            <div className="text-center mb-4">
+                                <span
+                                    style={{
+                                        display: "inline-block",
+                                        textAlign: "center",
+                                        padding: "0.8rem 1.5rem",
+                                        borderRadius: "25px",
+                                        backgroundColor: (() => {
+                                            switch (selectedPrediction.ktasExplained?.Title) {
+                                                case "Resuscitation":   // Level I
+                                                    return "#dc3545";
+                                                case "Emergency":       // Level II
+                                                    return "#fd7e14";
+                                                case "Urgent":          // Level III
+                                                    return "#ffc107";
+                                                case "Less Urgent":     // Level IV
+                                                    return "#28a745";
+                                                case "Non-Urgent":      // Level V
+                                                    return "#007bff";
+                                                default:
+                                                    return "#6c757d";
+                                            }
+                                        })(),
+                                        color: "white",
+                                        fontSize: "1.2rem",
+                                        fontWeight: "bold",
+                                        boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+                                    }}
+                                >
+                                    <i className="pi pi-exclamation-triangle mr-2"></i>
+                                    {selectedPrediction.ktasExplained?.Title}
+                                </span>
+                            </div>
+
+                            {/* Top Contributing Factors and Clinical Reasoning */}
+                            <div className="mb-3">
+                                {(() => {
+                                    const factors = [];
+                                    const inputs = selectedPrediction.inputs;
+                                    
+                                    // Check critical vital signs based on proper ranges
+                                    if (inputs?.HR) {
+                                        const hr = parseInt(inputs.HR);
+                                        if (hr > 120) {
+                                            factors.push({
+                                                label: "Heart Rate",
+                                                value: `${hr} BPM`,
+                                                status: hr > 150 ? "critical" : "high",
+                                                reason: hr > 150 ? "Tachycardia: >150 BPM (normal: 60-100)" : "Elevated: >120 BPM"
+                                            });
+                                        } else if (hr < 60) {
+                                            factors.push({
+                                                label: "Heart Rate",
+                                                value: `${hr} BPM`,
+                                                status: hr < 50 ? "critical" : "high",
+                                                reason: hr < 50 ? "Bradycardia: <50 BPM" : "Low: <60 BPM"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.SBP) {
+                                        const sbp = parseInt(inputs.SBP);
+                                        if (sbp < 90) {
+                                            factors.push({
+                                                label: "Systolic BP",
+                                                value: `${sbp} mmHg`,
+                                                status: "critical",
+                                                reason: "Hypotensive: <90 mmHg (normal: 90-120)"
+                                            });
+                                        } else if (sbp > 180) {
+                                            factors.push({
+                                                label: "Systolic BP",
+                                                value: `${sbp} mmHg`,
+                                                status: "high",
+                                                reason: "Hypertensive: >180 mmHg"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.DBP) {
+                                        const dbp = parseInt(inputs.DBP);
+                                        if (dbp < 60) {
+                                            factors.push({
+                                                label: "Diastolic BP",
+                                                value: `${dbp} mmHg`,
+                                                status: "critical",
+                                                reason: "Low diastolic: <60 mmHg (normal: 60-80)"
+                                            });
+                                        } else if (dbp > 100) {
+                                            factors.push({
+                                                label: "Diastolic BP",
+                                                value: `${dbp} mmHg`,
+                                                status: "high",
+                                                reason: "High diastolic: >100 mmHg"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.NRS_pain) {
+                                        const pain = parseInt(inputs.NRS_pain);
+                                        if (pain >= 8) {
+                                            factors.push({
+                                                label: "Pain Score",
+                                                value: `${pain}/10`,
+                                                status: "high",
+                                                reason: "Severe pain: ≥8/10 (0=no pain, 10=worst)"
+                                            });
+                                        } else if (pain >= 6) {
+                                            factors.push({
+                                                label: "Pain Score",
+                                                value: `${pain}/10`,
+                                                status: "moderate",
+                                                reason: "Moderate pain: 6-7/10"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.RR) {
+                                        const rr = parseInt(inputs.RR);
+                                        if (rr > 25) {
+                                            factors.push({
+                                                label: "Respiratory Rate",
+                                                value: `${rr} breaths/min`,
+                                                status: rr > 30 ? "critical" : "high",
+                                                reason: rr > 30 ? "Tachypnea: >30/min" : "Elevated: >25/min (normal: 12-20)"
+                                            });
+                                        } else if (rr < 12) {
+                                            factors.push({
+                                                label: "Respiratory Rate",
+                                                value: `${rr} breaths/min`,
+                                                status: "high",
+                                                reason: "Bradypnea: <12/min"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.BT) {
+                                        const temp = parseFloat(inputs.BT);
+                                        if (temp > 38.5) {
+                                            factors.push({
+                                                label: "Body Temperature",
+                                                value: `${temp}°C`,
+                                                status: temp > 39.5 ? "critical" : "high",
+                                                reason: temp > 39.5 ? "High fever: >39.5°C" : "Fever: >38.5°C (normal: 36.5-37.5°C)"
+                                            });
+                                        } else if (temp < 36.0) {
+                                            factors.push({
+                                                label: "Body Temperature",
+                                                value: `${temp}°C`,
+                                                status: "high",
+                                                reason: "Hypothermia: <36.0°C"
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.Mental) {
+                                        const mental = parseInt(inputs.Mental);
+                                        const mentalStatus = {
+                                            1: "Alert",
+                                            2: "Voice responsive", 
+                                            3: "Pain responsive",
+                                            4: "Unresponsive"
+                                        };
+                                        if (mental >= 3) {
+                                            factors.push({
+                                                label: "Mental Status",
+                                                value: mentalStatus[mental],
+                                                status: mental === 4 ? "critical" : "high",
+                                                reason: ""
+                                            });
+                                        }
+                                    }
+                                    
+                                    if (inputs?.Injury && parseInt(inputs.Injury) === 1) {
+                                        factors.push({
+                                            label: "Injury Present",
+                                            value: "Yes",
+                                            status: "high",
+                                            reason: "Trauma/injury reported"
+                                        });
+                                    }
+                                    
+                                    if (inputs?.Arrival_mode) {
+                                        const arrival = parseInt(inputs.Arrival_mode);
+                                        const arrivalModes = {
+                                            1: "Walk-in",
+                                            2: "Transfer", 
+                                            3: "Ambulance"
+                                        };
+                                        if (arrival === 3) {
+                                            factors.push({
+                                                label: "Arrival Mode",
+                                                value: arrivalModes[arrival],
+                                                status: "high",
+                                                reason: "EMS transport indicates urgency"
+                                            });
+                                        }
+                                    }
+                                    
+                                    // Sort factors by priority (critical > high > moderate) and take top 3
+                                    const sortedFactors = factors.sort((a, b) => {
+                                        const priorityOrder = { 'critical': 3, 'high': 2, 'moderate': 1 };
+                                        return priorityOrder[b.status] - priorityOrder[a.status];
+                                    }).slice(0, 3);
+                                    
+                                    const hasFactors = sortedFactors.length > 0;
+                                    const isLowUrgency = selectedPrediction.ktasExplained?.Title === "Less Urgent" || 
+                                                        selectedPrediction.ktasExplained?.Title === "Non-Urgent";
+                                    
+                                    return (
+                                        <>
+                                            {hasFactors && !isLowUrgency ? (
+                                                // Responsive layout when factors exist and not low urgency
+                                                <>
+                                                    <style>
+                                                        {`
+                                                            .prediction-layout-dialog {
+                                                                display: flex;
+                                                                flex-direction: column;
+                                                                gap: 15px;
+                                                            }
+                                                            @media (min-width: 1024px) {
+                                                                .prediction-layout-dialog {
+                                                                    flex-direction: row !important;
+                                                                }
+                                                                .prediction-item-dialog {
+                                                                    flex: 0 0 48% !important;
+                                                                    margin-bottom: 0 !important;
+                                                                }
+                                                            }
+                                                        `}
+                                                    </style>
+                                                    <div className="prediction-layout-dialog">
+                                                    {/* Top Contributing Factors - Full width on phone, half width on laptop+ */}
+                                                    <div className="prediction-item-dialog" style={{ 
+                                                        flex: '1',
+                                                        marginBottom: '15px'
+                                                    }}>
+                                                        <h5><i className="pi pi-info-circle mr-2"></i>Top Contributing Factors</h5>
+                                                        <div className="p-2" style={{ backgroundColor: "#fff3cd", borderRadius: "8px", border: "1px solid #ffeaa7" }}>
+                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                {sortedFactors.map((factor, index) => (
+                                                                    <div key={index} style={{ 
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        padding: '8px',
+                                                                        backgroundColor: factor.status === 'critical' ? '#f8d7da' : 
+                                                                                        factor.status === 'high' ? '#fff3cd' : '#d1ecf1',
+                                                                        borderRadius: '4px',
+                                                                        border: `1px solid ${factor.status === 'critical' ? '#f5c6cb' : 
+                                                                            factor.status === 'high' ? '#ffeaa7' : '#bee5eb'}`,
+                                                                        minWidth: 'fit-content',
+                                                                        flex: '0 0 auto',
+                                                                        marginRight: '4px'
+                                                                    }}>
+                                                                        <div style={{ marginRight: '4px' }}>
+                                                                            <strong>{factor.label}:</strong>
+                                                                        </div>
+                                                                        <div style={{ marginRight: '4px' }}>
+                                                                            <span className={`badge ${
+                                                                                factor.status === 'critical' ? 'bg-danger' : 
+                                                                                factor.status === 'high' ? 'bg-warning' : 'bg-info'
+                                                                            }`}>
+                                                                                {factor.value}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div style={{ color: '#6c757d', fontSize: '0.8rem' }}>
+                                                                            {factor.reason}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Clinical Reasoning - Full width on phone, half width on laptop+ */}
+                                                    <div className="prediction-item-dialog" style={{ 
+                                                        flex: '1'
+                                                    }}>
+                                                        <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                                        <div className="p-2" style={{ backgroundColor: "#e7f3ff", borderRadius: "8px", border: "1px solid #b3d9ff" }}>
+                                                            <div className="mb-2">
+                                                                <strong>Why Level {selectedPrediction.ktasExplained?.Level} Classification:</strong>
+                                                            </div>
+                                                            <div>
+                                                                <strong>Primary Assessment:</strong> {selectedPrediction.ktasExplained?.Meaning}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                // Centered layout when no factors OR low urgency
+                                                <div style={{ textAlign: 'center' }}>
+                                                    <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                                    <div className="p-3" style={{ 
+                                                        backgroundColor: "#e7f3ff", 
+                                                        borderRadius: "8px", 
+                                                        border: "1px solid #b3d9ff",
+                                                        maxWidth: '600px',
+                                                        margin: '0 auto'
+                                                    }}>
+                                                        <div className="mb-2">
+                                                            <strong>Why Level {selectedPrediction.ktasExplained?.Level} Classification:</strong>
+                                                        </div>
+                                                        <div>
+                                                            <strong>Primary Assessment:</strong> {selectedPrediction.ktasExplained?.Meaning}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
