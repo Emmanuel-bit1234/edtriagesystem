@@ -205,6 +205,7 @@ export const EDPrediction = (props) => {
         });
 
         prediction.getPrediction(newForm).then((data) => {
+            console.log("Prediction Results:", data);
             setPredictionResults(data);
             setLoad(false);
         });
