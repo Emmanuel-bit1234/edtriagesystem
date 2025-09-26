@@ -138,7 +138,7 @@ export const EDPrediction = (props) => {
         setInjury(undefined);
         setMentalState(undefined);
         setPredictionResults(null);
-        
+
         // Reset form to initial state but preserve nurse info
         setForm({
             Sex: null,
@@ -178,7 +178,7 @@ export const EDPrediction = (props) => {
             form.BT.trim() !== "" &&
             form.Chief_complain.trim() !== ""
         );
-        
+
         // Disable if fields are not filled OR if prediction already exists
         return allFieldsFilled && !predictionResults;
     };
@@ -203,7 +203,6 @@ export const EDPrediction = (props) => {
                 error = true;
             }
         });
-
         prediction.getPrediction(newForm).then((data) => {
             console.log("Prediction Results:", data);
             setPredictionResults(data);
@@ -255,11 +254,11 @@ export const EDPrediction = (props) => {
                         }}
                         footer={
                             <>
-                                <Button 
-                                    label="Predict" 
-                                    onClick={predict} 
-                                    className="p-button-success" 
-                                    type="submit" 
+                                <Button
+                                    label="Predict"
+                                    onClick={predict}
+                                    className="p-button-success"
+                                    type="submit"
                                     disabled={!isFormValid()}
                                 />
                             </>
@@ -449,7 +448,7 @@ export const EDPrediction = (props) => {
                                                 <>
                                                     <hr style={{ margin: "20px 0" }} />
                                                     <strong className="big-text">Triage Prediction Results</strong> <br /> <br />
-                                                    
+
                                                     {/* Main Prediction Badge */}
                                                     <div className="text-center mb-4">
                                                         <span
@@ -490,7 +489,7 @@ export const EDPrediction = (props) => {
                                                         {(() => {
                                                             const factors = [];
                                                             const inputs = predictionResults?.data?.inputs;
-                                                            
+
                                                             // Check critical vital signs based on proper ranges
                                                             if (inputs?.HR) {
                                                                 const hr = parseInt(inputs.HR);
@@ -510,7 +509,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.SBP) {
                                                                 const sbp = parseInt(inputs.SBP);
                                                                 if (sbp < 90) {
@@ -529,7 +528,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.DBP) {
                                                                 const dbp = parseInt(inputs.DBP);
                                                                 if (dbp < 60) {
@@ -548,7 +547,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.NRS_pain) {
                                                                 const pain = parseInt(inputs.NRS_pain);
                                                                 if (pain >= 8) {
@@ -567,7 +566,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.RR) {
                                                                 const rr = parseInt(inputs.RR);
                                                                 if (rr > 25) {
@@ -586,7 +585,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.BT) {
                                                                 const temp = parseFloat(inputs.BT);
                                                                 if (temp > 38.5) {
@@ -605,12 +604,12 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.Mental) {
                                                                 const mental = parseInt(inputs.Mental);
                                                                 const mentalStatus = {
                                                                     1: "Alert",
-                                                                    2: "Voice responsive", 
+                                                                    2: "Voice responsive",
                                                                     3: "Pain responsive",
                                                                     4: "Unresponsive"
                                                                 };
@@ -623,7 +622,7 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             if (inputs?.Injury && parseInt(inputs.Injury) === 1) {
                                                                 factors.push({
                                                                     label: "Injury Present",
@@ -632,12 +631,12 @@ export const EDPrediction = (props) => {
                                                                     reason: "Trauma/injury reported"
                                                                 });
                                                             }
-                                                            
+
                                                             if (inputs?.Arrival_mode) {
                                                                 const arrival = parseInt(inputs.Arrival_mode);
                                                                 const arrivalModes = {
                                                                     1: "Walk-in",
-                                                                    2: "Transfer", 
+                                                                    2: "Transfer",
                                                                     3: "Ambulance"
                                                                 };
                                                                 if (arrival === 3) {
@@ -649,17 +648,17 @@ export const EDPrediction = (props) => {
                                                                     });
                                                                 }
                                                             }
-                                                            
+
                                                             // Sort factors by priority (critical > high > moderate) and take top 3
                                                             const sortedFactors = factors.sort((a, b) => {
                                                                 const priorityOrder = { 'critical': 3, 'high': 2, 'moderate': 1 };
                                                                 return priorityOrder[b.status] - priorityOrder[a.status];
                                                             }).slice(0, 3);
-                                                            
+
                                                             const hasFactors = sortedFactors.length > 0;
-                                                            const isLowUrgency = predictionResults?.data?.Ktas_Explained?.Title === "Less Urgent" || 
-                                                                                predictionResults?.data?.Ktas_Explained?.Title === "Non-Urgent";
-                                                            
+                                                            const isLowUrgency = predictionResults?.data?.Ktas_Explained?.Title === "Less Urgent" ||
+                                                                predictionResults?.data?.Ktas_Explained?.Title === "Non-Urgent";
+
                                                             return (
                                                                 <>
                                                                     {hasFactors && !isLowUrgency ? (
@@ -684,71 +683,70 @@ export const EDPrediction = (props) => {
                                                                                 `}
                                                                             </style>
                                                                             <div className="prediction-layout">
-                                                                            {/* Top Contributing Factors */}
-                                                                            <div className="prediction-item" style={{ 
-                                                                                flex: '1',
-                                                                                marginBottom: '15px'
-                                                                            }}>
-                                                                                <h5><i className="pi pi-info-circle mr-2"></i>Top Contributing Factors</h5>
-                                                                                <div className="p-2" style={{ backgroundColor: "#fff3cd", borderRadius: "8px", border: "1px solid #ffeaa7" }}>
-                                                                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                                                                        {sortedFactors.map((factor, index) => (
-                                                                                            <div key={index} style={{ 
-                                                                                                display: 'flex',
-                                                                                                alignItems: 'center',
-                                                                                                padding: '8px',
-                                                                                                backgroundColor: factor.status === 'critical' ? '#f8d7da' : 
-                                                                                                                factor.status === 'high' ? '#fff3cd' : '#d1ecf1',
-                                                                                                borderRadius: '4px',
-                                                                                                border: `1px solid ${factor.status === 'critical' ? '#f5c6cb' : 
-                                                                                                    factor.status === 'high' ? '#ffeaa7' : '#bee5eb'}`,
-                                                                                                minWidth: 'fit-content',
-                                                                                                flex: '0 0 auto',
-                                                                                                marginRight: '4px'
-                                                                                            }}>
-                                                                                                <div style={{ marginRight: '4px' }}>
-                                                                                                    <strong>{factor.label}:</strong>
+                                                                                {/* Top Contributing Factors */}
+                                                                                <div className="prediction-item" style={{
+                                                                                    flex: '1',
+                                                                                    marginBottom: '15px'
+                                                                                }}>
+                                                                                    <h5><i className="pi pi-info-circle mr-2"></i>Top Contributing Factors</h5>
+                                                                                    <div className="p-2" style={{ backgroundColor: "#fff3cd", borderRadius: "8px", border: "1px solid #ffeaa7" }}>
+                                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                                            {sortedFactors.map((factor, index) => (
+                                                                                                <div key={index} style={{
+                                                                                                    display: 'flex',
+                                                                                                    alignItems: 'center',
+                                                                                                    padding: '8px',
+                                                                                                    backgroundColor: factor.status === 'critical' ? '#f8d7da' :
+                                                                                                        factor.status === 'high' ? '#fff3cd' : '#d1ecf1',
+                                                                                                    borderRadius: '4px',
+                                                                                                    border: `1px solid ${factor.status === 'critical' ? '#f5c6cb' :
+                                                                                                        factor.status === 'high' ? '#ffeaa7' : '#bee5eb'}`,
+                                                                                                    minWidth: 'fit-content',
+                                                                                                    flex: '0 0 auto',
+                                                                                                    marginRight: '4px'
+                                                                                                }}>
+                                                                                                    <div style={{ marginRight: '4px' }}>
+                                                                                                        <strong>{factor.label}:</strong>
+                                                                                                    </div>
+                                                                                                    <div style={{ marginRight: '4px' }}>
+                                                                                                        <span className={`badge ${factor.status === 'critical' ? 'bg-danger' :
+                                                                                                            factor.status === 'high' ? 'bg-warning' : 'bg-info'
+                                                                                                            }`}>
+                                                                                                            {factor.value}
+                                                                                                        </span>
+                                                                                                    </div>
+                                                                                                    <div style={{ color: '#6c757d', fontSize: '0.8rem' }}>
+                                                                                                        {factor.reason}
+                                                                                                    </div>
                                                                                                 </div>
-                                                                                                <div style={{ marginRight: '4px' }}>
-                                                                                                    <span className={`badge ${
-                                                                                                        factor.status === 'critical' ? 'bg-danger' : 
-                                                                                                        factor.status === 'high' ? 'bg-warning' : 'bg-info'
-                                                                                                    }`}>
-                                                                                                        {factor.value}
-                                                                                                    </span>
-                                                                                                </div>
-                                                                                                <div style={{ color: '#6c757d', fontSize: '0.8rem' }}>
-                                                                                                    {factor.reason}
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        ))}
+                                                                                            ))}
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
 
-                                                                            {/* Clinical Reasoning */}
-                                                                            <div className="prediction-item" style={{ 
-                                                                                flex: '1'
-                                                                            }}>
-                                                                                <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
-                                                                                <div className="p-2" style={{ backgroundColor: "#e7f3ff", borderRadius: "8px", border: "1px solid #b3d9ff" }}>
-                                                                                    <div className="mb-2">
-                                                                                        <strong>Why Level {predictionResults?.data?.Ktas_Explained?.Level} Classification:</strong>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <strong>Primary Assessment:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
+                                                                                {/* Clinical Reasoning */}
+                                                                                <div className="prediction-item" style={{
+                                                                                    flex: '1'
+                                                                                }}>
+                                                                                    <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                                                                    <div className="p-2" style={{ backgroundColor: "#e7f3ff", borderRadius: "8px", border: "1px solid #b3d9ff" }}>
+                                                                                        <div className="mb-2">
+                                                                                            <strong>Why Level {predictionResults?.data?.Ktas_Explained?.Level} Classification:</strong>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <strong>Primary Assessment:</strong> {predictionResults?.data?.Ktas_Explained?.Meaning}
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
                                                                             </div>
                                                                         </>
                                                                     ) : (
                                                                         // Centered layout when no factors OR low urgency
                                                                         <div style={{ textAlign: 'center' }}>
                                                                             <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
-                                                                            <div className="p-3" style={{ 
-                                                                                backgroundColor: "#e7f3ff", 
-                                                                                borderRadius: "8px", 
+                                                                            <div className="p-3" style={{
+                                                                                backgroundColor: "#e7f3ff",
+                                                                                borderRadius: "8px",
                                                                                 border: "1px solid #b3d9ff",
                                                                                 maxWidth: '600px',
                                                                                 margin: '0 auto'
@@ -832,7 +830,14 @@ export const EDPrediction = (props) => {
                                                 return "grey"; // fallback for unknown values
                                         }
                                     })(),
-                                    color: "white",
+                                    color: (() => {
+                                        switch (item.ktasExplained?.Title) {
+                                            case "Urgent":          // Level III - dark text for better contrast on yellow
+                                                return "#333333";
+                                            default:
+                                                return "white";
+                                        }
+                                    })(),
                                     marginBottom: "0.5rem",
                                     fontWeight: "bold",
                                     fontSize: "0.9rem"
@@ -1024,7 +1029,7 @@ export const EDPrediction = (props) => {
                         {/* Enhanced Prediction Results */}
                         <div className="col-12">
                             <h4>Triage Prediction Results</h4>
-                            
+
                             {/* Main Prediction Badge */}
                             <div className="text-center mb-4">
                                 <span
@@ -1065,7 +1070,7 @@ export const EDPrediction = (props) => {
                                 {(() => {
                                     const factors = [];
                                     const inputs = selectedPrediction.inputs;
-                                    
+
                                     // Check critical vital signs based on proper ranges
                                     if (inputs?.HR) {
                                         const hr = parseInt(inputs.HR);
@@ -1085,7 +1090,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.SBP) {
                                         const sbp = parseInt(inputs.SBP);
                                         if (sbp < 90) {
@@ -1104,7 +1109,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.DBP) {
                                         const dbp = parseInt(inputs.DBP);
                                         if (dbp < 60) {
@@ -1123,7 +1128,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.NRS_pain) {
                                         const pain = parseInt(inputs.NRS_pain);
                                         if (pain >= 8) {
@@ -1142,7 +1147,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.RR) {
                                         const rr = parseInt(inputs.RR);
                                         if (rr > 25) {
@@ -1161,7 +1166,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.BT) {
                                         const temp = parseFloat(inputs.BT);
                                         if (temp > 38.5) {
@@ -1180,12 +1185,12 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.Mental) {
                                         const mental = parseInt(inputs.Mental);
                                         const mentalStatus = {
                                             1: "Alert",
-                                            2: "Voice responsive", 
+                                            2: "Voice responsive",
                                             3: "Pain responsive",
                                             4: "Unresponsive"
                                         };
@@ -1198,7 +1203,7 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     if (inputs?.Injury && parseInt(inputs.Injury) === 1) {
                                         factors.push({
                                             label: "Injury Present",
@@ -1207,12 +1212,12 @@ export const EDPrediction = (props) => {
                                             reason: "Trauma/injury reported"
                                         });
                                     }
-                                    
+
                                     if (inputs?.Arrival_mode) {
                                         const arrival = parseInt(inputs.Arrival_mode);
                                         const arrivalModes = {
                                             1: "Walk-in",
-                                            2: "Transfer", 
+                                            2: "Transfer",
                                             3: "Ambulance"
                                         };
                                         if (arrival === 3) {
@@ -1224,17 +1229,17 @@ export const EDPrediction = (props) => {
                                             });
                                         }
                                     }
-                                    
+
                                     // Sort factors by priority (critical > high > moderate) and take top 3
                                     const sortedFactors = factors.sort((a, b) => {
                                         const priorityOrder = { 'critical': 3, 'high': 2, 'moderate': 1 };
                                         return priorityOrder[b.status] - priorityOrder[a.status];
                                     }).slice(0, 3);
-                                    
+
                                     const hasFactors = sortedFactors.length > 0;
-                                    const isLowUrgency = selectedPrediction.ktasExplained?.Title === "Less Urgent" || 
-                                                        selectedPrediction.ktasExplained?.Title === "Non-Urgent";
-                                    
+                                    const isLowUrgency = selectedPrediction.ktasExplained?.Title === "Less Urgent" ||
+                                        selectedPrediction.ktasExplained?.Title === "Non-Urgent";
+
                                     return (
                                         <>
                                             {hasFactors && !isLowUrgency ? (
@@ -1259,71 +1264,70 @@ export const EDPrediction = (props) => {
                                                         `}
                                                     </style>
                                                     <div className="prediction-layout-dialog">
-                                                    {/* Top Contributing Factors - Full width on phone, half width on laptop+ */}
-                                                    <div className="prediction-item-dialog" style={{ 
-                                                        flex: '1',
-                                                        marginBottom: '15px'
-                                                    }}>
-                                                        <h5><i className="pi pi-info-circle mr-2"></i>Top Contributing Factors</h5>
-                                                        <div className="p-2" style={{ backgroundColor: "#fff3cd", borderRadius: "8px", border: "1px solid #ffeaa7" }}>
-                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                                                {sortedFactors.map((factor, index) => (
-                                                                    <div key={index} style={{ 
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        padding: '8px',
-                                                                        backgroundColor: factor.status === 'critical' ? '#f8d7da' : 
-                                                                                        factor.status === 'high' ? '#fff3cd' : '#d1ecf1',
-                                                                        borderRadius: '4px',
-                                                                        border: `1px solid ${factor.status === 'critical' ? '#f5c6cb' : 
-                                                                            factor.status === 'high' ? '#ffeaa7' : '#bee5eb'}`,
-                                                                        minWidth: 'fit-content',
-                                                                        flex: '0 0 auto',
-                                                                        marginRight: '4px'
-                                                                    }}>
-                                                                        <div style={{ marginRight: '4px' }}>
-                                                                            <strong>{factor.label}:</strong>
+                                                        {/* Top Contributing Factors - Full width on phone, half width on laptop+ */}
+                                                        <div className="prediction-item-dialog" style={{
+                                                            flex: '1',
+                                                            marginBottom: '15px'
+                                                        }}>
+                                                            <h5><i className="pi pi-info-circle mr-2"></i>Top Contributing Factors</h5>
+                                                            <div className="p-2" style={{ backgroundColor: "#fff3cd", borderRadius: "8px", border: "1px solid #ffeaa7" }}>
+                                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                                                    {sortedFactors.map((factor, index) => (
+                                                                        <div key={index} style={{
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            padding: '8px',
+                                                                            backgroundColor: factor.status === 'critical' ? '#f8d7da' :
+                                                                                factor.status === 'high' ? '#fff3cd' : '#d1ecf1',
+                                                                            borderRadius: '4px',
+                                                                            border: `1px solid ${factor.status === 'critical' ? '#f5c6cb' :
+                                                                                factor.status === 'high' ? '#ffeaa7' : '#bee5eb'}`,
+                                                                            minWidth: 'fit-content',
+                                                                            flex: '0 0 auto',
+                                                                            marginRight: '4px'
+                                                                        }}>
+                                                                            <div style={{ marginRight: '4px' }}>
+                                                                                <strong>{factor.label}:</strong>
+                                                                            </div>
+                                                                            <div style={{ marginRight: '4px' }}>
+                                                                                <span className={`badge ${factor.status === 'critical' ? 'bg-danger' :
+                                                                                    factor.status === 'high' ? 'bg-warning' : 'bg-info'
+                                                                                    }`}>
+                                                                                    {factor.value}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div style={{ color: '#6c757d', fontSize: '0.8rem' }}>
+                                                                                {factor.reason}
+                                                                            </div>
                                                                         </div>
-                                                                        <div style={{ marginRight: '4px' }}>
-                                                                            <span className={`badge ${
-                                                                                factor.status === 'critical' ? 'bg-danger' : 
-                                                                                factor.status === 'high' ? 'bg-warning' : 'bg-info'
-                                                                            }`}>
-                                                                                {factor.value}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div style={{ color: '#6c757d', fontSize: '0.8rem' }}>
-                                                                            {factor.reason}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
+                                                                    ))}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    {/* Clinical Reasoning - Full width on phone, half width on laptop+ */}
-                                                    <div className="prediction-item-dialog" style={{ 
-                                                        flex: '1'
-                                                    }}>
-                                                        <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
-                                                        <div className="p-2" style={{ backgroundColor: "#e7f3ff", borderRadius: "8px", border: "1px solid #b3d9ff" }}>
-                                                            <div className="mb-2">
-                                                                <strong>Why Level {selectedPrediction.ktasExplained?.Level} Classification:</strong>
-                                                            </div>
-                                                            <div>
-                                                                <strong>Primary Assessment:</strong> {selectedPrediction.ktasExplained?.Meaning}
+                                                        {/* Clinical Reasoning - Full width on phone, half width on laptop+ */}
+                                                        <div className="prediction-item-dialog" style={{
+                                                            flex: '1'
+                                                        }}>
+                                                            <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                                            <div className="p-2" style={{ backgroundColor: "#e7f3ff", borderRadius: "8px", border: "1px solid #b3d9ff" }}>
+                                                                <div className="mb-2">
+                                                                    <strong>Why Level {selectedPrediction.ktasExplained?.Level} Classification:</strong>
+                                                                </div>
+                                                                <div>
+                                                                    <strong>Primary Assessment:</strong> {selectedPrediction.ktasExplained?.Meaning}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
                                                     </div>
                                                 </>
                                             ) : (
                                                 // Centered layout when no factors OR low urgency
                                                 <div style={{ textAlign: 'center' }}>
                                                     <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
-                                                    <div className="p-3" style={{ 
-                                                        backgroundColor: "#e7f3ff", 
-                                                        borderRadius: "8px", 
+                                                    <div className="p-3" style={{
+                                                        backgroundColor: "#e7f3ff",
+                                                        borderRadius: "8px",
                                                         border: "1px solid #b3d9ff",
                                                         maxWidth: '600px',
                                                         margin: '0 auto'
