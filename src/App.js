@@ -24,6 +24,8 @@ import "./App.scss";
 import Cookies from "js-cookie";
 import { NurseReport } from "./pages/NurseReport";
 import PredictionAPI from "./service/predictionAPI";
+import IdleTimeoutService from "./service/IdleTimeoutService";
+import IdleTimeoutDialog from "./componets/IdleTimeoutDialog";
 
 const App = () => {
     const [layoutMode, setLayoutMode] = useState("static");
@@ -37,6 +39,7 @@ const App = () => {
     const copyTooltipRef = useRef();
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showIdleDialog, setShowIdleDialog] = useState(false);
     const predictionAPI = new PredictionAPI();
 
     PrimeReact.ripple = true;
@@ -70,6 +73,36 @@ const App = () => {
     useEffect(() => {
         copyTooltipRef && copyTooltipRef.current && copyTooltipRef.current.updateTargetEvents();
     }, [location]);
+
+    // Idle timeout effect
+    useEffect(() => {
+        if (isLoggedIn) {
+            // Initialize idle timeout service with 30 seconds for testing
+            IdleTimeoutService.updateTimeouts(30 * 1000, 10 * 1000); // 30 seconds idle, 10 seconds warning
+            IdleTimeoutService.init({
+                onWarning: () => {
+                    setShowIdleDialog(true);
+                },
+                onLogout: () => {
+                    handleLogout();
+                },
+                onContinue: () => {
+                    setShowIdleDialog(false);
+                }
+            });
+
+            // No need for countdown interval - dialog handles its own countdown
+
+            return () => {
+                IdleTimeoutService.destroy();
+            };
+        } else {
+            // Clean up when not logged in
+            IdleTimeoutService.destroy();
+            setShowIdleDialog(false);
+        }
+    }, [isLoggedIn]);
+
 
     const onInputStyleChange = (inputStyle) => {
         setInputStyle(inputStyle);
@@ -148,6 +181,22 @@ const App = () => {
     };
     const isDesktop = () => {
         return window.innerWidth >= 992;
+    };
+
+    const handleLogout = () => {
+        predictionAPI.logout();
+        Cookies.set("LoggedIn", false);
+        setIsLoggedIn(false);
+        setShowIdleDialog(false);
+        window.location.reload();
+    };
+
+    const handleContinueSession = () => {
+        IdleTimeoutService.continueSession();
+    };
+
+    const handleIdleLogout = () => {
+        IdleTimeoutService.handleLogout();
     };
 
     const menu = [
@@ -381,6 +430,15 @@ const App = () => {
             <CSSTransition classNames="layout-mask" timeout={{ enter: 200, exit: 200 }} in={mobileMenuActive} unmountOnExit>
                 <div className="layout-mask p-component-overlay"></div>
             </CSSTransition>
+
+            {/* Idle Timeout Dialog */}
+            <IdleTimeoutDialog
+                visible={showIdleDialog}
+                onContinue={handleContinueSession}
+                onLogout={handleIdleLogout}
+                timeRemaining={10}
+                totalTime={10}
+            />
         </div>
     );
 };
