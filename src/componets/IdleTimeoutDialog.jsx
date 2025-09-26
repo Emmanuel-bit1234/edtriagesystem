@@ -55,7 +55,7 @@ const IdleTimeoutDialog = ({ visible, onContinue, onLogout, timeRemaining, total
                     <i className="pi pi-clock text-4xl text-orange-500 mb-3"></i>
                     <h4 className="mb-3">Your session is about to expire</h4>
                     <p className="text-gray-600 mb-4">
-                        You have been inactive for 30 seconds. Your session will expire in:
+                        You have been inactive for 3 minutes. Your session will expire in:
                     </p>
                 </div>
 

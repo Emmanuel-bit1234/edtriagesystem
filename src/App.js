@@ -77,8 +77,8 @@ const App = () => {
     // Idle timeout effect
     useEffect(() => {
         if (isLoggedIn) {
-            // Initialize idle timeout service with 30 seconds for testing
-            IdleTimeoutService.updateTimeouts(30 * 1000, 10 * 1000); // 30 seconds idle, 10 seconds warning
+            // Initialize idle timeout service with 3 minutes
+            IdleTimeoutService.updateTimeouts(3 * 60 * 1000, 30 * 1000); // 3 minutes idle, 30 seconds warning
             IdleTimeoutService.init({
                 onWarning: () => {
                     setShowIdleDialog(true);
@@ -436,8 +436,8 @@ const App = () => {
                 visible={showIdleDialog}
                 onContinue={handleContinueSession}
                 onLogout={handleIdleLogout}
-                timeRemaining={10}
-                totalTime={10}
+                timeRemaining={30}
+                totalTime={30}
             />
         </div>
     );
