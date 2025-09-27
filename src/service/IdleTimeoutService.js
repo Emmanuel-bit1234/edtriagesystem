@@ -24,7 +24,6 @@ class IdleTimeoutService {
             'keydown'
         ];
     }
-
     // Initialize the idle timeout service
     init(callbacks) {
         this.callbacks = { ...this.callbacks, ...callbacks };
