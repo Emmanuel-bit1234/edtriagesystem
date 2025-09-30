@@ -40,7 +40,15 @@ const App = () => {
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showIdleDialog, setShowIdleDialog] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const predictionAPI = new PredictionAPI();
+
+    // Helper function to check if user is admin
+    const isAdmin = () => {
+        return currentUser?.name === 'Admin' || 
+               currentUser?.username === 'Admin' || 
+               currentUser?.email === 'Admin@edtriage.co.za';
+    };
 
     PrimeReact.ripple = true;
 
@@ -53,10 +61,20 @@ const App = () => {
             const isAuthenticated = predictionAPI.isAuthenticated();
             setIsLoggedIn(isAuthenticated);
             
-            // Also update cookies for backward compatibility
+            // Get current user data
             if (isAuthenticated) {
+                const storedUser = localStorage.getItem('user');
+                if (storedUser) {
+                    try {
+                        const userData = JSON.parse(storedUser);
+                        setCurrentUser(userData);
+                    } catch (error) {
+                        console.error("Error parsing user data:", error);
+                    }
+                }
                 Cookies.set("LoggedIn", true);
             } else {
+                setCurrentUser(null);
                 Cookies.set("LoggedIn", false);
             }
         };
@@ -202,11 +220,12 @@ const App = () => {
     const menu = [
         {
             items: [
-                {
+                // Dashboard - Admin only
+                ...(isAdmin() ? [{
                     label: "Dashboard",
                     icon: "pi pi-fw pi-chart-bar",
                     to: "/",
-                },
+                }] : []),
                 {
                     label: "Emergency Triage",
                     icon: "pi pi-fw pi-home",
@@ -418,7 +437,15 @@ const App = () => {
                     </div>
                     <div className="layout-main-container">
                         <div className="layout-main">
-                            <Route path="/" exact render={() => <Dashboard colorMode={layoutColorMode} />} />
+                            <Route path="/" exact render={() => {
+                                if (isAdmin()) {
+                                    return <Dashboard colorMode={layoutColorMode} />;
+                                } else {
+                                    // Redirect non-admin users to Emergency Triage
+                                    window.location.href = '/EDPrediction';
+                                    return null;
+                                }
+                            }} />
                             <Route path="/EDPrediction" component={EDPrediction} />
                             <Route path="/nurse-report" component={NurseReport} />
                         </div>

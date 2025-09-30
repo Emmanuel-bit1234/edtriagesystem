@@ -26,6 +26,13 @@ export default function PredictionAPI() {
         }).then((response) => response.data);
     };
 
+    this.getPredictionsByNurse = (nurseId) => {
+        var url = `https://triagecdssproxy.vercel.app/prediction-logs/nurse/${nurseId}`;
+        return axios.get(url, {
+            headers: getAuthHeaders()
+        }).then((response) => response.data);
+    };
+
     this.getStatsSummary = () => {
         var url = `https://triagecdssproxy.vercel.app/prediction-logs/stats/summary`;
         return axios.get(url, {

@@ -106,16 +106,17 @@ export const EDPrediction = (props) => {
         },
     });
     useEffect(() => {
-        prediction.getAllPredictions().then((data) => {
-            //("ALL PREDICTIONS HERE:", data);
-            setAllPredictions(data?.logs)
-        });
-
         // Get nurse information from local storage
         const storedUser = localStorage.getItem('user');
+        let isAdminUser = false;
+        
         if (storedUser) {
             try {
                 const userData = JSON.parse(storedUser);
+                isAdminUser = userData.name === 'Admin' || 
+                              userData.username === 'Admin' || 
+                              userData.email === 'Admin@edtriage.co.za';
+                
                 setForm(prevForm => ({
                     ...prevForm,
                     nurseName: userData.name || "",
@@ -123,6 +124,27 @@ export const EDPrediction = (props) => {
                 }));
             } catch (error) {
                 console.error("Error parsing user data from localStorage:", error);
+            }
+        }
+
+        // Load predictions based on user role
+        if (isAdminUser) {
+            // Admin sees all predictions
+            prediction.getAllPredictions().then((data) => {
+                setAllPredictions(data?.logs)
+            });
+        } else {
+            // Regular nurses see only their own predictions
+            const nurseId = JSON.parse(storedUser || '{}').id;
+            if (nurseId) {
+                prediction.getAllPredictions().then((data) => {
+                    const allPredictions = data?.logs || [];
+                    // Filter predictions by current nurse ID
+                    const nursePredictions = allPredictions.filter(pred => 
+                        pred.user?.id === nurseId || pred.user?.id === String(nurseId)
+                    );
+                    setAllPredictions(nursePredictions);
+                });
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -805,7 +827,7 @@ export const EDPrediction = (props) => {
                         metaKeySelection={false}
                     >
                         <Column field="patientNumber" header="Patient Number" sortable body={(item) => <b>{item.patientNumber}</b>}></Column>
-                        <Column field="gender" header="Gender" sortable body={(item) => <b>{item.inputs?.Sex === 1 ? 'Female' : 'Male'}</b>}></Column>
+                        <Column field="gender" header="Gender" sortable body={(item) => <b>{item.inputs?.Sex === 1 ? 'Female' : item.inputs?.Sex === 2 ? 'Male' : 'Unknown'}</b>}></Column>
                         <Column field="ktasExplained.Level" header="Prediction Level" sortable body={(item) => <b>{item.ktasExplained?.Level}</b>}></Column>
                         <Column field="ktasExplained.Title" header="Prediction Title" sortable body={(item) => (
                             <span
@@ -962,7 +984,7 @@ export const EDPrediction = (props) => {
                                     <strong>Age:</strong> {selectedPrediction.inputs?.Age} years
                                 </div>
                                 <div className="col-6">
-                                    <strong>Gender:</strong> {selectedPrediction.inputs?.Sex === 1 ? 'Female' : 'Male'}
+                                    <strong>Gender:</strong> {selectedPrediction.inputs?.Sex === 1 ? 'Female' : selectedPrediction.inputs?.Sex === 2 ? 'Male' : 'Unknown'}
                                 </div>
                                 <div className="col-6">
                                     <strong>Arrival Mode:</strong> {

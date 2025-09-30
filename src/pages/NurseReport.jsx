@@ -27,6 +27,8 @@ export const NurseReport = (props) => {
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
+    const [currentUser, setCurrentUser] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const toast = useRef(null);
 
     // Helper function to get auth headers
@@ -37,6 +39,29 @@ export const NurseReport = (props) => {
 
     // Load nurses list on component mount
     useEffect(() => {
+        // Check user role and set up initial state
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setCurrentUser(userData);
+                const adminCheck = userData.name === 'Admin' || 
+                                  userData.username === 'Admin' || 
+                                  userData.email === 'Admin@edtriage.co.za';
+                setIsAdmin(adminCheck);
+                
+                if (!adminCheck) {
+                    // For regular nurses, set themselves as selected nurse
+                    setSelectedNurse({
+                        id: userData.id,
+                        name: userData.name
+                    });
+                }
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+            }
+        }
+        
         loadNurses();
     }, []);
 
@@ -429,59 +454,73 @@ export const NurseReport = (props) => {
         </DataTable>
     );
 
-    // Vital signs ranges
-    const VitalSignsCard = () => (
-        <Card 
-            title="Vital Signs Ranges" 
-            className="h-full"
-            style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
-        >
-            <div className="p-3">
-                <div className="grid">
-                    <div className="col-6">
-                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
-                            <i className="pi pi-heart text-3xl text-blue-500 mb-2"></i>
-                            <div className="text-xl font-bold text-900 mb-2">Blood Pressure</div>
-                            <div className="text-600 font-medium">
-                                {reportData?.insights?.vitalSignsRanges?.bloodPressure?.min || 0} - {reportData?.insights?.vitalSignsRanges?.bloodPressure?.max || 0}
+    // Helper function to determine vital sign status
+    const getVitalSignStatus = (value, normalMin, normalMax) => {
+        if (value < normalMin) return { status: 'low', color: 'blue', icon: 'pi-arrow-down' };
+        if (value > normalMax) return { status: 'high', color: 'red', icon: 'pi-arrow-up' };
+        return { status: 'normal', color: 'green', icon: 'pi-check' };
+    };
+
+    // Helper function to calculate gender distribution
+    const calculateGenderDistribution = (reportData) => {
+        const demographics = reportData?.demographics || {};
+        
+        // Handle both aggregated counts and raw Sex values
+        let malePatients = demographics?.genderDistribution?.male || 0;
+        let femalePatients = demographics?.genderDistribution?.female || 0;
+        
+        // If the API returns raw Sex values instead of counts, convert them
+        // This handles the case where male/female might contain Sex values (1=Female, 2=Male)
+        if (demographics?.genderDistribution?.male === 2) {
+            malePatients = 1; // Convert Sex value 2 to count 1
+        }
+        if (demographics?.genderDistribution?.female === 1) {
+            femalePatients = 1; // Convert Sex value 1 to count 1
+        }
+        
+        return {
+            malePatients,
+            femalePatients
+        };
+    };
+
+    // Gender Distribution
+    const GenderDistributionCard = () => {
+        const gender = calculateGenderDistribution(reportData);
+        
+        return (
+            <Card 
+                title="Gender Distribution" 
+                className="h-full"
+                style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+            >
+                <div className="p-3">
+                    <div className="grid">
+                        <div className="col-6">
+                            <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                                <i className="pi pi-user text-3xl text-green-500 mb-2"></i>
+                                <div className="text-xl font-bold text-900 mb-2">Male Patients</div>
+                                <div className="text-3xl font-bold text-green-600 mb-2">
+                                    {gender.malePatients}
+                                </div>
+                                <div className="text-sm text-500">Gender split</div>
                             </div>
-                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bloodPressure?.avg || 0}</div>
                         </div>
-                    </div>
-                    <div className="col-6">
-                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
-                            <i className="pi pi-heart text-3xl text-green-500 mb-2"></i>
-                            <div className="text-xl font-bold text-900 mb-2">Heart Rate</div>
-                            <div className="text-600 font-medium">
-                                {reportData?.insights?.vitalSignsRanges?.heartRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.heartRate?.max || 0}
+                        <div className="col-6">
+                            <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
+                                <i className="pi pi-user text-3xl text-pink-500 mb-2"></i>
+                                <div className="text-xl font-bold text-900 mb-2">Female Patients</div>
+                                <div className="text-3xl font-bold text-pink-600 mb-2">
+                                    {gender.femalePatients}
+                                </div>
+                                <div className="text-sm text-500">Gender split</div>
                             </div>
-                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.heartRate?.avg || 0}</div>
-                        </div>
-                    </div>
-                    <div className="col-6">
-                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
-                            <i className="pi pi-wind text-3xl text-orange-500 mb-2"></i>
-                            <div className="text-xl font-bold text-900 mb-2">Respiratory Rate</div>
-                            <div className="text-600 font-medium">
-                                {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.min || 0} - {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.max || 0}
-                            </div>
-                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.respiratoryRate?.avg || 0}</div>
-                        </div>
-                    </div>
-                    <div className="col-6">
-                        <div className="text-center p-3 border-round border-1 surface-border hover:shadow-2 transition-all transition-duration-200">
-                            <i className="pi pi-thermometer text-3xl text-purple-500 mb-2"></i>
-                            <div className="text-xl font-bold text-900 mb-2">Body Temperature</div>
-                            <div className="text-600 font-medium">
-                                {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.min || 0}°C - {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.max || 0}°C
-                            </div>
-                            <div className="text-sm text-500">Avg: {reportData?.insights?.vitalSignsRanges?.bodyTemperature?.avg || 0}°C</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </Card>
-    );
+            </Card>
+        );
+    };
 
     // Risk factors
     const RiskFactorsCard = () => (
@@ -531,19 +570,29 @@ export const NurseReport = (props) => {
     // Toolbar
     const toolbarLeft = (
         <div className="flex flex-column md:flex-row align-items-start md:align-items-center">
-            <Dropdown
-                value={selectedNurse}
-                options={nurses}
-                onChange={(e) => setSelectedNurse(e.value)}
-                optionLabel="name"
-                placeholder="Select Nurse"
-                className="w-full md:w-20rem mb-3 md:mb-0 md:mr-3"
-                disabled={loadingNurses}
-                filter
-                filterBy="name"
-                showClear
-                filterPlaceholder="Search nurses..."
-            />
+            {/* Show nurse dropdown only for Admin users */}
+            {isAdmin && (
+                <Dropdown
+                    value={selectedNurse}
+                    options={nurses}
+                    onChange={(e) => setSelectedNurse(e.value)}
+                    optionLabel="name"
+                    placeholder="Select Nurse"
+                    className="w-full md:w-20rem mb-3 md:mb-0 md:mr-3"
+                    disabled={loadingNurses}
+                    filter
+                    filterBy="name"
+                    showClear
+                    filterPlaceholder="Search nurses..."
+                />
+            )}
+            {/* Show current nurse info for regular nurses */}
+            {!isAdmin && selectedNurse && (
+                <div className="flex align-items-center mb-3 md:mb-0 md:mr-3 p-2 border-round" style={{ backgroundColor: '#e3f2fd', border: '1px solid #bbdefb' }}>
+                    <i className="pi pi-user mr-2 text-blue-500"></i>
+                    <span className="font-medium text-blue-700">Reporting for: {selectedNurse.name}</span>
+                </div>
+            )}
             <div className="flex align-items-center w-full md:w-auto mb-3 md:mb-0 md:mr-3">
                 <Calendar
                     value={selectedDate}
@@ -730,9 +779,9 @@ export const NurseReport = (props) => {
                                                 </div>
                                             </Card>
                                         </div>
-                                        <div className="col-12 lg:col-6">
-                                            <VitalSignsCard />
-                                        </div>
+                        <div className="col-12 lg:col-6">
+                            <GenderDistributionCard />
+                        </div>
                                         <div className="col-12">
                                             <RiskFactorsCard />
                                         </div>
