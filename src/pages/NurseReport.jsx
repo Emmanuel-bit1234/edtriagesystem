@@ -670,13 +670,27 @@ export const NurseReport = (props) => {
                         <div className="flex flex-column justify-content-center align-items-center" style={{ height: '400px' }}>
                             <i className="pi pi-chart-line text-6xl text-gray-300 mb-4"></i>
                             <h3 className="text-2xl font-bold text-900 mb-2">No Report Data</h3>
-                            <p className="text-600 text-center mb-4">
-                                Select a nurse and click "Generate Report" to view performance analytics
-                            </p>
-                            <div className="text-sm text-500">
-                                <i className="pi pi-info-circle mr-2"></i>
-                                Choose a nurse from the dropdown above to get started
-                            </div>
+                            {isAdmin ? (
+                                <>
+                                    <p className="text-600 text-center mb-4">
+                                        Select a nurse and click "Generate Report" to view performance analytics
+                                    </p>
+                                    <div className="text-sm text-500">
+                                        <i className="pi pi-info-circle mr-2"></i>
+                                        Choose a nurse from the dropdown above to get started
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-600 text-center mb-4">
+                                        Click "Generate Report" to view your performance analytics
+                                    </p>
+                                    <div className="text-sm text-500">
+                                        <i className="pi pi-info-circle mr-2"></i>
+                                        Your report will be generated for the selected date
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
 
