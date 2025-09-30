@@ -105,8 +105,8 @@ export const EDPrediction = (props) => {
             constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
         },
     });
-    useEffect(() => {
-        // Get nurse information from local storage
+    // Helper function to load predictions based on user role
+    const loadPredictions = () => {
         const storedUser = localStorage.getItem('user');
         let isAdminUser = false;
         
@@ -116,12 +116,6 @@ export const EDPrediction = (props) => {
                 isAdminUser = userData.name === 'Admin' || 
                               userData.username === 'Admin' || 
                               userData.email === 'Admin@edtriage.co.za';
-                
-                setForm(prevForm => ({
-                    ...prevForm,
-                    nurseName: userData.name || "",
-                    nurseId: userData.id || ""
-                }));
             } catch (error) {
                 console.error("Error parsing user data from localStorage:", error);
             }
@@ -147,6 +141,27 @@ export const EDPrediction = (props) => {
                 });
             }
         }
+    };
+
+    useEffect(() => {
+        // Get nurse information from local storage
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setForm(prevForm => ({
+                    ...prevForm,
+                    nurseName: userData.name || "",
+                    nurseId: userData.id || ""
+                }));
+            } catch (error) {
+                console.error("Error parsing user data from localStorage:", error);
+            }
+        }
+
+        // Load initial predictions
+        loadPredictions();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     var [predictionResults, setPredictionResults] = useState();
@@ -267,12 +282,10 @@ export const EDPrediction = (props) => {
                             setshowPredictionForm(false);
                             // Reset all form data when dialog is closed
                             resetForm();
-                            // Refresh all predictions when dialog is closed
+                            // Refresh predictions based on user role when dialog is closed
                             setLoad(true);
-                            prediction.getAllPredictions().then((data) => {
-                                setAllPredictions(data?.logs);
-                                setLoad(false);
-                            });
+                            loadPredictions();
+                            setLoad(false);
                         }}
                         footer={
                             <>

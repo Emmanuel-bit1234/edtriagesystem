@@ -371,8 +371,11 @@ export const NurseReport = (props) => {
                 >
                     <div className="flex flex-column align-items-center h-full justify-content-center p-3">
                         <i className="pi pi-chart-bar text-4xl text-orange-500 mb-3"></i>
-                        <div className="text-4xl font-bold text-900 mb-2">
-                            {reportData?.summary?.mostCommonLevel || 0}
+                        <div className="text-2xl font-bold text-900 mb-2">
+                            {reportData?.summary?.mostCommonLevel ? 
+                                getKTASDisplay(reportData.summary.mostCommonLevel) : 
+                                'No Data'
+                            }
                         </div>
                         <div className="text-600 font-medium">Most Common Level</div>
                         <div className="text-xs text-500 mt-1">KTAS Level</div>

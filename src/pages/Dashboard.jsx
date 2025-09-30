@@ -274,12 +274,24 @@ export const Dashboard = (props) => {
                 <Card className="text-center h-full" style={{ minHeight: '120px' }}>
                     <div className="flex flex-column align-items-center h-full justify-content-center p-2">
                         <i className="pi pi-exclamation-triangle text-3xl text-orange-500 mb-2"></i>
-                        <div className="text-xl font-bold text-900">
+                        <div className="text-lg font-bold text-900">
                             {stats?.levelDistribution ? 
-                                Object.entries(stats.levelDistribution).reduce((max, [level, count]) => 
-                                    count > max.count ? { level, count } : max, 
-                                    { level: '0', count: 0 }
-                                ).level : '0'
+                                (() => {
+                                    const mostCommon = Object.entries(stats.levelDistribution).reduce((max, [level, count]) => 
+                                        count > max.count ? { level, count } : max, 
+                                        { level: '0', count: 0 }
+                                    );
+                                    const names = {
+                                        1: 'Resuscitation',
+                                        2: 'Emergency',
+                                        3: 'Urgent',
+                                        4: 'Less Urgent',
+                                        5: 'Non-Urgent'
+                                    };
+                                    return mostCommon.level !== '0' ? 
+                                        `${mostCommon.level}: (${names[parseInt(mostCommon.level)] || 'Unknown'})` : 
+                                        'No Data';
+                                })() : 'No Data'
                             }
                         </div>
                         <div className="text-800 text-sm">Most Common Level</div>

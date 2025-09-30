@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
-import { Route, useLocation } from "react-router-dom";
+import { Route, useLocation, Redirect } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
 
 import { AppTopbar } from "./AppTopbar";
@@ -8,6 +8,7 @@ import { AppMenu } from "./AppMenu";
 
 import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
+import { NurseReport } from "./pages/NurseReport";
 import Login from "./pages/Login";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
@@ -22,7 +23,6 @@ import "primeflex/primeflex.css";
 import "./assets/layout/layout.scss";
 import "./App.scss";
 import Cookies from "js-cookie";
-import { NurseReport } from "./pages/NurseReport";
 import PredictionAPI from "./service/predictionAPI";
 import IdleTimeoutService from "./service/IdleTimeoutService";
 import IdleTimeoutDialog from "./componets/IdleTimeoutDialog";
@@ -59,15 +59,18 @@ const App = () => {
         // Check authentication using the new API
         const checkAuth = () => {
             const isAuthenticated = predictionAPI.isAuthenticated();
+            console.log('Authentication check - isAuthenticated:', isAuthenticated);
             setIsLoggedIn(isAuthenticated);
             
             // Get current user data
             if (isAuthenticated) {
                 const storedUser = localStorage.getItem('user');
+                console.log('Stored user:', storedUser);
                 if (storedUser) {
                     try {
                         const userData = JSON.parse(storedUser);
                         setCurrentUser(userData);
+                        console.log('Parsed user data:', userData);
                     } catch (error) {
                         console.error("Error parsing user data:", error);
                     }
@@ -418,6 +421,9 @@ const App = () => {
         "layout-theme-light": layoutColorMode === "light",
     });
 
+    // Debug logging
+    console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser);
+
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
             {isLoggedIn === false ? (
@@ -442,8 +448,7 @@ const App = () => {
                                     return <Dashboard colorMode={layoutColorMode} />;
                                 } else {
                                     // Redirect non-admin users to Emergency Triage
-                                    window.location.href = '/EDPrediction';
-                                    return null;
+                                    return <Redirect to="/EDPrediction" />;
                                 }
                             }} />
                             <Route path="/EDPrediction" component={EDPrediction} />
