@@ -8,7 +8,7 @@ import ProfileDialog from "./componets/ProfileDialog";
 export const AppTopbar = (props) => {
     const predictionAPI = new PredictionAPI();
     const [showProfileDialog, setShowProfileDialog] = useState(false);
-    
+
     function Logout() {
         predictionAPI.logout();
         Cookies.set("LoggedIn", false);
@@ -22,48 +22,31 @@ export const AppTopbar = (props) => {
     return (
         <div className="layout-topbar custom-topbar">
             <div className="topbar-left">
-                <button 
-                    type="button" 
-                    className="p-link layout-menu-button layout-topbar-button" 
-                    onClick={props.onToggleMenuClick}
-                >
+                <button type="button" className="p-link layout-menu-button layout-topbar-button" onClick={props.onToggleMenuClick}>
                     <i className="pi pi-bars" />
                 </button>
             </div>
 
             <div className="topbar-center">
                 <Link to="/" className="layout-topbar-logo">
-                    <i className="pi pi-shield mr-2" style={{ fontSize: '1.2rem', color: '#ffffff' }}></i>
-                    <span>EMERGENCY DEPARTMENT</span>
+                    <i className="pi pi-shield mr-2" style={{ fontSize: "1.2rem", color: "#ffffff" }}></i>
+                    <span>EMERGENCY TRIAGE SYSTEM</span>
                 </Link>
             </div>
 
-            <div className="topbar-right" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1.5rem' }}>
-                <button 
-                    type="button" 
-                    className="p-link layout-topbar-button" 
-                    onClick={handleProfileClick}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-                >
+            <div className="topbar-right" style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1.5rem" }}>
+                <button type="button" className="p-link layout-topbar-button" onClick={handleProfileClick} style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", whiteSpace: "nowrap" }}>
                     <i className="pi pi-user" />
                     <span className="lg:inline hidden"></span>
                 </button>
 
-                <button 
-                    type="button" 
-                    className="p-link layout-topbar-button" 
-                    onClick={Logout}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}
-                >
+                <button type="button" className="p-link layout-topbar-button" onClick={Logout} style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", whiteSpace: "nowrap" }}>
                     <i className="pi pi-sign-out" />
                     <span className="lg:inline hidden"></span>
                 </button>
             </div>
-            
-            <ProfileDialog 
-                visible={showProfileDialog} 
-                onHide={() => setShowProfileDialog(false)} 
-            />
+
+            <ProfileDialog visible={showProfileDialog} onHide={() => setShowProfileDialog(false)} />
         </div>
     );
 };
