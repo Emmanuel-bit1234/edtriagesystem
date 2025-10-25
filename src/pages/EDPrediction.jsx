@@ -28,6 +28,9 @@ export const EDPrediction = (props) => {
     var [showPredictionForm, setshowPredictionForm] = useState(false);
     var [showDetailsDialog, setShowDetailsDialog] = useState(false);
     var [selectedPrediction, setSelectedPrediction] = useState(null);
+    var [showPatientDetailsDialog, setShowPatientDetailsDialog] = useState(false);
+    var [selectedPatient, setSelectedPatient] = useState(null);
+    var [loadingPatientDetails, setLoadingPatientDetails] = useState(false);
 
     const Genders = [
         { name: "Male", value: 2 },
@@ -286,6 +289,28 @@ export const EDPrediction = (props) => {
             } catch (axiosError) {
                 console.error('Axios fallback also failed:', axiosError);
             }
+        }
+    };
+
+    // Function to fetch patient details
+    const fetchPatientDetails = async (patientNumber) => {
+        setLoadingPatientDetails(true);
+        try {
+            const response = await patientAPI.getPatientByNumber(patientNumber);
+            if (response && response.patient) {
+                setSelectedPatient(response.patient);
+                setShowPatientDetailsDialog(true);
+            }
+        } catch (error) {
+            console.error('Error fetching patient details:', error);
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Failed to fetch patient details',
+                life: 3000
+            });
+        } finally {
+            setLoadingPatientDetails(false);
         }
     };
 
@@ -1127,14 +1152,28 @@ export const EDPrediction = (props) => {
                     setSelectedPrediction(null);
                 }}
                 footer={
-                    <Button
-                        label="Close"
-                        onClick={() => {
-                            setShowDetailsDialog(false);
-                            setSelectedPrediction(null);
-                        }}
-                        className="p-button-secondary"
-                    />
+                    <div className="flex justify-content-end gap-2">
+                        <Button
+                            label="View Patient Details"
+                            icon="pi pi-user"
+                            loading={loadingPatientDetails}
+                            onClick={() => {
+                                if (selectedPrediction?.patientNumber) {
+                                    fetchPatientDetails(selectedPrediction.patientNumber);
+                                }
+                            }}
+                            className="p-button-info"
+                            disabled={!selectedPrediction?.patientNumber || loadingPatientDetails}
+                        />
+                        <Button
+                            label="Close"
+                            onClick={() => {
+                                setShowDetailsDialog(false);
+                                setSelectedPrediction(null);
+                            }}
+                            className="p-button-secondary"
+                        />
+                    </div>
                 }
             >
                 {selectedPrediction && (
@@ -1559,6 +1598,224 @@ export const EDPrediction = (props) => {
                         </div>
                     </div>
                 )}
+            </Dialog>
+
+            {/* Patient Details Dialog */}
+            <Dialog
+                header={
+                    <div className="flex align-items-center">
+                        <i className="pi pi-user text-primary text-xl mr-3"></i>
+                        <span className="text-xl font-semibold">Patient Details</span>
+                    </div>
+                }
+                visible={showPatientDetailsDialog}
+                style={{ width: "95vw", maxWidth: "900px" }}
+                modal
+                onHide={() => {
+                    setShowPatientDetailsDialog(false);
+                    setSelectedPatient(null);
+                }}
+                footer={
+                    <div className="flex justify-content-end">
+                        <Button
+                            label="Close"
+                            icon="pi pi-times"
+                            onClick={() => {
+                                setShowPatientDetailsDialog(false);
+                                setSelectedPatient(null);
+                            }}
+                            className="p-button-secondary"
+                        />
+                    </div>
+                }
+            >
+                {loadingPatientDetails ? (
+                    <div className="flex justify-content-center align-items-center" style={{ height: '200px' }}>
+                        <ProgressSpinner />
+                    </div>
+                ) : selectedPatient ? (
+                    <div className="grid gap-4">
+                        {/* Patient Basic Information Card */}
+                        <div className="col-12">
+                            <div className="card p-4 border-1 border-200">
+                                <div className="flex align-items-center gap-2 mb-3">
+                                    <i className="pi pi-id-card text-primary text-lg mr-2"></i>
+                                    <h4 className="text-lg font-semibold m-0 text-primary">Patient Information</h4>
+                                </div>
+                                <div className="grid">
+                                    <div className="col-12 md:col-6">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Patient Number</label>
+                                            <span className="text-lg font-semibold text-900">{selectedPatient.patientNumber}</span>
+                                        </div>
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Full Name</label>
+                                            <span className="text-lg font-semibold text-900">{selectedPatient.firstName} {selectedPatient.lastName}</span>
+                                        </div>
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Date of Birth</label>
+                                            <span className="text-900">{new Date(selectedPatient.dateOfBirth).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 md:col-6">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Age</label>
+                                            <span className="text-900">{patientAPI.calculateDetailedAge(selectedPatient.dateOfBirth)}</span>
+                                        </div>
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Gender</label>
+                                            <span className="text-900">{selectedPatient.gender.charAt(0).toUpperCase() + selectedPatient.gender.slice(1)}</span>
+                                        </div>
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Phone</label>
+                                            <span className="text-900">{selectedPatient.phoneNumber || 'Not provided'}</span>
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-1">Email</label>
+                                            <span className="text-900">{selectedPatient.email || 'Not provided'}</span>
+                                        </div>
+                                        <div className="field">
+                                            <label className="text-sm font-medium text-600 block mb-1">Address</label>
+                                            <span className="text-900">{selectedPatient.address || 'Not provided'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Emergency Contact Card */}
+                        {selectedPatient.emergencyContact && (
+                            <div className="col-12">
+                                <div className="card p-4 border-1 border-200">
+                                    <div className="flex align-items-center gap-2 mb-3">
+                                        <i className="pi pi-phone text-orange-500 text-lg mr-2"></i>
+                                        <h4 className="text-lg font-semibold m-0 text-orange-500">Emergency Contact</h4>
+                                    </div>
+                                    <div className="grid">
+                                        <div className="col-12 md:col-4">
+                                            <div className="field mb-3">
+                                                <label className="text-sm font-medium text-600 block mb-1">Name</label>
+                                                <span className="text-900">{selectedPatient.emergencyContact.name || 'Not provided'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-12 md:col-4">
+                                            <div className="field mb-3">
+                                                <label className="text-sm font-medium text-600 block mb-1">Relationship</label>
+                                                <span className="text-900">{selectedPatient.emergencyContact.relationship || 'Not provided'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-12 md:col-4">
+                                            <div className="field mb-3">
+                                                <label className="text-sm font-medium text-600 block mb-1">Phone</label>
+                                                <span className="text-900">{selectedPatient.emergencyContact.phoneNumber || 'Not provided'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Medical Information Card */}
+                        <div className="col-12">
+                            <div className="card p-4 border-1 border-200">
+                                <div className="flex align-items-center gap-2 mb-3">
+                                    <i className="pi pi-heart text-red-500 text-lg mr-2"></i>
+                                    <h4 className="text-lg font-semibold m-0 text-red-500">Medical Information</h4>
+                                </div>
+                                <div className="grid">
+                                    <div className="col-12 md:col-4">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-2">Medical History</label>
+                                            {selectedPatient.medicalHistory && selectedPatient.medicalHistory.length > 0 ? (
+                                                <ul className="list-none p-0 m-0">
+                                                    {selectedPatient.medicalHistory.map((condition, index) => (
+                                                        <li key={index} className="mb-1 p-2 bg-blue-50 border-round text-900">
+                                                            <i className="pi pi-check-circle text-green-500 mr-3"></i>
+                                                            {condition}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <div className="p-2 bg-gray-50 border-round text-600">
+                                                    <i className="pi pi-info-circle mr-3"></i>
+                                                    No medical history recorded
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-12 md:col-4">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-2">Allergies</label>
+                                            {selectedPatient.allergies && selectedPatient.allergies.length > 0 ? (
+                                                <ul className="list-none p-0 m-0">
+                                                    {selectedPatient.allergies.map((allergy, index) => (
+                                                        <li key={index} className="mb-1 p-2 bg-red-50 border-round text-900">
+                                                            <i className="pi pi-exclamation-triangle text-red-500 mr-3"></i>
+                                                            {allergy}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <div className="p-2 bg-gray-50 border-round text-600">
+                                                    <i className="pi pi-info-circle mr-3"></i>
+                                                    No known allergies
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-12 md:col-4">
+                                        <div className="field mb-3">
+                                            <label className="text-sm font-medium text-600 block mb-2">Medications</label>
+                                            {selectedPatient.medications && selectedPatient.medications.length > 0 ? (
+                                                <ul className="list-none p-0 m-0">
+                                                    {selectedPatient.medications.map((medication, index) => (
+                                                        <li key={index} className="mb-1 p-2 bg-green-50 border-round text-900">
+                                                            <i className="pi pi-capsule text-green-500 mr-3"></i>
+                                                            {medication}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <div className="p-2 bg-gray-50 border-round text-600">
+                                                    <i className="pi pi-info-circle mr-3"></i>
+                                                    No current medications
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Insurance Information Card */}
+                        {selectedPatient.insuranceInfo && (
+                            <div className="col-12">
+                                <div className="card p-4 border-1 border-200">
+                                    <div className="flex align-items-center gap-2 mb-3">
+                                        <i className="pi pi-shield text-purple-500 text-lg mr-2"></i>
+                                        <h4 className="text-lg font-semibold m-0 text-purple-500">Insurance Information</h4>
+                                    </div>
+                                    <div className="grid">
+                                        <div className="col-12 md:col-6">
+                                            <div className="field mb-3">
+                                                <label className="text-sm font-medium text-600 block mb-1">Provider</label>
+                                                <span className="text-900">{selectedPatient.insuranceInfo.provider || 'Not provided'}</span>
+                                            </div>
+                                        </div>
+                                        <div className="col-12 md:col-6">
+                                            <div className="field mb-3">
+                                                <label className="text-sm font-medium text-600 block mb-1">Policy Number</label>
+                                                <span className="text-900">{selectedPatient.insuranceInfo.policyNumber || 'Not provided'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : null}
             </Dialog>
         </div >
     );
