@@ -8,7 +8,7 @@ export default function PredictionAPI() {
 
     // Helper function to get headers with auth token
     const getAuthHeaders = () => {
-        const token = getAuthToken();
+        const token = getAuthToken();   
         return token ? { 'Authorization': `Bearer ${token}` } : {};
     };
 

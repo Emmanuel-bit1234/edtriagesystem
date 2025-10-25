@@ -9,6 +9,7 @@ import { AppMenu } from "./AppMenu";
 import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
 import { NurseReport } from "./pages/NurseReport";
+import { PatientsManagement } from "./pages/PatientsManagement";
 import Login from "./pages/Login";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
@@ -239,6 +240,11 @@ const App = () => {
                     icon: "pi pi-fw pi-chart-line",
                     to: "/nurse-report",
                 },
+                {
+                    label: "Patients Management",
+                    icon: "pi pi-fw pi-users",
+                    to: "/patients-management",
+                },
                 //     {
                 //         label: "Administration",
                 //         icon: "pi pi-fw pi-folder-open",
@@ -453,6 +459,7 @@ const App = () => {
                             }} />
                             <Route path="/EDPrediction" component={EDPrediction} />
                             <Route path="/nurse-report" component={NurseReport} />
+                            <Route path="/patients-management" component={PatientsManagement} />
                         </div>
                     </div>
                 </>

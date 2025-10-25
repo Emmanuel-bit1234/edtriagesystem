@@ -14,12 +14,16 @@ import InputArea from "../componets/InputArea";
 import FloatInputArea from "../componets/FloatInputArea";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import PatientAPI from "../service/patientAPI";
 
 export const EDPrediction = (props) => {
 
     var prediction = new PredictionAPI();
+    var patientAPI = new PatientAPI();
     var [load, setLoad] = useState(false);
     var [allPredictions, setAllPredictions] = useState()
+    var toast = useRef(null);
 
     var [showPredictionForm, setshowPredictionForm] = useState(false);
     var [showDetailsDialog, setShowDetailsDialog] = useState(false);
@@ -73,7 +77,7 @@ export const EDPrediction = (props) => {
     var [mentalState, setMentalState] = useState();
 
     var [form, setForm] = useState({
-        Sex: null,
+        Sex: "",
         patientNumber: "",
         Age: "",
         Arrival_mode: null,
@@ -178,9 +182,10 @@ export const EDPrediction = (props) => {
 
         // Reset form to initial state but preserve nurse info
         setForm({
-            Sex: null,
+            Sex: "",
             patientNumber: "",
             Age: "",
+            gender: "",
             Arrival_mode: null,
             Injury: null,
             Mental: null,
@@ -197,11 +202,99 @@ export const EDPrediction = (props) => {
         });
     };
 
+    // Patient search function
+    const searchPatient = async (patientNumber) => {
+        if (!patientNumber.trim()) {
+            return;
+        }
+
+        try {
+            console.log('Searching for patient:', patientNumber);
+            console.log('API URL will be:', `https://triagecdssproxy.vercel.app/patients/number/${patientNumber}`);
+            
+            // Try direct fetch first
+            const token = localStorage.getItem('token');
+            const response = await fetch(`https://triagecdssproxy.vercel.app/patients/number/${patientNumber}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('Patient found:', data);
+            
+            if (data && data.patient) {
+                const patient = data.patient;
+                
+                // Calculate age from date of birth
+                const age = patientAPI.calculateAge(patient.dateOfBirth);
+                
+                // Convert gender to the correct format for the dropdown
+                const genderOption = Genders.find(g => 
+                    g.name.toLowerCase() === patient.gender.toLowerCase()
+                );
+                
+                // Update form with patient data
+                setForm({
+                    ...form,
+                    patientNumber: patient.patientNumber,
+                    Age: age.toString()
+                });
+                
+                // Set gender dropdown
+                if (genderOption) {
+                    setGender(genderOption);
+                }
+                
+                console.log('Form updated with patient data - Age:', age, 'Gender:', genderOption);
+            }
+        } catch (error) {
+            console.error('Error searching patient:', error);
+            console.error('Error details:', error.message);
+            
+            // Fallback to axios method
+            try {
+                console.log('Trying axios method as fallback...');
+                const response = await patientAPI.getPatientByNumber(patientNumber);
+                console.log('Patient found via axios:', response);
+                
+                if (response && response.patient) {
+                    const patient = response.patient;
+                    const age = patientAPI.calculateAge(patient.dateOfBirth);
+                    const genderOption = Genders.find(g => 
+                        g.name.toLowerCase() === patient.gender.toLowerCase()
+                    );
+                    
+                    setForm({
+                        ...form,
+                        patientNumber: patient.patientNumber,
+                        Age: age.toString()
+                    });
+                    
+                    if (genderOption) {
+                        setGender(genderOption);
+                    }
+                    
+                    console.log('Form updated via axios fallback');
+                }
+            } catch (axiosError) {
+                console.error('Axios fallback also failed:', axiosError);
+            }
+        }
+    };
+
     // Function to validate if all required fields are filled and no prediction exists yet
     const isFormValid = () => {
         const allFieldsFilled = (
             form.patientNumber.trim() !== "" &&
-            gender !== undefined &&
+            form.gender && form.gender !== "" &&
+            form.Sex !== "" &&
             form.Age.trim() !== "" &&
             arrivalMode !== undefined &&
             injury !== undefined &&
@@ -222,7 +315,7 @@ export const EDPrediction = (props) => {
 
     function predict() {
         setLoad(true);
-        form.Sex = gender;
+        // form.Sex = gender;
         form.Arrival_mode = arrivalMode;
         form.Injury = injury;
         form.Mental = mentalState;
@@ -251,6 +344,7 @@ export const EDPrediction = (props) => {
     return (
 
         <div className="card  p-align-stretch vertical-container">
+            <Toast ref={toast} />
             <div className="">
                 <Toolbar
                     className="mb-4"
@@ -320,38 +414,120 @@ export const EDPrediction = (props) => {
                                             </div>
                                             <div className="grid">
                                                 <div className="col-12  lg:col-3">
-                                                    <InputArea
-                                                        label="Patient Number"
-                                                        placeholder="Enter a Patient Number"
-                                                        value={form.patientNumber}
-                                                        min={1}
-                                                        max={999999999}
-                                                        onChange={(e) => setForm({ ...form, patientNumber: e.target.value })}
+                                                    <div className="field">
+                                                        <label htmlFor="patientNumber">Patient Number</label>
+                                                        <InputText
+                                                            id="patientNumber"
+                                                            placeholder="Enter a Patient Number"
+                                                            value={form.patientNumber}
+                                                            onChange={(e) => setForm({ ...form, patientNumber: e.target.value.toUpperCase() })}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                    <Button
+                                                        label="Search Patient"
+                                                        icon="pi pi-search"
+                                                        disabled={!form.patientNumber.trim()}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            if (form.patientNumber.trim()) {
+                                                                // Simple direct API call
+                                                                const token = localStorage.getItem('authToken');
+                                                                fetch(`https://triagecdssproxy.vercel.app/patients/number/${form.patientNumber.trim()}`, {
+                                                                    method: 'GET',
+                                                                    headers: {
+                                                                        'Authorization': `Bearer ${token}`,
+                                                                        'Content-Type': 'application/json'
+                                                                    }
+                                                                })
+                                                                .then(response => {
+                                                                    if (!response.ok) {
+                                                                        if (response.status === 404) {
+                                                                            // Patient not found - show toast
+                                                                            toast.current.show({
+                                                                                severity: 'warn',
+                                                                                summary: 'Patient Not Found',
+                                                                                detail: `No patient found with number: ${form.patientNumber.trim()}`,
+                                                                                life: 3000
+                                                                            });
+                                                                            return;
+                                                                        }
+                                                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                                                    }
+                                                                    return response.json();
+                                                                })
+                                                                .then(data => {
+                                                                    if (data && data.patient) {
+                                                                        const patient = data.patient;
+                                                                        const age = patientAPI.calculateAge(patient.dateOfBirth);
+                                                                        
+                                                                        // Convert gender to Sex value (1 = Female, 2 = Male)
+                                                                        let sexValue = null;
+                                                                        if (patient.gender.toLowerCase() === 'female') {
+                                                                            sexValue = 1;
+                                                                        } else if (patient.gender.toLowerCase() === 'male') {
+                                                                            sexValue = 2;
+                                                                        }
+                                                                        
+                                                                        setForm({
+                                                                            ...form,
+                                                                            patientNumber: patient.patientNumber,
+                                                                            Age: age.toString(),
+                                                                            gender: patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1),
+                                                                            Sex: sexValue
+                                                                        });
+                                                                        
+                                                                        // Show success toast
+                                                                        toast.current.show({
+                                                                            severity: 'success',
+                                                                            summary: 'Patient Found',
+                                                                            detail: `Patient ${patient.firstName} ${patient.lastName} loaded successfully`,
+                                                                            life: 3000
+                                                                        });
+                                                                        
+                                                                        console.log('Patient found and form updated - Sex:', sexValue);
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    console.error('Error searching patient:', error);
+                                                                    // Show error toast for other errors
+                                                                    toast.current.show({
+                                                                        severity: 'error',
+                                                                        summary: 'Search Error',
+                                                                        detail: 'An error occurred while searching for the patient',
+                                                                        life: 3000
+                                                                    });
+                                                                });
+                                                            }
+                                                        }}
+                                                        className="w-full mt-2"
+                                                        size="small"
                                                     />
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <label>
-                                                        <strong>Gender</strong>
-                                                    </label>
-                                                    <Dropdown
-                                                        onChange={(e) => setGender(e.value)}
-                                                        value={gender}
-                                                        options={Genders}
-                                                        placeholder="Select a Gender"
-                                                        optionLabel="name"
-                                                        style={{ width: "100%" }}
-                                                    />
+                                                    <div className="field">
+                                                        <label htmlFor="gender">Gender</label>
+                                                        <InputText
+                                                            id="gender"
+                                                            value={form.gender || ''}
+                                                            disabled={true}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="col-12  lg:col-3">
-                                                    <InputArea
-                                                        label="Age (18-120)"
-                                                        placeholder="Enter an Age"
-                                                        value={form.Age}
-                                                        min={18}
-                                                        max={120}
-                                                        onChange={(e) => setForm({ ...form, Age: e.target.value })}
-                                                    />
+                                                    <div className="field">
+                                                        <label htmlFor="age">Age</label>
+                                                        <InputText
+                                                            id="age"
+                                                            value={form.Age || ''}
+                                                            disabled={true}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
                                                 </div>
+                                                </div>
+                                                <div className="grid">
                                                 <div className="col-12  lg:col-3">
                                                     <label>
                                                         <strong>Arrival mode</strong>
