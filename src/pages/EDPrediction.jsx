@@ -82,6 +82,8 @@ export const EDPrediction = (props) => {
     var [form, setForm] = useState({
         Sex: "",
         patientNumber: "",
+        firstName: "",
+        lastName: "",
         Age: "",
         Arrival_mode: null,
         Injury: null,
@@ -187,6 +189,8 @@ export const EDPrediction = (props) => {
         setForm({
             Sex: "",
             patientNumber: "",
+            firstName: "",
+            lastName: "",
             Age: "",
             gender: "",
             Arrival_mode: null,
@@ -497,6 +501,8 @@ export const EDPrediction = (props) => {
                                                                         setForm({
                                                                             ...form,
                                                                             patientNumber: patient.patientNumber,
+                                                                            firstName: patient.firstName,
+                                                                            lastName: patient.lastName,
                                                                             Age: age.toString(),
                                                                             gender: patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1),
                                                                             Sex: sexValue
@@ -528,6 +534,28 @@ export const EDPrediction = (props) => {
                                                         className="w-full mt-2"
                                                         size="small"
                                                     />
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <div className="field">
+                                                        <label htmlFor="firstName">First Name</label>
+                                                        <InputText
+                                                            id="firstName"
+                                                            value={form.firstName || ''}
+                                                            disabled={true}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-12  lg:col-3">
+                                                    <div className="field">
+                                                        <label htmlFor="lastName">Last Name</label>
+                                                        <InputText
+                                                            id="lastName"
+                                                            value={form.lastName || ''}
+                                                            disabled={true}
+                                                            className="w-full"
+                                                        />
+                                                    </div>
                                                 </div>
                                                 <div className="col-12  lg:col-3">
                                                     <div className="field">

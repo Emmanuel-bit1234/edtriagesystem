@@ -29,6 +29,7 @@ import { Chart } from "primereact/chart";
 import { MultiSelect } from "primereact/multiselect";
 import { Slider } from "primereact/slider";
 import { ToggleButton } from "primereact/togglebutton";
+import { ProgressSpinner } from "primereact/progressspinner";
 import PatientAPI from "../service/patientAPI";
 
 export const PatientsManagement = (props) => {
@@ -57,8 +58,26 @@ export const PatientsManagement = (props) => {
     const [medicalHistoryInput, setMedicalHistoryInput] = useState('');
     const [allergiesInput, setAllergiesInput] = useState('');
     const [medicationsInput, setMedicationsInput] = useState('');
+    const [patientVisits, setPatientVisits] = useState(null);
+    const [loadingVisits, setLoadingVisits] = useState(false);
+    const [selectedVisit, setSelectedVisit] = useState(null);
+    const [showVisitDetails, setShowVisitDetails] = useState(false);
     const toast = useRef(null);
     const patientAPI = new PatientAPI();
+
+    // Check if current user is admin
+    const isAdminUser = () => {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) return false;
+        try {
+            const userData = JSON.parse(storedUser);
+            return userData.name === 'Admin' || 
+                   userData.username === 'Admin' || 
+                   userData.email === 'Admin@edtriage.co.za';
+        } catch (error) {
+            return false;
+        }
+    };
 
     // Gender options
     const genderOptions = [
@@ -270,9 +289,21 @@ export const PatientsManagement = (props) => {
         setPatient({ ...patient, medications: updatedMedications });
     };
 
-    const viewPatientDetails = (patient) => {
+    const viewPatientDetails = async (patient) => {
         setSelectedPatient(patient);
         setPatientDetailDialog(true);
+        
+        // Load patient visits
+        try {
+            setLoadingVisits(true);
+            const visitsData = await patientAPI.getPatientVisits(patient.patientNumber);
+            setPatientVisits(visitsData);
+        } catch (error) {
+            console.error('Error fetching patient visits:', error);
+            setPatientVisits({ visits: [], totalVisits: 0 });
+        } finally {
+            setLoadingVisits(false);
+        }
     };
 
     const hideDialog = () => {
@@ -824,6 +855,144 @@ export const PatientsManagement = (props) => {
                             </div>
                         </div>
                     </div>
+                </TabPanel>
+                
+                <TabPanel header="ED Visits">
+                    {loadingVisits ? (
+                        <div className="flex justify-content-center align-items-center" style={{ height: '200px' }}>
+                            <ProgressSpinner />
+                        </div>
+                    ) : (
+                        <div className="grid">
+                            {patientVisits?.visits && patientVisits.visits.length > 0 && (
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <Badge value={patientVisits.totalVisits} severity="info" />
+                                        <span className="ml-2 text-lg font-semibold">Total ED Visits</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="col-12">
+                                {patientVisits?.visits && patientVisits.visits.length > 0 ? (
+                                    <DataTable
+                                        value={patientVisits.visits}
+                                        paginator
+                                        rows={10}
+                                        className="datatable-responsive"
+                                        emptyMessage="No ED visits found."
+                                        resizableColumns
+                                        columnResizeMode="expand"
+                                        responsiveLayout="scroll"
+                                    >
+                                        <Column field="ktasExplained.Level" header="Level" sortable 
+                                            body={(rowData) => <b>{rowData.ktasExplained?.Level}</b>}
+                                            style={{ minWidth: '80px' }}
+                                        />
+                                        <Column field="ktasExplained.Title" header="Title" sortable
+                                            body={(rowData) => (
+                                                <span
+                                                    style={{
+                                                        display: "inline-block",
+                                                        textAlign: "center",
+                                                        padding: "0.5rem 1rem",
+                                                        borderRadius: "20px",
+                                                        backgroundColor: (() => {
+                                                            switch (rowData.ktasExplained?.Title) {
+                                                                case "Resuscitation":
+                                                                    return "red";
+                                                                case "Emergency":
+                                                                    return "orange";
+                                                                case "Urgent":
+                                                                    return "yellow";
+                                                                case "Less Urgent":
+                                                                    return "green";
+                                                                case "Non-Urgent":
+                                                                    return "blue";
+                                                                default:
+                                                                    return "grey";
+                                                            }
+                                                        })(),
+                                                        color: rowData.ktasExplained?.Title === "Urgent" ? "#333333" : "white",
+                                                        fontWeight: "bold",
+                                                        fontSize: "0.9rem"
+                                                    }}
+                                                >
+                                                    <b>{rowData.ktasExplained?.Title}</b>
+                                                </span>
+                                            )}
+                                            style={{ minWidth: '150px' }}
+                                        />
+                                        <Column field="ktasExplained.Meaning" header="Meaning" 
+                                            body={(rowData) => (
+                                                <div
+                                                    style={{
+                                                        maxWidth: '300px',
+                                                        wordWrap: 'break-word',
+                                                        whiteSpace: 'pre-wrap',
+                                                        lineHeight: '1.4'
+                                                    }}
+                                                    title={rowData.ktasExplained?.Meaning}
+                                                >
+                                                    {rowData.ktasExplained?.Meaning}
+                                                </div>
+                                            )}
+                                            style={{ minWidth: '200px' }}
+                                        />
+                                        <Column field="inputs.Chief_complain" header="Chief Complaint"
+                                            body={(rowData) => (
+                                                <div
+                                                    style={{
+                                                        maxWidth: '200px',
+                                                        wordWrap: 'break-word',
+                                                        whiteSpace: 'pre-wrap',
+                                                        lineHeight: '1.4'
+                                                    }}
+                                                >
+                                                    {rowData.inputs?.Chief_complain}
+                                                </div>
+                                            )}
+                                            style={{ minWidth: '150px' }}
+                                        />
+                                        <Column field="createdAt" header="Created Date" sortable
+                                            body={(rowData) => new Date(rowData.createdAt).toLocaleString()}
+                                            style={{ minWidth: '180px' }}
+                                        />
+                                        {isAdminUser() && (
+                                            <Column field="user.name" header="Nurse" 
+                                                body={(rowData) => <b>{rowData.user?.name}</b>}
+                                                style={{ minWidth: '120px' }}
+                                            />
+                                        )}
+                                        {isAdminUser() && (
+                                            <Column field="user.id" header="Nurse ID" 
+                                                body={(rowData) => <b>{rowData.user?.id}</b>}
+                                                style={{ minWidth: '100px' }}
+                                            />
+                                        )}
+                                        <Column
+                                            header="Action"
+                                            body={(rowData) => (
+                                                <Button
+                                                    icon="pi pi-eye"
+                                                    className="p-button-rounded mr-2"
+                                                    tooltip="View Visit Details"
+                                                    onClick={() => {
+                                                        setSelectedVisit(rowData);
+                                                        setShowVisitDetails(true);
+                                                    }}
+                                                />
+                                            )}
+                                            style={{ minWidth: '80px' }}
+                                        />
+                                    </DataTable>
+                                ) : (
+                                    <div className="text-center p-4">
+                                        <p className="text-400">No ED visits found for this patient.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </TabPanel>
             </TabView>
         );
@@ -1445,13 +1614,199 @@ export const PatientsManagement = (props) => {
                 {/* Patient Detail Dialog */}
                 <Dialog
                     visible={patientDetailDialog}
-                    style={{ width: '90vw', maxWidth: '800px' }}
+                    style={{ width: '95vw', maxWidth: '1200px' }}
                     header={`Patient Details - ${selectedPatient?.firstName} ${selectedPatient?.lastName}`}
                     modal
                     onHide={hidePatientDetailDialog}
                     maximizable
                 >
                     {patientDetailDialogContent()}
+                </Dialog>
+
+                {/* Visit Details Dialog */}
+                <Dialog
+                    header="Prediction Details"
+                    visible={showVisitDetails}
+                    style={{ width: "90%", maxWidth: "800px" }}
+                    modal
+                    onHide={() => {
+                        setShowVisitDetails(false);
+                        setSelectedVisit(null);
+                    }}
+                    footer={
+                        <div className="flex justify-content-end">
+                            <Button
+                                label="Close"
+                                icon="pi pi-times"
+                                onClick={() => {
+                                    setShowVisitDetails(false);
+                                    setSelectedVisit(null);
+                                }}
+                                className="p-button-secondary"
+                            />
+                        </div>
+                    }
+                >
+                    {selectedVisit && (
+                        <div className="grid">
+                            {/* Patient Information */}
+                            <div className="col-12">
+                                <h4>Patient Information</h4>
+                                <div className="grid">
+                                    <div className="col-6">
+                                        <strong>Patient Number:</strong> {selectedVisit.patientNumber}
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Created Date:</strong> {new Date(selectedVisit.createdAt).toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Nurse Information - Only for Admin */}
+                            {isAdminUser() && (
+                                <div className="col-12">
+                                    <h4>Nurse Information</h4>
+                                    <div className="grid">
+                                        <div className="col-6">
+                                            <strong>Nurse Name:</strong> {selectedVisit.user?.name || 'N/A'}
+                                        </div>
+                                        <div className="col-6">
+                                            <strong>Nurse ID:</strong> {selectedVisit.user?.id || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Input Parameters */}
+                            <div className="col-12">
+                                <h4>Input Parameters</h4>
+                                <div className="grid">
+                                    <div className="col-6">
+                                        <strong>Age:</strong> {selectedVisit.inputs?.Age} years
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Gender:</strong> {selectedVisit.inputs?.Sex === 1 ? 'Female' : selectedVisit.inputs?.Sex === 2 ? 'Male' : 'Unknown'}
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Arrival Mode:</strong> {
+                                            selectedVisit.inputs?.Arrival_mode === 1 ? 'Walk-in (self-presented)' :
+                                                selectedVisit.inputs?.Arrival_mode === 2 ? 'Transfer (from another facility)' :
+                                                    selectedVisit.inputs?.Arrival_mode === 3 ? 'Ambulance (EMS)' : 'Unknown'
+                                        }
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Injury Present:</strong> {selectedVisit.inputs?.Injury === 1 ? 'Yes (trauma/injury)' : 'No (medical complaint)'}
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Mental Status:</strong> {
+                                            selectedVisit.inputs?.Mental === 1 ? 'Alert (fully awake, oriented)' :
+                                                selectedVisit.inputs?.Mental === 2 ? 'Voice (responds to verbal stimulus)' :
+                                                    selectedVisit.inputs?.Mental === 3 ? 'Pain (responds only to painful stimulus)' :
+                                                        selectedVisit.inputs?.Mental === 4 ? 'Unresponsive (no response to voice or pain)' : 'Unknown'
+                                        }
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Pain Present:</strong> {selectedVisit.inputs?.Pain === 1 ? 'Yes' : 'No'}
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Pain Score (NRS):</strong> {selectedVisit.inputs?.NRS_pain}/10
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Body Temperature:</strong> {selectedVisit.inputs?.BT}°C
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Vital Signs */}
+                            <div className="col-12">
+                                <h4>Vital Signs</h4>
+                                <div className="grid">
+                                    <div className="col-6">
+                                        <strong>Systolic BP:</strong> {selectedVisit.inputs?.SBP} mmHg
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Diastolic BP:</strong> {selectedVisit.inputs?.DBP} mmHg
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Heart Rate:</strong> {selectedVisit.inputs?.HR} bpm
+                                    </div>
+                                    <div className="col-6">
+                                        <strong>Respiratory Rate:</strong> {selectedVisit.inputs?.RR} breaths/min
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Chief Complaint */}
+                            <div className="col-12">
+                                <h4>Chief Complaint</h4>
+                                <p style={{
+                                    padding: '10px',
+                                    backgroundColor: '#f8f9fa',
+                                    borderRadius: '4px',
+                                    border: '1px solid #dee2e6'
+                                }}>
+                                    {selectedVisit.inputs?.Chief_complain}
+                                </p>
+                            </div>
+
+                            {/* Triage Prediction Results */}
+                            <div className="col-12">
+                                <h4>Triage Prediction Results</h4>
+                                <div className="text-center mb-4">
+                                    <span
+                                        style={{
+                                            display: "inline-block",
+                                            textAlign: "center",
+                                            padding: "0.8rem 1.5rem",
+                                            borderRadius: "25px",
+                                            backgroundColor: (() => {
+                                                switch (selectedVisit.ktasExplained?.Title) {
+                                                    case "Resuscitation":
+                                                        return "#dc3545";
+                                                    case "Emergency":
+                                                        return "#fd7e14";
+                                                    case "Urgent":
+                                                        return "#ffc107";
+                                                    case "Less Urgent":
+                                                        return "#28a745";
+                                                    case "Non-Urgent":
+                                                        return "#007bff";
+                                                    default:
+                                                        return "#6c757d";
+                                                }
+                                            })(),
+                                            color: "white",
+                                            fontSize: "1.2rem",
+                                            fontWeight: "bold",
+                                            boxShadow: "0 4px 8px rgba(0,0,0,0.2)"
+                                        }}
+                                    >
+                                        <i className="pi pi-exclamation-triangle mr-2"></i>
+                                        {selectedVisit.ktasExplained?.Title}
+                                    </span>
+                                </div>
+                                <div className="mb-3">
+                                    <div style={{ textAlign: 'center' }}>
+                                        <h5><i className="pi pi-lightbulb mr-2"></i>Clinical Reasoning</h5>
+                                        <div className="p-3" style={{
+                                            backgroundColor: "#e7f3ff",
+                                            borderRadius: "8px",
+                                            border: "1px solid #b3d9ff",
+                                            maxWidth: '600px',
+                                            margin: '0 auto'
+                                        }}>
+                                            <div className="mb-2">
+                                                <strong>Why Level {selectedVisit.ktasExplained?.Level} Classification:</strong>
+                                            </div>
+                                            <div>
+                                                <strong>Primary Assessment:</strong> {selectedVisit.ktasExplained?.Meaning}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </Dialog>
 
                 {/* Delete Confirmation Dialog */}

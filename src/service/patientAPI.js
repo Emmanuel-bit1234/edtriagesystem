@@ -81,6 +81,14 @@ export default function PatientAPI() {
         }).then((response) => response.data);
     };
 
+    // Get patient ED visits (prediction logs)
+    this.getPatientVisits = (patientNumber) => {
+        const url = `${baseURL}/prediction-logs/patient/${patientNumber}`;
+        return axios.get(url, {
+            headers: getAuthHeaders()
+        }).then((response) => response.data);
+    };
+
     // Delete patient
     this.deletePatient = (id) => {
         const url = `${baseURL}/patients/${id}`;
