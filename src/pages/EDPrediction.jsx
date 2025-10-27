@@ -442,7 +442,7 @@ export const EDPrediction = (props) => {
                                                 </div>
                                             </div>
                                             <div className="grid">
-                                                <div className="col-12  lg:col-3">
+                                                <div className="col-12 lg:col-3">
                                                     <div className="field">
                                                         <label htmlFor="patientNumber">Patient Number</label>
                                                         <InputText
@@ -453,89 +453,94 @@ export const EDPrediction = (props) => {
                                                             className="w-full"
                                                         />
                                                     </div>
-                                                    <Button
-                                                        label="Search Patient"
-                                                        icon="pi pi-search"
-                                                        disabled={!form.patientNumber.trim()}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            if (form.patientNumber.trim()) {
-                                                                // Simple direct API call
-                                                                const token = localStorage.getItem('authToken');
-                                                                fetch(`https://triagecdssproxy.vercel.app/patients/number/${form.patientNumber.trim()}`, {
-                                                                    method: 'GET',
-                                                                    headers: {
-                                                                        'Authorization': `Bearer ${token}`,
-                                                                        'Content-Type': 'application/json'
-                                                                    }
-                                                                })
-                                                                .then(response => {
-                                                                    if (!response.ok) {
-                                                                        if (response.status === 404) {
-                                                                            // Patient not found - show toast
+                                                </div>
+                                                <div className="col-12 lg:col-2">
+                                                    <div className="field">
+                                                        <label>&nbsp;</label>
+                                                        <Button
+                                                            label="Search Patient"
+                                                            icon="pi pi-search"
+                                                            disabled={!form.patientNumber.trim()}
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                if (form.patientNumber.trim()) {
+                                                                    // Simple direct API call
+                                                                    const token = localStorage.getItem('authToken');
+                                                                    fetch(`https://triagecdssproxy.vercel.app/patients/number/${form.patientNumber.trim()}`, {
+                                                                        method: 'GET',
+                                                                        headers: {
+                                                                            'Authorization': `Bearer ${token}`,
+                                                                            'Content-Type': 'application/json'
+                                                                        }
+                                                                    })
+                                                                    .then(response => {
+                                                                        if (!response.ok) {
+                                                                            if (response.status === 404) {
+                                                                                // Patient not found - show toast
+                                                                                toast.current.show({
+                                                                                    severity: 'warn',
+                                                                                    summary: 'Patient Not Found',
+                                                                                    detail: `No patient found with number: ${form.patientNumber.trim()}`,
+                                                                                    life: 3000
+                                                                                });
+                                                                                return;
+                                                                            }
+                                                                            throw new Error(`HTTP error! status: ${response.status}`);
+                                                                        }
+                                                                        return response.json();
+                                                                    })
+                                                                    .then(data => {
+                                                                        if (data && data.patient) {
+                                                                            const patient = data.patient;
+                                                                            const age = patientAPI.calculateAge(patient.dateOfBirth);
+                                                                            
+                                                                            // Convert gender to Sex value (1 = Female, 2 = Male)
+                                                                            let sexValue = null;
+                                                                            if (patient.gender.toLowerCase() === 'female') {
+                                                                                sexValue = 1;
+                                                                            } else if (patient.gender.toLowerCase() === 'male') {
+                                                                                sexValue = 2;
+                                                                            }
+                                                                            
+                                                                            setForm({
+                                                                                ...form,
+                                                                                patientNumber: patient.patientNumber,
+                                                                                firstName: patient.firstName,
+                                                                                lastName: patient.lastName,
+                                                                                Age: age.toString(),
+                                                                                gender: patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1),
+                                                                                Sex: sexValue
+                                                                            });
+                                                                            
+                                                                            // Show success toast
                                                                             toast.current.show({
-                                                                                severity: 'warn',
-                                                                                summary: 'Patient Not Found',
-                                                                                detail: `No patient found with number: ${form.patientNumber.trim()}`,
+                                                                                severity: 'success',
+                                                                                summary: 'Patient Found',
+                                                                                detail: `Patient ${patient.firstName} ${patient.lastName} loaded successfully`,
                                                                                 life: 3000
                                                                             });
-                                                                            return;
+                                                                            
+                                                                            console.log('Patient found and form updated - Sex:', sexValue);
                                                                         }
-                                                                        throw new Error(`HTTP error! status: ${response.status}`);
-                                                                    }
-                                                                    return response.json();
-                                                                })
-                                                                .then(data => {
-                                                                    if (data && data.patient) {
-                                                                        const patient = data.patient;
-                                                                        const age = patientAPI.calculateAge(patient.dateOfBirth);
-                                                                        
-                                                                        // Convert gender to Sex value (1 = Female, 2 = Male)
-                                                                        let sexValue = null;
-                                                                        if (patient.gender.toLowerCase() === 'female') {
-                                                                            sexValue = 1;
-                                                                        } else if (patient.gender.toLowerCase() === 'male') {
-                                                                            sexValue = 2;
-                                                                        }
-                                                                        
-                                                                        setForm({
-                                                                            ...form,
-                                                                            patientNumber: patient.patientNumber,
-                                                                            firstName: patient.firstName,
-                                                                            lastName: patient.lastName,
-                                                                            Age: age.toString(),
-                                                                            gender: patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1),
-                                                                            Sex: sexValue
-                                                                        });
-                                                                        
-                                                                        // Show success toast
+                                                                    })
+                                                                    .catch(error => {
+                                                                        console.error('Error searching patient:', error);
+                                                                        // Show error toast for other errors
                                                                         toast.current.show({
-                                                                            severity: 'success',
-                                                                            summary: 'Patient Found',
-                                                                            detail: `Patient ${patient.firstName} ${patient.lastName} loaded successfully`,
+                                                                            severity: 'error',
+                                                                            summary: 'Search Error',
+                                                                            detail: 'An error occurred while searching for the patient',
                                                                             life: 3000
                                                                         });
-                                                                        
-                                                                        console.log('Patient found and form updated - Sex:', sexValue);
-                                                                    }
-                                                                })
-                                                                .catch(error => {
-                                                                    console.error('Error searching patient:', error);
-                                                                    // Show error toast for other errors
-                                                                    toast.current.show({
-                                                                        severity: 'error',
-                                                                        summary: 'Search Error',
-                                                                        detail: 'An error occurred while searching for the patient',
-                                                                        life: 3000
                                                                     });
-                                                                });
-                                                            }
-                                                        }}
-                                                        className="w-full mt-2"
-                                                        size="small"
-                                                    />
+                                                                }
+                                                            }}
+                                                            className="w-full"
+                                                            size="small"
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="col-12  lg:col-3">
+                                                <div className="col-12 lg:col-2">
                                                     <div className="field">
                                                         <label htmlFor="firstName">First Name</label>
                                                         <InputText
@@ -546,7 +551,7 @@ export const EDPrediction = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12  lg:col-3">
+                                                <div className="col-12 lg:col-2">
                                                     <div className="field">
                                                         <label htmlFor="lastName">Last Name</label>
                                                         <InputText
@@ -557,7 +562,7 @@ export const EDPrediction = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12  lg:col-3">
+                                                <div className="col-12 lg:col-2">
                                                     <div className="field">
                                                         <label htmlFor="gender">Gender</label>
                                                         <InputText
@@ -568,7 +573,7 @@ export const EDPrediction = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="col-12  lg:col-3">
+                                                <div className="col-12 lg:col-1">
                                                     <div className="field">
                                                         <label htmlFor="age">Age</label>
                                                         <InputText
@@ -579,7 +584,7 @@ export const EDPrediction = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                </div>
+                                            </div>
                                                 <div className="grid">
                                                 <div className="col-12  lg:col-3">
                                                     <label>

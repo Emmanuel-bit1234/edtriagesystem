@@ -19,6 +19,7 @@ const Register = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
+    const [nameError, setNameError] = useState('');
     const toast = useRef(null);
     const history = useHistory();
     const predictionAPI = new PredictionAPI();
@@ -27,6 +28,25 @@ const Register = () => {
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    };
+
+    // Name validation function - check for "Admin" or similar names
+    const validateName = (name) => {
+        const adminVariations = [
+            'admin', 'administrator', 'adm', 'admn', 'administrador',
+            'admin1', 'admin2', 'admin3', 'admin123', 'admin1234',
+            'admin_', '_admin', 'admin-', '-admin',
+            'adminstrator', 'adminn', 'addmin', 'aadmin',
+            'adm1', 'adm2', 'admn1', 'admn2',
+            'superadmin', 'super-admin', 'super_admin',
+            'sysadmin', 'sys-admin', 'sys_admin',
+            'root', 'rootadmin',
+            'adminadmin', 'admin admin',
+            'imadmin', 'iadmin', 'madmin',
+            'aradmin', 'adminr', 'admine'
+        ];
+        const lowerCaseName = name.toLowerCase().trim();
+        return !adminVariations.includes(lowerCaseName);
     };
 
     // Debounced email validation
@@ -54,6 +74,22 @@ const Register = () => {
         debouncedEmailValidation(emailValue);
     };
 
+    // Handle name change with validation
+    const handleNameChange = (e) => {
+        const nameValue = e.target.value;
+        setName(nameValue);
+        
+        // Clear error when user starts typing
+        if (nameError) {
+            setNameError('');
+        }
+        
+        // Real-time validation
+        if (nameValue.trim() !== '' && !validateName(nameValue)) {
+            setNameError('You cannot use this name');
+        }
+    };
+
     // Check if form is valid
     const isFormValid = () => {
         return name.trim() !== '' && 
@@ -76,6 +112,19 @@ const Register = () => {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        
+        // Validate name
+        if (!validateName(name)) {
+            setNameError('You cannot use this name');
+            toast.current.show({
+                severity: 'error',
+                summary: 'Invalid Name',
+                detail: 'You cannot use this name. Please choose a different name.'
+            });
+            return;
+        } else {
+            setNameError('');
+        }
         
         if (password !== confirmPassword) {
             toast.current.show({
@@ -146,10 +195,15 @@ const Register = () => {
                                         <InputText
                                             id="name"
                                             value={name}
-                                            className="p-inputtext-lg p-d-block"
-                                            onChange={(e) => setName(e.target.value)}
+                                            className={`p-inputtext-lg p-d-block ${nameError ? 'p-invalid' : ''}`}
+                                            onChange={handleNameChange}
                                             required
                                         />
+                                        {nameError && (
+                                            <small className="p-error" style={{ color: '#e24c4c', fontSize: '0.875rem', display: 'block', marginTop: '4px' }}>
+                                                {nameError}
+                                            </small>
+                                        )}
                                     </div>
                                     <div className="p-field my-3">
                                         <label htmlFor="email" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Email</label>

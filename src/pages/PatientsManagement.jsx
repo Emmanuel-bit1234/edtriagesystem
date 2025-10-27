@@ -30,7 +30,43 @@ import { MultiSelect } from "primereact/multiselect";
 import { Slider } from "primereact/slider";
 import { ToggleButton } from "primereact/togglebutton";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PatientAPI from "../service/patientAPI";
+import PhoneInput from "../componets/PhoneInput";
+
+// Country codes mapping
+const countryCodesList = [
+    { value: '+27', iso: 'ZA', maxLength: 9 },
+    { value: '+266', iso: 'LS', maxLength: 8 },
+    { value: '+1', iso: 'US', maxLength: 10 },
+    { value: '+44', iso: 'GB', maxLength: 10 },
+    { value: '+234', iso: 'NG', maxLength: 10 },
+    { value: '+254', iso: 'KE', maxLength: 9 },
+    { value: '+233', iso: 'GH', maxLength: 9 },
+    { value: '+267', iso: 'BW', maxLength: 8 },
+    { value: '+268', iso: 'SZ', maxLength: 8 },
+    { value: '+263', iso: 'ZW', maxLength: 9 },
+    { value: '+260', iso: 'ZM', maxLength: 9 },
+    { value: '+258', iso: 'MZ', maxLength: 9 },
+    { value: '+265', iso: 'MW', maxLength: 9 },
+    { value: '+255', iso: 'TZ', maxLength: 9 },
+    { value: '+256', iso: 'UG', maxLength: 9 },
+    { value: '+250', iso: 'RW', maxLength: 9 },
+    { value: '+251', iso: 'ET', maxLength: 10 },
+    { value: '+20', iso: 'EG', maxLength: 10 },
+    { value: '+91', iso: 'IN', maxLength: 10 },
+    { value: '+86', iso: 'CN', maxLength: 11 },
+    { value: '+61', iso: 'AU', maxLength: 9 },
+    { value: '+1', iso: 'CA', maxLength: 10 },
+    { value: '+49', iso: 'DE', maxLength: 11 },
+    { value: '+33', iso: 'FR', maxLength: 9 },
+    { value: '+34', iso: 'ES', maxLength: 9 },
+    { value: '+39', iso: 'IT', maxLength: 10 },
+    { value: '+55', iso: 'BR', maxLength: 11 },
+    { value: '+52', iso: 'MX', maxLength: 10 },
+    { value: '+54', iso: 'AR', maxLength: 10 },
+    { value: '+90', iso: 'TR', maxLength: 10 },
+];
 
 export const PatientsManagement = (props) => {
     const [patients, setPatients] = useState([]);
@@ -62,6 +98,9 @@ export const PatientsManagement = (props) => {
     const [loadingVisits, setLoadingVisits] = useState(false);
     const [selectedVisit, setSelectedVisit] = useState(null);
     const [showVisitDetails, setShowVisitDetails] = useState(false);
+    const [emailError, setEmailError] = useState('');
+    const [patientCountryCode, setPatientCountryCode] = useState('+27');
+    const [emergencyContactCountryCode, setEmergencyContactCountryCode] = useState('+27');
     const toast = useRef(null);
     const patientAPI = new PatientAPI();
 
@@ -76,6 +115,50 @@ export const PatientsManagement = (props) => {
                    userData.email === 'Admin@edtriage.co.za';
         } catch (error) {
             return false;
+        }
+    };
+
+    // Validate email
+    const validateEmail = (email) => {
+        if (!email || email.trim() === '') return true; // Allow empty email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Validate phone number
+    const validatePhoneNumber = (phoneNumber, countryCode) => {
+        if (!phoneNumber || phoneNumber.trim() === '') return true; // Allow empty phone
+        if (!countryCode) return true;
+        
+        try {
+            const countryInfo = countryCodesList.find(c => c.value === countryCode);
+            if (!countryInfo) return true;
+            
+            // Check minimum length (at least 7 digits for most countries)
+            const minLength = Math.max(7, Math.floor(countryInfo.maxLength * 0.7));
+            if (phoneNumber.length < minLength) {
+                return false;
+            }
+            
+            const fullNumber = `${countryCode}${phoneNumber}`;
+            const parsed = parsePhoneNumberFromString(fullNumber, countryInfo.iso);
+            return parsed ? parsed.isValid() : false;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    // Handle email change with validation
+    const handleEmailChange = (value) => {
+        setPatient({ ...patient, email: value });
+        if (value && value.trim() !== '') {
+            if (!validateEmail(value)) {
+                setEmailError('Please enter a valid email address');
+            } else {
+                setEmailError('');
+            }
+        } else {
+            setEmailError('');
         }
     };
 
@@ -236,16 +319,43 @@ export const PatientsManagement = (props) => {
         setAllergiesInput('');
         setMedicationsInput('');
         setSubmitted(false);
+        setPatientCountryCode('+27');
+        setEmergencyContactCountryCode('+27');
         setPatientDialog(true);
     };
 
-    const editPatient = (patient) => {
-        const formattedPatient = patientAPI.formatPatientForForm(patient);
+    const editPatient = (patientData) => {
+        const formattedPatient = patientAPI.formatPatientForForm(patientData);
+        
+        // Parse country code from existing phone numbers
+        let countryCode = '+27';
+        let emergencyCountryCode = '+27';
+        
+        if (formattedPatient.phoneNumber && formattedPatient.phoneNumber.startsWith('+')) {
+            const match = formattedPatient.phoneNumber.match(/^(\+\d{1,3})/);
+            if (match) {
+                countryCode = match[1];
+                // Extract just the number part (without country code)
+                formattedPatient.phoneNumber = formattedPatient.phoneNumber.substring(match[1].length).trim();
+            }
+        }
+        
+        if (formattedPatient.emergencyContact?.phoneNumber && formattedPatient.emergencyContact.phoneNumber.startsWith('+')) {
+            const match = formattedPatient.emergencyContact.phoneNumber.match(/^(\+\d{1,3})/);
+            if (match) {
+                emergencyCountryCode = match[1];
+                // Extract just the number part (without country code)
+                formattedPatient.emergencyContact.phoneNumber = formattedPatient.emergencyContact.phoneNumber.substring(match[1].length).trim();
+            }
+        }
+        
         setPatient(formattedPatient);
         setMedicalHistoryInput('');
         setAllergiesInput('');
         setMedicationsInput('');
         setSubmitted(false);
+        setPatientCountryCode(countryCode);
+        setEmergencyContactCountryCode(emergencyCountryCode);
         setPatientDialog(true);
     };
 
@@ -321,6 +431,16 @@ export const PatientsManagement = (props) => {
 
     const savePatient = async () => {
         setSubmitted(true);
+        // Validate email
+        if (patient.email && patient.email.trim() !== '' && !validateEmail(patient.email)) {
+            setEmailError('Please enter a valid email address');
+            toast.current.show({
+                severity: 'error',
+                summary: 'Validation Error',
+                detail: 'Please enter a valid email address'
+            });
+            return;
+        }
 
         // Validation
         if (!patient.firstName || !patient.lastName || 
@@ -333,17 +453,50 @@ export const PatientsManagement = (props) => {
             return;
         }
 
+        // Validate phone numbers if provided
+        if (patient.phoneNumber && !validatePhoneNumber(patient.phoneNumber, patientCountryCode)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Validation Error',
+                detail: 'Please enter a valid phone number (minimum 7 digits)'
+            });
+            return;
+        }
+
+        if (patient.emergencyContact?.phoneNumber && !validatePhoneNumber(patient.emergencyContact.phoneNumber, emergencyContactCountryCode)) {
+            toast.current.show({
+                severity: 'error',
+                summary: 'Validation Error',
+                detail: 'Please enter a valid emergency contact phone number (minimum 7 digits)'
+            });
+            return;
+        }
+
         // Capitalize first letter of names
         const capitalizeName = (name) => {
             if (!name) return name;
             return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
         };
 
-        // Prepare patient data with capitalized names
+        // Concatenate country codes with phone numbers
+        const fullPhoneNumber = patient.phoneNumber 
+            ? `${patientCountryCode}${patient.phoneNumber}` 
+            : '';
+        
+        const fullEmergencyPhoneNumber = patient.emergencyContact?.phoneNumber 
+            ? `${emergencyContactCountryCode}${patient.emergencyContact.phoneNumber}` 
+            : '';
+
+        // Prepare patient data with capitalized names and full phone numbers
         const patientData = {
             ...patient,
             firstName: capitalizeName(patient.firstName),
-            lastName: capitalizeName(patient.lastName)
+            lastName: capitalizeName(patient.lastName),
+            phoneNumber: fullPhoneNumber,
+            emergencyContact: {
+                ...patient.emergencyContact,
+                phoneNumber: fullEmergencyPhoneNumber
+            }
         };
 
         try {
@@ -362,7 +515,7 @@ export const PatientsManagement = (props) => {
                     hideDialog();
                     fetchPatients();
                     fetchStats();
-                }, 3000);
+                }, 1500);
             } else {
                 // Create new patient
                 await patientAPI.createPatient(patientData);
@@ -371,13 +524,13 @@ export const PatientsManagement = (props) => {
                     summary: 'Success',
                     detail: 'Patient added successfully'
                 });
-                
                 // Wait 3 seconds for toast to show before closing dialog and refreshing
+               
                 setTimeout(() => {
                     hideDialog();
                     fetchPatients();
                     fetchStats();
-                }, 3000);
+                }, 1500);
             }
         } catch (error) {
             console.error('Error saving patient:', error);
@@ -408,7 +561,7 @@ export const PatientsManagement = (props) => {
                 hideDeletePatientDialog();
                 fetchPatients();
                 fetchStats();
-            }, 3000);
+            }, 1500);
         } catch (error) {
             console.error('Error deleting patient:', error);
             toast.current.show({
@@ -700,6 +853,7 @@ export const PatientsManagement = (props) => {
                 label="Save"
                 icon="pi pi-check"
                 onClick={savePatient}
+                disabled={!!emailError}
             />
         </div>
     );
@@ -1306,7 +1460,7 @@ export const PatientsManagement = (props) => {
                             <div className="grid">
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="gender">Gender *</label>
+                                        <label htmlFor="gender" style={{ fontWeight: 'bold' }}>Gender *</label>
                                         <Dropdown
                                             id="gender"
                                             value={patient.gender}
@@ -1323,11 +1477,12 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="firstName">First Name *</label>
+                                        <label htmlFor="firstName" style={{ fontWeight: 'bold' }}>First Name *</label>
                                         <InputText
                                             id="firstName"
                                             value={patient.firstName}
                                             onChange={(e) => setPatient({ ...patient, firstName: e.target.value })}
+                                            placeholder="Enter first name"
                                             required
                                             className={submitted && !patient.firstName ? 'p-invalid' : ''}
                                         />
@@ -1338,11 +1493,12 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="lastName">Last Name *</label>
+                                        <label htmlFor="lastName" style={{ fontWeight: 'bold' }}>Last Name *</label>
                                         <InputText
                                             id="lastName"
                                             value={patient.lastName}
                                             onChange={(e) => setPatient({ ...patient, lastName: e.target.value })}
+                                            placeholder="Enter last name"
                                             required
                                             className={submitted && !patient.lastName ? 'p-invalid' : ''}
                                         />
@@ -1353,7 +1509,7 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="dateOfBirth">Date of Birth *</label>
+                                        <label htmlFor="dateOfBirth" style={{ fontWeight: 'bold' }}>Date of Birth *</label>
                                         <Calendar
                                             id="dateOfBirth"
                                             value={patient.dateOfBirth ? new Date(patient.dateOfBirth) : null}
@@ -1375,32 +1531,40 @@ export const PatientsManagement = (props) => {
                                     </div>
                                 </div>
                                 <div className="col-12 md:col-6">
-                                    <div className="field">
-                                        <label htmlFor="phoneNumber">Phone Number</label>
-                                        <InputText
-                                            id="phoneNumber"
-                                            value={patient.phoneNumber}
-                                            onChange={(e) => setPatient({ ...patient, phoneNumber: e.target.value })}
-                                        />
-                                    </div>
+                                    <PhoneInput
+                                        label="Phone Number"
+                                        value={patient.phoneNumber || ''}
+                                        countryCode={patientCountryCode}
+                                        onChange={(e) => setPatient({ ...patient, phoneNumber: e.target.value })}
+                                        onCountryCodeChange={(e) => {
+                                            setPatientCountryCode(e.value);
+                                        }}
+                                    />
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="email">Email</label>
+                                        <label htmlFor="email" style={{ fontWeight: 'bold' }}>Email</label>
                                         <InputText
                                             id="email"
+                                            type="email"
                                             value={patient.email}
-                                            onChange={(e) => setPatient({ ...patient, email: e.target.value })}
+                                            onChange={(e) => handleEmailChange(e.target.value)}
+                                            placeholder="Enter email address"
+                                            className={emailError ? 'p-invalid' : ''}
                                         />
+                                        {emailError && (
+                                            <small className="p-error">{emailError}</small>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="col-12">
                                     <div className="field">
-                                        <label htmlFor="address">Address</label>
+                                        <label htmlFor="address" style={{ fontWeight: 'bold' }}>Address</label>
                                         <InputTextarea
                                             id="address"
                                             value={patient.address}
                                             onChange={(e) => setPatient({ ...patient, address: e.target.value })}
+                                            placeholder="Enter street address"
                                             rows={3}
                                         />
                                     </div>
@@ -1412,7 +1576,7 @@ export const PatientsManagement = (props) => {
                             <div className="grid">
                                 <div className="col-12 md:col-4">
                                     <div className="field">
-                                        <label htmlFor="emergencyName">Name</label>
+                                        <label htmlFor="emergencyName" style={{ fontWeight: 'bold' }}>Name</label>
                                         <InputText
                                             id="emergencyName"
                                             value={patient.emergencyContact?.name || ''}
@@ -1420,12 +1584,13 @@ export const PatientsManagement = (props) => {
                                                 ...patient,
                                                 emergencyContact: { ...patient.emergencyContact, name: e.target.value }
                                             })}
+                                            placeholder="Enter contact name"
                                         />
                                     </div>
                                 </div>
                                 <div className="col-12 md:col-4">
                                     <div className="field">
-                                        <label htmlFor="emergencyRelationship">Relationship</label>
+                                        <label htmlFor="emergencyRelationship" style={{ fontWeight: 'bold' }}>Relationship</label>
                                         <Dropdown
                                             id="emergencyRelationship"
                                             value={patient.emergencyContact?.relationship || ''}
@@ -1439,17 +1604,20 @@ export const PatientsManagement = (props) => {
                                     </div>
                                 </div>
                                 <div className="col-12 md:col-4">
-                                    <div className="field">
-                                        <label htmlFor="emergencyPhone">Phone Number</label>
-                                        <InputText
-                                            id="emergencyPhone"
-                                            value={patient.emergencyContact?.phoneNumber || ''}
-                                            onChange={(e) => setPatient({
-                                                ...patient,
-                                                emergencyContact: { ...patient.emergencyContact, phoneNumber: e.target.value }
-                                            })}
-                                        />
-                                    </div>
+                                    <PhoneInput
+                                        label="Phone Number"
+                                        value={patient.emergencyContact?.phoneNumber || ''}
+                                        countryCode={emergencyContactCountryCode}
+                                        onChange={(e) => setPatient({
+                                            ...patient,
+                                            emergencyContact: { ...patient.emergencyContact, phoneNumber: e.target.value }
+                                        })}
+                                        onCountryCodeChange={(e) => {
+                                            if (e && e.value) {
+                                                setEmergencyContactCountryCode(e.value.value || e.value);
+                                            }
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </TabPanel>
@@ -1458,7 +1626,7 @@ export const PatientsManagement = (props) => {
                             <div className="grid">
                                 <div className="col-12">
                                     <div className="field">
-                                        <label htmlFor="medicalHistory">Medical History</label>
+                                        <label htmlFor="medicalHistory" style={{ fontWeight: 'bold' }}>Medical History</label>
                                         <div className="flex flex-column gap-2">
                                             <div className="flex">
                                                 <InputText
@@ -1497,7 +1665,7 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12">
                                     <div className="field">
-                                        <label htmlFor="allergies">Allergies</label>
+                                        <label htmlFor="allergies" style={{ fontWeight: 'bold' }}>Allergies</label>
                                         <div className="flex flex-column gap-2">
                                             <div className="flex">
                                                 <InputText
@@ -1536,7 +1704,7 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12">
                                     <div className="field">
-                                        <label htmlFor="medications">Current Medications</label>
+                                        <label htmlFor="medications" style={{ fontWeight: 'bold' }}>Current Medications</label>
                                         <div className="flex flex-column gap-2">
                                             <div className="flex">
                                                 <InputText
@@ -1580,7 +1748,7 @@ export const PatientsManagement = (props) => {
                             <div className="grid">
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="insuranceProvider">Provider</label>
+                                        <label htmlFor="insuranceProvider" style={{ fontWeight: 'bold' }}>Provider</label>
                                         <InputText
                                             id="insuranceProvider"
                                             value={patient.insuranceInfo?.provider || ''}
@@ -1594,7 +1762,7 @@ export const PatientsManagement = (props) => {
                                 </div>
                                 <div className="col-12 md:col-6">
                                     <div className="field">
-                                        <label htmlFor="policyNumber">Policy Number</label>
+                                        <label htmlFor="policyNumber" style={{ fontWeight: 'bold' }}>Policy Number</label>
                                         <InputText
                                             id="policyNumber"
                                             value={patient.insuranceInfo?.policyNumber || ''}
