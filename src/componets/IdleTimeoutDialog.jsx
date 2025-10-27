@@ -18,7 +18,6 @@ const IdleTimeoutDialog = ({ visible, onContinue, onLogout, timeRemaining, total
         if (visible) {
             const timer = setInterval(() => {
                 setCountdown(prev => {
-                    console.log('Countdown:', prev - 1); // Debug log
                     if (prev <= 1) {
                         clearInterval(timer);
                         onLogout();

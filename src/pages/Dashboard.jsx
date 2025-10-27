@@ -341,7 +341,7 @@ export const Dashboard = (props) => {
             {/* Gender Distribution Chart */}
             <div className="col-12 lg:col-6">
                 <Card 
-                    title="Patient Gender Distribution" 
+                    title="Gender Distribution by Predictions" 
                     className="h-full"
                     style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
                 >
@@ -512,7 +512,7 @@ export const Dashboard = (props) => {
                                 <div className="p-3 bg-blue-50 border-1 border-blue-200 border-round">
                                     <div className="flex align-items-center justify-content-between">
                                         <div>
-                                            <div className="font-bold text-900 text-lg">Total Patients</div>
+                                            <div className="font-bold text-900 text-lg">Total Predictions</div>
                                             <div className="text-600">Across all triage levels</div>
                                         </div>
                                         <div className="text-right">

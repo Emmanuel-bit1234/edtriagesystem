@@ -60,18 +60,15 @@ const App = () => {
         // Check authentication using the new API
         const checkAuth = () => {
             const isAuthenticated = predictionAPI.isAuthenticated();
-            console.log('Authentication check - isAuthenticated:', isAuthenticated);
             setIsLoggedIn(isAuthenticated);
             
             // Get current user data
             if (isAuthenticated) {
                 const storedUser = localStorage.getItem('user');
-                console.log('Stored user:', storedUser);
                 if (storedUser) {
                     try {
                         const userData = JSON.parse(storedUser);
                         setCurrentUser(userData);
-                        console.log('Parsed user data:', userData);
                     } catch (error) {
                         console.error("Error parsing user data:", error);
                     }
@@ -428,8 +425,6 @@ const App = () => {
     });
 
     // Debug logging
-    console.log('App render - isLoggedIn:', isLoggedIn, 'currentUser:', currentUser);
-
     return (
         <div className={wrapperClass} onClick={onWrapperClick}>
             {isLoggedIn === false ? (

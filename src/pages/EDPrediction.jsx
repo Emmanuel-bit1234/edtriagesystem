@@ -216,9 +216,6 @@ export const EDPrediction = (props) => {
         }
 
         try {
-            console.log('Searching for patient:', patientNumber);
-            console.log('API URL will be:', `https://triagecdssproxy.vercel.app/patients/number/${patientNumber}`);
-            
             // Try direct fetch first
             const token = localStorage.getItem('token');
             const response = await fetch(`https://triagecdssproxy.vercel.app/patients/number/${patientNumber}`, {
@@ -234,7 +231,6 @@ export const EDPrediction = (props) => {
             }
             
             const data = await response.json();
-            console.log('Patient found:', data);
             
             if (data && data.patient) {
                 const patient = data.patient;
@@ -258,8 +254,6 @@ export const EDPrediction = (props) => {
                 if (genderOption) {
                     setGender(genderOption);
                 }
-                
-                console.log('Form updated with patient data - Age:', age, 'Gender:', genderOption);
             }
         } catch (error) {
             console.error('Error searching patient:', error);
@@ -267,9 +261,7 @@ export const EDPrediction = (props) => {
             
             // Fallback to axios method
             try {
-                console.log('Trying axios method as fallback...');
                 const response = await patientAPI.getPatientByNumber(patientNumber);
-                console.log('Patient found via axios:', response);
                 
                 if (response && response.patient) {
                     const patient = response.patient;
@@ -287,8 +279,6 @@ export const EDPrediction = (props) => {
                     if (genderOption) {
                         setGender(genderOption);
                     }
-                    
-                    console.log('Form updated via axios fallback');
                 }
             } catch (axiosError) {
                 console.error('Axios fallback also failed:', axiosError);
@@ -363,7 +353,6 @@ export const EDPrediction = (props) => {
             }
         });
         prediction.getPrediction(newForm).then((data) => {
-            console.log("Prediction Results:", data);
             setPredictionResults(data);
             setLoad(false);
         });
@@ -519,12 +508,9 @@ export const EDPrediction = (props) => {
                                                                                 detail: `Patient ${patient.firstName} ${patient.lastName} loaded successfully`,
                                                                                 life: 3000
                                                                             });
-                                                                            
-                                                                            console.log('Patient found and form updated - Sex:', sexValue);
                                                                         }
                                                                     })
                                                                     .catch(error => {
-                                                                        console.error('Error searching patient:', error);
                                                                         // Show error toast for other errors
                                                                         toast.current.show({
                                                                             severity: 'error',

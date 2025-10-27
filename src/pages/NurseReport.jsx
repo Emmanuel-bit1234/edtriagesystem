@@ -344,7 +344,7 @@ export const NurseReport = (props) => {
                         <div className="text-4xl font-bold text-900 mb-2">
                             {reportData?.summary?.totalPatients || 0}
                         </div>
-                        <div className="text-600 font-medium">Total Patients</div>
+                        <div className="text-600 font-medium">Total Predictions</div>
                         <div className="text-xs text-500 mt-1">All triage levels</div>
                     </div>
                 </Card>
@@ -493,7 +493,7 @@ export const NurseReport = (props) => {
         
         return (
             <Card 
-                title="Gender Distribution" 
+                title="Gender Distribution by Predictions" 
                 className="h-full"
                 style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
             >
@@ -704,7 +704,7 @@ export const NurseReport = (props) => {
 
                             {/* Detailed Analytics */}
                             <TabView>
-                                <TabPanel header="Overview" leftIcon="pi pi-chart-bar">
+                                <TabPanel header={<span><i className="pi pi-chart-bar mr-2"></i>Overview</span>}>
                                     <div className="grid">
                                         <div className="col-12 lg:col-6">
                                             <Card 
@@ -733,11 +733,11 @@ export const NurseReport = (props) => {
                                     </div>
                                 </TabPanel>
 
-                                <TabPanel header="Demographics" leftIcon="pi pi-users">
+                                <TabPanel header={<span><i className="pi pi-users mr-2"></i>Demographics</span>}>
                                     <div className="grid">
                                         <div className="col-12 lg:col-4">
                                             <Card 
-                                                title="Gender Distribution" 
+                                                title="Gender Distribution by Predictions" 
                                                 className="h-full"
                                                 style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
                                             >
@@ -750,7 +750,7 @@ export const NurseReport = (props) => {
                                         </div>
                                         <div className="col-12 lg:col-4">
                                             <Card 
-                                                title="Age Groups" 
+                                                title="Age Groups by Predictions" 
                                                 className="h-full"
                                                 style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
                                             >
@@ -783,7 +783,7 @@ export const NurseReport = (props) => {
                                 </TabPanel>
 
 
-                                <TabPanel header="Insights" leftIcon="pi pi-lightbulb">
+                                <TabPanel header={<span><i className="pi pi-lightbulb mr-2"></i>Insights</span>}>
                                     <div className="grid">
                                         <div className="col-12 lg:col-6">
                                             <Card 
