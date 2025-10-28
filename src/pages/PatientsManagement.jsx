@@ -1387,6 +1387,10 @@ export const PatientsManagement = (props) => {
                         responsiveLayout="scroll"
                         showGridlines
                         stripedRows
+                        onRowClick={(e) => {
+                            setSelectedPatient(e.data);
+                            setPatientDetailDialog(true);
+                        }}
                     >
                         <Column
                             field="patientNumber"
