@@ -144,6 +144,9 @@ export default function PhoneInput({
                         disabled={disabled}
                         className="w-full"
                         panelClassName="country-dropdown-panel"
+                        filter
+                        filterBy="name,code"
+                        filterPlaceholder="Search countries..."
                         valueTemplate={(option) => {
                             // Check if option exists, otherwise use selectedCountry from state
                             const displayOption = option || selectedCountry;

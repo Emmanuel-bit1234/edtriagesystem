@@ -22,6 +22,7 @@ export const EDPrediction = (props) => {
     var prediction = new PredictionAPI();
     var patientAPI = new PatientAPI();
     var [load, setLoad] = useState(false);
+    var [loadingPredictions, setLoadingPredictions] = useState(true);
     var [allPredictions, setAllPredictions] = useState()
     var toast = useRef(null);
 
@@ -116,6 +117,7 @@ export const EDPrediction = (props) => {
     });
     // Helper function to load predictions based on user role
     const loadPredictions = () => {
+        setLoadingPredictions(true);
         const storedUser = localStorage.getItem('user');
         let isAdminUser = false;
         
@@ -135,6 +137,7 @@ export const EDPrediction = (props) => {
             // Admin sees all predictions
             prediction.getAllPredictions().then((data) => {
                 setAllPredictions(data?.logs)
+                setLoadingPredictions(false);
             });
         } else {
             // Regular nurses see only their own predictions
@@ -147,7 +150,10 @@ export const EDPrediction = (props) => {
                         pred.user?.id === nurseId || pred.user?.id === String(nurseId)
                     );
                     setAllPredictions(nursePredictions);
+                    setLoadingPredictions(false);
                 });
+            } else {
+                setLoadingPredictions(false);
             }
         }
     };
@@ -1034,7 +1040,13 @@ export const EDPrediction = (props) => {
                         </div>
                     </Dialog>
 
-                    <DataTable
+                    {loadingPredictions ? (
+                        <div className="text-center p-6">
+                            <ProgressSpinner />
+                            <p className="mt-3 text-600">Loading predictions...</p>
+                        </div>
+                    ) : (
+                        <DataTable
                         size="small"
                         scrollable={true}
                         value={allPredictions}
@@ -1157,6 +1169,7 @@ export const EDPrediction = (props) => {
                             )}
                         ></Column>
                     </DataTable>
+                    )}
                 </div>
             </div >
 
