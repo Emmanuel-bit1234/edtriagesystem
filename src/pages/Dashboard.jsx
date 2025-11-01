@@ -49,24 +49,30 @@ export const Dashboard = (props) => {
                     return `${level}: (${names[level] || 'Unknown'})`;
                 };
                 
-                const labels = Object.keys(summaryData.levelDistribution).map(level => getKTASDisplay(parseInt(level)));
-                const values = Object.values(summaryData.levelDistribution);
+                const levelEntries = Object.entries(summaryData.levelDistribution).sort(([a], [b]) => parseInt(a) - parseInt(b));
+                const labels = levelEntries.map(([level]) => getKTASDisplay(parseInt(level)));
+                const values = levelEntries.map(([, count]) => count);
+                
+                // Map colors based on actual level number, not array position
+                const getColorForLevel = (level) => {
+                    const colorMap = {
+                        1: '#dc3545', // Red - Level 1 (Resuscitation)
+                        2: '#fd7e14', // Orange - Level 2 (Emergency)
+                        3: '#ffc107', // Yellow - Level 3 (Urgent)
+                        4: '#28a745', // Green - Level 4 (Less Urgent)
+                        5: '#007bff', // Blue - Level 5 (Non-Urgent)
+                    };
+                    return colorMap[parseInt(level)] || '#6c757d'; // Gray for unknown levels
+                };
+                
+                const backgroundColor = levelEntries.map(([level]) => getColorForLevel(level));
                 
                 setChartData({
                     labels: labels,
                     datasets: [
                         {
                             data: values,
-                            backgroundColor: [
-                                '#DC2626', // Red - Level 1 (Resuscitation) - Most Critical
-                                '#EA580C', // Orange - Level 2 (Emergency) - Very Urgent
-                                '#EAB308', // Yellow - Level 3 (Urgent) - Urgent
-                                '#16A34A', // Green - Level 4 (Less Urgent) - Less Urgent
-                                '#2563EB', // Blue - Level 5 (Non-Urgent) - Least Urgent
-                                '#7C3AED', // Purple - Level 6 (if exists)
-                                '#DC2626', // Red - Level 7 (if exists)
-                                '#059669'  // Emerald - Level 8 (if exists)
-                            ],
+                            backgroundColor: backgroundColor,
                             borderColor: '#ffffff',
                             borderWidth: 2,
                             hoverBorderWidth: 3,
@@ -377,14 +383,30 @@ export const Dashboard = (props) => {
                                             1: { 
                                                 bg: 'bg-red-600', 
                                                 text: 'text-white',
-                                                style: { backgroundColor: '#DC2626', color: 'white' }
+                                                style: { backgroundColor: '#dc3545', color: 'white' }
                                             },
-                                            2: { bg: 'bg-orange-100', text: 'text-orange-600' },
-                                            3: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
-                                            4: { bg: 'bg-green-100', text: 'text-green-600' },
-                                            5: { bg: 'bg-blue-100', text: 'text-blue-600' }
+                                            2: { 
+                                                bg: 'bg-orange-500', 
+                                                text: 'text-white',
+                                                style: { backgroundColor: '#fd7e14', color: 'white' }
+                                            },
+                                            3: { 
+                                                bg: 'bg-yellow-500', 
+                                                text: 'text-gray-900',
+                                                style: { backgroundColor: '#ffc107', color: '#333333' }
+                                            },
+                                            4: { 
+                                                bg: 'bg-green-500', 
+                                                text: 'text-white',
+                                                style: { backgroundColor: '#28a745', color: 'white' }
+                                            },
+                                            5: { 
+                                                bg: 'bg-blue-500', 
+                                                text: 'text-white',
+                                                style: { backgroundColor: '#007bff', color: 'white' }
+                                            }
                                         };
-                                        return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600' };
+                                        return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600', style: {} };
                                     };
                                     const levelColor = getLevelColor(level);
                                     return (
@@ -455,14 +477,34 @@ export const Dashboard = (props) => {
                                                         bg: 'bg-red-600', 
                                                         text: 'text-white', 
                                                         progress: 'bg-red-600',
-                                                        style: { backgroundColor: '#DC2626', color: 'white' }
+                                                        style: { backgroundColor: '#dc3545', color: 'white' }
                                                     },
-                                                    2: { bg: 'bg-orange-100', text: 'text-orange-600', progress: 'bg-orange-500' },
-                                                    3: { bg: 'bg-yellow-100', text: 'text-yellow-600', progress: 'bg-yellow-500' },
-                                                    4: { bg: 'bg-green-100', text: 'text-green-600', progress: 'bg-green-500' },
-                                                    5: { bg: 'bg-blue-100', text: 'text-blue-600', progress: 'bg-blue-500' }
+                                                    2: { 
+                                                        bg: 'bg-orange-500', 
+                                                        text: 'text-white', 
+                                                        progress: 'bg-orange-500',
+                                                        style: { backgroundColor: '#fd7e14', color: 'white' }
+                                                    },
+                                                    3: { 
+                                                        bg: 'bg-yellow-500', 
+                                                        text: 'text-gray-900', 
+                                                        progress: 'bg-yellow-500',
+                                                        style: { backgroundColor: '#ffc107', color: '#333333' }
+                                                    },
+                                                    4: { 
+                                                        bg: 'bg-green-500', 
+                                                        text: 'text-white', 
+                                                        progress: 'bg-green-500',
+                                                        style: { backgroundColor: '#28a745', color: 'white' }
+                                                    },
+                                                    5: { 
+                                                        bg: 'bg-blue-500', 
+                                                        text: 'text-white', 
+                                                        progress: 'bg-blue-500',
+                                                        style: { backgroundColor: '#007bff', color: 'white' }
+                                                    }
                                                 };
-                                                return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600', progress: 'bg-gray-500' };
+                                                return colors[parseInt(level)] || { bg: 'bg-gray-100', text: 'text-gray-600', progress: 'bg-gray-500', style: {} };
                                             };
                                             const levelColor = getLevelColor(level);
                                             return (
