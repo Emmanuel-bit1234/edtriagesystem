@@ -94,6 +94,9 @@ export const PatientsManagement = (props) => {
     const [medicalHistoryInput, setMedicalHistoryInput] = useState('');
     const [allergiesInput, setAllergiesInput] = useState('');
     const [medicationsInput, setMedicationsInput] = useState('');
+    const [newNoteInput, setNewNoteInput] = useState('');
+    const [notesExpanded, setNotesExpanded] = useState(false);
+    const [detailNotesExpanded, setDetailNotesExpanded] = useState(false);
     const [patientVisits, setPatientVisits] = useState(null);
     const [loadingVisits, setLoadingVisits] = useState(false);
     const [selectedVisit, setSelectedVisit] = useState(null);
@@ -313,11 +316,14 @@ export const PatientsManagement = (props) => {
             insuranceInfo: {
                 provider: '',
                 policyNumber: ''
-            }
+            },
+            notes: []
         });
         setMedicalHistoryInput('');
         setAllergiesInput('');
         setMedicationsInput('');
+        setNewNoteInput('');
+        setNotesExpanded(false);
         setSubmitted(false);
         setPatientCountryCode('+27');
         setEmergencyContactCountryCode('+27');
@@ -353,6 +359,7 @@ export const PatientsManagement = (props) => {
         setMedicalHistoryInput('');
         setAllergiesInput('');
         setMedicationsInput('');
+        setNewNoteInput('');
         setSubmitted(false);
         setPatientCountryCode(countryCode);
         setEmergencyContactCountryCode(emergencyCountryCode);
@@ -399,8 +406,32 @@ export const PatientsManagement = (props) => {
         setPatient({ ...patient, medications: updatedMedications });
     };
 
+    const addNote = () => {
+        if (newNoteInput.trim()) {
+            const newNote = {
+                content: newNoteInput.trim()
+            };
+            const updatedNotes = [...(patient.notes || []), newNote];
+            setPatient({ ...patient, notes: updatedNotes });
+            setNewNoteInput('');
+        }
+    };
+
+    const removeNote = (index) => {
+        const updatedNotes = patient.notes.filter((_, i) => i !== index);
+        setPatient({ ...patient, notes: updatedNotes });
+    };
+
     const viewPatientDetails = async (patient) => {
-        setSelectedPatient(patient);
+        // Fetch full patient data with notes
+        try {
+            const fullPatientData = await patientAPI.getPatientById(patient.id);
+            setSelectedPatient(fullPatientData.patient || patient);
+        } catch (error) {
+            console.error('Error fetching patient details:', error);
+            setSelectedPatient(patient);
+        }
+        setDetailNotesExpanded(false);
         setPatientDetailDialog(true);
         
         // Load patient visits
@@ -503,7 +534,43 @@ export const PatientsManagement = (props) => {
             if (patient.id) {
                 // Update existing patient - exclude patientNumber from update data
                 const { patientNumber, ...updateData } = patientData;
-                await patientAPI.updatePatient(patient.id, updateData);
+                
+                // Handle notes for updates
+                if (updateData.notes && updateData.notes.length > 0) {
+                    // Separate existing notes (with id) from new notes (without id)
+                    const newNotes = updateData.notes.filter(note => note.content && !note.id);
+                    
+                    if (newNotes.length > 0) {
+                        // We have new notes to add
+                        // Use newNote field for the latest note (API will append it)
+                        // If there are multiple new notes, we'll send them one by one
+                        // Start with the first new note
+                        const firstNewNote = newNotes[0].content;
+                        updateData.newNote = firstNewNote;
+                        delete updateData.notes;
+                        
+                        // Update patient with first note
+                        await patientAPI.updatePatient(patient.id, updateData);
+                        
+                        // If there are more new notes, add them sequentially
+                        if (newNotes.length > 1) {
+                            for (let i = 1; i < newNotes.length; i++) {
+                                await patientAPI.updatePatient(patient.id, {
+                                    newNote: newNotes[i].content
+                                });
+                            }
+                        }
+                    } else {
+                        // No new notes - remove notes from update
+                        delete updateData.notes;
+                        await patientAPI.updatePatient(patient.id, updateData);
+                    }
+                } else {
+                    // No notes in update data - remove it
+                    delete updateData.notes;
+                    await patientAPI.updatePatient(patient.id, updateData);
+                }
+                
                 toast.current.show({
                     severity: 'success',
                     summary: 'Success',
@@ -518,7 +585,17 @@ export const PatientsManagement = (props) => {
                 }, 1500);
             } else {
                 // Create new patient
-                await patientAPI.createPatient(patientData);
+                // For new patients, include notes array if it has content
+                const createData = { ...patientData };
+                if (createData.notes && createData.notes.length > 0) {
+                    // Filter out empty notes and ensure they have content
+                    createData.notes = createData.notes.filter(note => note.content && note.content.trim());
+                } else {
+                    // Remove empty notes array
+                    delete createData.notes;
+                }
+                
+                await patientAPI.createPatient(createData);
                 toast.current.show({
                     severity: 'success',
                     summary: 'Success',
@@ -1148,6 +1225,63 @@ export const PatientsManagement = (props) => {
                         </div>
                     )}
                 </TabPanel>
+                
+                <TabPanel header="Clinical Notes">
+                    <div className="grid">
+                        <div className="col-12">
+                            <div className="field">
+                                <label className="font-semibold">Clinical Notes</label>
+                                <div className="flex flex-column mt-3">
+                                    {selectedPatient.notes && selectedPatient.notes.length > 0 ? (
+                                        <>
+                                            {(detailNotesExpanded ? selectedPatient.notes : selectedPatient.notes.slice(0, 3)).map((note, index) => (
+                                                <Card key={note.id || index} className="surface-50" style={{ marginBottom: index < (detailNotesExpanded ? selectedPatient.notes.length : Math.min(selectedPatient.notes.length, 3)) - 1 ? '1.5rem' : '0' }}>
+                                                    <div className="mb-2">
+                                                        <p className="m-0 text-900" style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+                                                            {note.content}
+                                                        </p>
+                                                    </div>
+                                                    {note.author && (
+                                                        <div className="flex align-items-center mt-2 pt-2 border-top-1 surface-border">
+                                                            <i className="pi pi-user text-500 mr-2"></i>
+                                                            <span className="text-sm text-600 font-semibold">{note.author.name}</span>
+                                                            {note.author.email && (
+                                                                <span className="text-sm text-500 ml-1">({note.author.email})</span>
+                                                            )}
+                                                            {note.createdAt && (
+                                                                <>
+                                                                    <i className="pi pi-calendar text-500 ml-3 mr-2"></i>
+                                                                    <span className="text-sm text-600">
+                                                                        {patientAPI.formatDateTime(note.createdAt)}
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </Card>
+                                            ))}
+                                            {selectedPatient.notes.length > 3 && (
+                                                <div className="mt-3">
+                                                    <Button
+                                                        label={detailNotesExpanded ? "Show Less" : `Show All (${selectedPatient.notes.length - 3} more)`}
+                                                        icon={detailNotesExpanded ? "pi pi-chevron-up" : "pi pi-chevron-down"}
+                                                        className="p-button-text p-button-sm"
+                                                        onClick={() => setDetailNotesExpanded(!detailNotesExpanded)}
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="text-center text-400 py-4">
+                                            <i className="pi pi-file-edit text-3xl mb-2"></i>
+                                            <p className="m-0">No clinical notes recorded for this patient.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </TabPanel>
             </TabView>
         );
     };
@@ -1776,6 +1910,104 @@ export const PatientsManagement = (props) => {
                                             })}
                                             placeholder="e.g., BC123456789"
                                         />
+                                    </div>
+                                </div>
+                            </div>
+                        </TabPanel>
+                        
+                        <TabPanel header="Notes">
+                            <div className="grid">
+                                <div className="col-12">
+                                    <div className="field">
+                                        <label htmlFor="newNote" style={{ fontWeight: 'bold' }}>Add Clinical Note</label>
+                                        <div className="flex flex-column">
+                                            <div className="flex">
+                                                <InputTextarea
+                                                    id="newNote"
+                                                    value={newNoteInput}
+                                                    onChange={(e) => setNewNoteInput(e.target.value)}
+                                                    placeholder="Enter a clinical note..."
+                                                    rows={4}
+                                                    className="mr-3"
+                                                />
+                                                <Button
+                                                    icon="pi pi-plus"
+                                                    className="p-button-outlined"
+                                                    onClick={addNote}
+                                                    tooltip="Add note"
+                                                    disabled={!newNoteInput.trim()}
+                                                />
+                                            </div>
+                                            <div className="text-sm text-500 mt-2">
+                                                <i className="pi pi-info-circle mr-2"></i>
+                                                Notes are automatically timestamped and attributed to you.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="field">
+                                        <label className="font-semibold">Existing Notes</label>
+                                        <div className="flex flex-column mt-3">
+                                            {patient.notes && patient.notes.length > 0 ? (
+                                                <>
+                                                    {(notesExpanded ? patient.notes : patient.notes.slice(0, 3)).map((note, displayIndex) => {
+                                                        const actualIndex = notesExpanded ? displayIndex : patient.notes.findIndex(n => n === note);
+                                                        return (
+                                                        <Card key={actualIndex} className="surface-50" style={{ marginBottom: displayIndex < (notesExpanded ? patient.notes.length : Math.min(patient.notes.length, 3)) - 1 ? '1.5rem' : '0' }}>
+                                                            <div className="flex justify-content-between align-items-start mb-2">
+                                                                <div className="flex-1">
+                                                                    <p className="m-0 text-900" style={{ whiteSpace: 'pre-wrap' }}>
+                                                                        {note.content}
+                                                                    </p>
+                                                                </div>
+                                                                {!note.id && (
+                                                                    <Button
+                                                                        icon="pi pi-times"
+                                                                        className="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                                                        onClick={() => removeNote(actualIndex)}
+                                                                        tooltip="Remove note"
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                            {note.author && (
+                                                                <div className="flex align-items-center mt-2 pt-2 border-top-1 surface-border">
+                                                                    <i className="pi pi-user text-500 mr-2"></i>
+                                                                    <span className="text-sm text-600">{note.author.name}</span>
+                                                                    {note.author.email && (
+                                                                        <span className="text-sm text-500 ml-1">({note.author.email})</span>
+                                                                    )}
+                                                                    {note.createdAt && (
+                                                                        <>
+                                                                            <i className="pi pi-calendar text-500 ml-3 mr-2"></i>
+                                                                            <span className="text-sm text-600">
+                                                                                {patientAPI.formatDateTime(note.createdAt)}
+                                                                            </span>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </Card>
+                                                        );
+                                                    })}
+                                                    {patient.notes.length > 3 && (
+                                                        <div className="mt-3">
+                                                            <Button
+                                                                label={notesExpanded ? "Show Less" : `Show All (${patient.notes.length - 3} more)`}
+                                                                icon={notesExpanded ? "pi pi-chevron-up" : "pi pi-chevron-down"}
+                                                                className="p-button-text p-button-sm"
+                                                                onClick={() => setNotesExpanded(!notesExpanded)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="text-center text-400 py-4">
+                                                    <i className="pi pi-file-edit text-3xl mb-2"></i>
+                                                    <p className="m-0">No notes added yet</p>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

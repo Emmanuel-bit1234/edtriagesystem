@@ -123,7 +123,8 @@ export default function PatientAPI() {
                 provider: '',
                 policyNumber: '',
                 groupNumber: ''
-            }
+            },
+            notes: patient.notes || []
         };
     };
 
