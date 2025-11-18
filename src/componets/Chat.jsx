@@ -30,6 +30,23 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversation?.id]);
 
+    // Poll for new messages every 3 seconds
+    useEffect(() => {
+        if (!conversation) return;
+        
+        const conversationIdStr = String(conversation.id || '');
+        if (conversation.isTemporary || conversationIdStr.startsWith('temp-')) {
+            return;
+        }
+
+        const pollInterval = setInterval(() => {
+            loadMessages(true); // Pass true to skip loading state
+        }, 3000); // Poll every 3 seconds
+
+        return () => clearInterval(pollInterval);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversation?.id]);
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
@@ -53,7 +70,7 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         }
     };
 
-    const loadMessages = async () => {
+    const loadMessages = async (silent = false) => {
         if (!conversation) return;
 
         // If conversation is temporary, skip loading messages
@@ -65,7 +82,9 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         }
 
         try {
-            setLoading(true);
+            if (!silent) {
+                setLoading(true);
+            }
             const data = await messagingAPI.getConversationMessages(conversation.id, {
                 limit: 50
             });
@@ -74,9 +93,13 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         } catch (error) {
             console.error('Error loading messages:', error);
             // If conversation doesn't exist yet, just set empty messages
-            setMessages([]);
+            if (!silent) {
+                setMessages([]);
+            }
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
 

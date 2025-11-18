@@ -52,14 +52,25 @@ export const Messages = () => {
         loadConversations();
     }, []);
 
-    const loadConversations = async () => {
+    // Poll for new conversations and updates every 5 seconds
+    useEffect(() => {
+        const pollInterval = setInterval(() => {
+            loadConversations(true); // Pass true to skip loading state
+        }, 5000); // Poll every 5 seconds
+
+        return () => clearInterval(pollInterval);
+    }, []);
+
+    const loadConversations = async (silent = false) => {
         try {
-            setLoading(true);
+            if (!silent) {
+                setLoading(true);
+            }
             const data = await messagingAPI.getConversations();
             setConversations(data.conversations || []);
         } catch (error) {
             console.error('Error loading conversations:', error);
-            if (toast.current) {
+            if (!silent && toast.current) {
                 toast.current.show({
                     severity: 'error',
                     summary: 'Error',
@@ -67,7 +78,9 @@ export const Messages = () => {
                 });
             }
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
 
