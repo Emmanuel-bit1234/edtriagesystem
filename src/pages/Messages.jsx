@@ -20,6 +20,7 @@ import GroupManagement from "../componets/GroupManagement";
 export const Messages = () => {
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [showChatDialog, setShowChatDialog] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
@@ -64,7 +65,12 @@ export const Messages = () => {
     const loadConversations = async (silent = false) => {
         try {
             if (!silent) {
-                setLoading(true);
+                if (conversations.length > 0) {
+                    // If conversations already exist, show refreshing state instead of full loading
+                    setRefreshing(true);
+                } else {
+                    setLoading(true);
+                }
             }
             const data = await messagingAPI.getConversations();
             setConversations(data.conversations || []);
@@ -80,6 +86,7 @@ export const Messages = () => {
         } finally {
             if (!silent) {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -224,6 +231,8 @@ export const Messages = () => {
                             icon="pi pi-refresh"
                             onClick={loadConversations}
                             className="p-button-text"
+                            loading={refreshing}
+                            disabled={refreshing}
                         />
                     </div>
 
