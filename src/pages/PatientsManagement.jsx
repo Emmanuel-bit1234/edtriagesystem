@@ -1122,17 +1122,17 @@ export const PatientsManagement = (props) => {
                                                         backgroundColor: (() => {
                                                             switch (rowData.ktasExplained?.Title) {
                                                                 case "Resuscitation":
-                                                                    return "red";
+                                                                    return "#dc3545";
                                                                 case "Emergency":
-                                                                    return "orange";
+                                                                    return "#fd7e14";
                                                                 case "Urgent":
-                                                                    return "yellow";
+                                                                    return "#ffc107";
                                                                 case "Less Urgent":
-                                                                    return "green";
+                                                                    return "#28a745";
                                                                 case "Non-Urgent":
-                                                                    return "blue";
+                                                                    return "#007bff";
                                                                 default:
-                                                                    return "grey";
+                                                                    return "#6c757d";
                                                             }
                                                         })(),
                                                         color: rowData.ktasExplained?.Title === "Urgent" ? "#333333" : "white",

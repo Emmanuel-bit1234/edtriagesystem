@@ -183,11 +183,11 @@ export const NurseReport = (props) => {
                     data.summary.levelDistribution['5'] || 0
                 ],
                 backgroundColor: [
-                    '#DC2626', // Red - Level 1 (Resuscitation) - Most Critical
-                    '#EA580C', // Orange - Level 2 (Emergency) - Very Urgent
-                    '#EAB308', // Yellow - Level 3 (Urgent) - Urgent
-                    '#16A34A', // Green - Level 4 (Less Urgent) - Less Urgent
-                    '#2563EB'  // Blue - Level 5 (Non-Urgent) - Least Urgent
+                    '#dc3545', // Red - Level 1 (Resuscitation) - Most Critical
+                    '#fd7e14', // Orange - Level 2 (Emergency) - Very Urgent
+                    '#ffc107', // Yellow - Level 3 (Urgent) - Urgent
+                    '#28a745', // Green - Level 4 (Less Urgent) - Less Urgent
+                    '#007bff'  // Blue - Level 5 (Non-Urgent) - Least Urgent
                 ],
                 borderColor: '#ffffff',
                 borderWidth: 2,
@@ -292,13 +292,13 @@ export const NurseReport = (props) => {
     // Get KTAS level color (matching Dashboard colors)
     const getKTASColor = (level) => {
         const colors = {
-            1: '#DC2626',  // Red - Resuscitation (Most Critical)
-            2: '#EA580C',  // Orange - Emergency (Very Urgent)
-            3: '#EAB308',  // Yellow - Urgent
-            4: '#16A34A',  // Green - Less Urgent
-            5: '#2563EB'   // Blue - Non-Urgent (Least Urgent)
+            1: '#dc3545',  // Red - Resuscitation (Most Critical)
+            2: '#fd7e14',  // Orange - Emergency (Very Urgent)
+            3: '#ffc107',  // Yellow - Urgent
+            4: '#28a745',  // Green - Less Urgent
+            5: '#007bff'   // Blue - Non-Urgent (Least Urgent)
         };
-        return colors[level] || '#6B7280';
+        return colors[level] || '#6c757d';
     };
 
     // Get KTAS level name

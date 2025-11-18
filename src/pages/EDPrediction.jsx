@@ -1084,17 +1084,17 @@ export const EDPrediction = (props) => {
                                     backgroundColor: (() => {
                                         switch (item.ktasExplained?.Title) {
                                             case "Resuscitation":   // Level I
-                                                return "red";
+                                                return "#dc3545";
                                             case "Emergency":       // Level II
-                                                return "orange";
+                                                return "#fd7e14";
                                             case "Urgent":          // Level III
-                                                return "yellow";
+                                                return "#ffc107";
                                             case "Less Urgent":     // Level IV
-                                                return "green";
+                                                return "#28a745";
                                             case "Non-Urgent":      // Level V
-                                                return "blue";
+                                                return "#007bff";
                                             default:
-                                                return "grey"; // fallback for unknown values
+                                                return "#6c757d"; // fallback for unknown values
                                         }
                                     })(),
                                     color: (() => {
