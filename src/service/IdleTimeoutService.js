@@ -148,4 +148,5 @@ class IdleTimeoutService {
     }
 }
 
-export default new IdleTimeoutService();
+const idleTimeoutService = new IdleTimeoutService();
+export default idleTimeoutService;

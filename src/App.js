@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import classNames from "classnames";
 import { Route, useLocation, Redirect } from "react-router-dom";
 import { CSSTransition } from "react-transition-group";
@@ -10,7 +10,6 @@ import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
 import { NurseReport } from "./pages/NurseReport";
 import { PatientsManagement } from "./pages/PatientsManagement";
-import Login from "./pages/Login";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
 
@@ -29,10 +28,10 @@ import IdleTimeoutService from "./service/IdleTimeoutService";
 import IdleTimeoutDialog from "./componets/IdleTimeoutDialog";
 
 const App = () => {
-    const [layoutMode, setLayoutMode] = useState("static");
-    const [layoutColorMode, setLayoutColorMode] = useState("light");
-    const [inputStyle, setInputStyle] = useState("outlined");
-    const [ripple, setRipple] = useState(true);
+    const [layoutMode] = useState("static");
+    const [layoutColorMode] = useState("light");
+    const [inputStyle] = useState("outlined");
+    const [ripple] = useState(true);
     const [staticMenuInactive, setStaticMenuInactive] = useState(false);
     const [overlayMenuActive, setOverlayMenuActive] = useState(false);
     const [mobileMenuActive, setMobileMenuActive] = useState(false);
@@ -42,7 +41,7 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showIdleDialog, setShowIdleDialog] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-    const predictionAPI = new PredictionAPI();
+    const predictionAPI = useMemo(() => new PredictionAPI(), []);
 
     // Helper function to check if user is admin
     const isAdmin = () => {
@@ -87,7 +86,7 @@ const App = () => {
         } else {
             removeClass(document.body, "body-overflow-hidden");
         }
-    }, [mobileMenuActive]);
+    }, [mobileMenuActive, predictionAPI]);
 
     useEffect(() => {
         copyTooltipRef && copyTooltipRef.current && copyTooltipRef.current.updateTargetEvents();
@@ -95,6 +94,14 @@ const App = () => {
 
     // Idle timeout effect
     useEffect(() => {
+        const handleLogout = () => {
+            predictionAPI.logout();
+            Cookies.set("LoggedIn", false);
+            setIsLoggedIn(false);
+            setShowIdleDialog(false);
+            window.location.reload();
+        };
+
         if (isLoggedIn) {
             // Initialize idle timeout service with 3 minutes
             IdleTimeoutService.updateTimeouts(3 * 60 * 1000, 30 * 1000); // 3 minutes idle, 30 seconds warning
@@ -102,9 +109,7 @@ const App = () => {
                 onWarning: () => {
                     setShowIdleDialog(true);
                 },
-                onLogout: () => {
-                    handleLogout();
-                },
+                onLogout: handleLogout,
                 onContinue: () => {
                     setShowIdleDialog(false);
                 }
@@ -120,25 +125,9 @@ const App = () => {
             IdleTimeoutService.destroy();
             setShowIdleDialog(false);
         }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, predictionAPI]);
 
 
-    const onInputStyleChange = (inputStyle) => {
-        setInputStyle(inputStyle);
-    };
-
-    const onRipple = (e) => {
-        PrimeReact.ripple = e.value;
-        setRipple(e.value);
-    };
-
-    const onLayoutModeChange = (mode) => {
-        setLayoutMode(mode);
-    };
-
-    const onColorModeChange = (mode) => {
-        setLayoutColorMode(mode);
-    };
 
     const onWrapperClick = (event) => {
         if (!menuClick) {
@@ -202,13 +191,6 @@ const App = () => {
         return window.innerWidth >= 992;
     };
 
-    const handleLogout = () => {
-        predictionAPI.logout();
-        Cookies.set("LoggedIn", false);
-        setIsLoggedIn(false);
-        setShowIdleDialog(false);
-        window.location.reload();
-    };
 
     const handleContinueSession = () => {
         IdleTimeoutService.continueSession();

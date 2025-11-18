@@ -4,7 +4,6 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
-import TextInput from "../componets/TextInput";
 import InputTextArea from "../componets/InputTextArea";
 import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView } from "primereact/tabview";
@@ -37,7 +36,7 @@ export const EDPrediction = (props) => {
         { name: "Male", value: 2 },
         { name: "Female", value: 1 }
     ]
-    var [gender, setGender] = useState();
+    var [, setGender] = useState();
 
     const PainPresent = [
         { name: "No", value: 0 },
@@ -216,6 +215,7 @@ export const EDPrediction = (props) => {
     };
 
     // Patient search function
+    // eslint-disable-next-line no-unused-vars
     const searchPatient = async (patientNumber) => {
         if (!patientNumber.trim()) {
             return;
@@ -347,12 +347,12 @@ export const EDPrediction = (props) => {
         form.Pain = painPresent;
         form.NRS_pain = painScore;
         var newForm = {};
-        Object.keys(form).map((key) => {
+        Object.keys(form).forEach((key) => {
             newForm[key] = form[key];
         });
         // eslint-disable-next-line no-unused-vars
         var error = false;
-        Object.keys(newForm).map((key) => {
+        Object.keys(newForm).forEach((key) => {
             var value = newForm[key];
             if (value === "") {
                 error = true;

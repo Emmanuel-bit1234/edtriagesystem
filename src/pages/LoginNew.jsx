@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
-import { useHistory, Link } from 'react-router-dom';
-import { Image } from 'primereact/image';
-import LesothoIcon from '../assets/images/ieclogos.png';
+import { useHistory } from 'react-router-dom';
 import Logo from '../assets/images/Logo.jpg';
 import PredictionAPI from '../service/predictionAPI';
 
@@ -28,22 +25,16 @@ const LoginNew = () => {
     };
 
     // Debounced email validation
-    const debouncedEmailValidation = useCallback(
-        (() => {
-            let timeoutId;
-            return (emailValue) => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    if (emailValue && !validateEmail(emailValue)) {
-                        setEmailError('Please enter a valid email address');
-                    } else {
-                        setEmailError('');
-                    }
-                }, 500); // Wait 500ms after user stops typing
-            };
-        })(),
-        []
-    );
+    const debouncedEmailValidation = useCallback((emailValue) => {
+        const timeoutId = setTimeout(() => {
+            if (emailValue && !validateEmail(emailValue)) {
+                setEmailError('Please enter a valid email address');
+            } else {
+                setEmailError('');
+            }
+        }, 500); // Wait 500ms after user stops typing
+        return () => clearTimeout(timeoutId);
+    }, []);
 
     // Handle email change with debounced validation
     const handleEmailChange = (e) => {
@@ -74,7 +65,7 @@ const LoginNew = () => {
         setLoading(true);
 
         try {
-            const result = await predictionAPI.login(email, password);
+            await predictionAPI.login(email, password);
             
             toast.current.show({
                 severity: 'success',
@@ -98,6 +89,7 @@ const LoginNew = () => {
         }
     };
 
+    // eslint-disable-next-line no-unused-vars
     const goToRegister = () => {
         // Check if we're already on register page
         if (window.location.hash === '#/register' || window.location.pathname === '/register') {

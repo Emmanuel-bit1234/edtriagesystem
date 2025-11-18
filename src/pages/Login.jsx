@@ -1,6 +1,5 @@
 import React from 'react'
 import { InputText } from 'primereact/inputtext'
-import { Card } from 'primereact/card'
 import { Image } from 'primereact/image'
 import { Divider } from 'primereact/divider'
 import LesothoIcon from '../assets/images/ieclogos.png'
@@ -98,7 +97,7 @@ class Login extends React.Component {
           <div>
             <div className="box p-fluid p-grid">
               <div className="p-field p-col-12">
-                <img src={CoatOfArms} alt="Image" className="logo" />
+                <img src={CoatOfArms} alt="Coat of Arms" className="logo" />
               </div>
               <div className="p-field p-col-12 hide-small">
                 <Divider layout="vertical" />
@@ -106,7 +105,7 @@ class Login extends React.Component {
 
               <div className="p-field p-col-12">
                 <h4>Login</h4>
-                <Image src={LesothoIcon} alt="Image" width="100%" />
+                <Image src={LesothoIcon} alt="Lesotho" width="100%" />
 
                 <div className="Card">
                   <div className="p-field my-3">

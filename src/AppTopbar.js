@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import classNames from "classnames";
 import Cookies from "js-cookie";
 import PredictionAPI from "./service/predictionAPI";
 import ProfileDialog from "./componets/ProfileDialog";

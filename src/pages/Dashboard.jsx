@@ -9,6 +9,7 @@ import PredictionAPI from "../service/predictionAPI";
 export const Dashboard = (props) => {
     const [stats, setStats] = useState(null);
     const [last24hStats, setLast24hStats] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [genderStats, setGenderStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,6 +23,7 @@ export const Dashboard = (props) => {
 
     useEffect(() => {
         fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchStats = async () => {

@@ -13,7 +13,6 @@ import { Badge } from "primereact/badge";
 import { Divider } from "primereact/divider";
 import { Tag } from "primereact/tag";
 import { Toolbar } from "primereact/toolbar";
-import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import axios from "axios";
 
@@ -27,7 +26,6 @@ export const NurseReport = (props) => {
     const [error, setError] = useState(null);
     const [chartData, setChartData] = useState({});
     const [chartOptions, setChartOptions] = useState({});
-    const [currentUser, setCurrentUser] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const toast = useRef(null);
 
@@ -44,7 +42,6 @@ export const NurseReport = (props) => {
         if (storedUser) {
             try {
                 const userData = JSON.parse(storedUser);
-                setCurrentUser(userData);
                 const adminCheck = userData.name === 'Admin' || 
                                   userData.username === 'Admin' || 
                                   userData.email === 'Admin@edtriage.co.za';
@@ -63,6 +60,7 @@ export const NurseReport = (props) => {
         }
         
         loadNurses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Load nurses from API
@@ -458,6 +456,7 @@ export const NurseReport = (props) => {
     );
 
     // Helper function to determine vital sign status
+    // eslint-disable-next-line no-unused-vars
     const getVitalSignStatus = (value, normalMin, normalMax) => {
         if (value < normalMin) return { status: 'low', color: 'blue', icon: 'pi-arrow-down' };
         if (value > normalMax) return { status: 'high', color: 'red', icon: 'pi-arrow-up' };

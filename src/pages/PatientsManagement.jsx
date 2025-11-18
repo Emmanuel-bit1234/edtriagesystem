@@ -12,23 +12,13 @@ import { Card } from "primereact/card";
 import { Tag } from "primereact/tag";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import { Chip } from "primereact/chip";
-import { Panel } from "primereact/panel";
-import { Divider } from "primereact/divider";
-import { Message } from "primereact/message";
 import { Skeleton } from "primereact/skeleton";
 import { Toolbar } from "primereact/toolbar";
-import { SplitButton } from "primereact/splitbutton";
-import { Menu } from "primereact/menu";
 import { Badge } from "primereact/badge";
 import { ProgressBar } from "primereact/progressbar";
 import { Avatar } from "primereact/avatar";
-import { OverlayPanel } from "primereact/overlaypanel";
 import { TabView, TabPanel } from "primereact/tabview";
-import { ScrollPanel } from "primereact/scrollpanel";
-import { Chart } from "primereact/chart";
-import { MultiSelect } from "primereact/multiselect";
 import { Slider } from "primereact/slider";
-import { ToggleButton } from "primereact/togglebutton";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PatientAPI from "../service/patientAPI";
@@ -72,7 +62,6 @@ export const PatientsManagement = (props) => {
     const [patients, setPatients] = useState([]);
     const [filteredPatients, setFilteredPatients] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [patientDialog, setPatientDialog] = useState(false);
     const [deletePatientDialog, setDeletePatientDialog] = useState(false);
     const [patientDetailDialog, setPatientDetailDialog] = useState(false);
@@ -82,14 +71,15 @@ export const PatientsManagement = (props) => {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [stats, setStats] = useState(null);
     const [showStats, setShowStats] = useState(false);
-    const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
     const [filters, setFilters] = useState({
         gender: null,
         ageRange: [0, 100],
         hasAllergies: null,
         hasMedications: null
     });
+    // eslint-disable-next-line no-unused-vars
     const [chartData, setChartData] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [chartOptions, setChartOptions] = useState(null);
     const [medicalHistoryInput, setMedicalHistoryInput] = useState('');
     const [allergiesInput, setAllergiesInput] = useState('');
@@ -190,10 +180,12 @@ export const PatientsManagement = (props) => {
     useEffect(() => {
         fetchPatients();
         fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         applyFilters();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters, patients]);
 
     const fetchPatients = async () => {
@@ -204,7 +196,7 @@ export const PatientsManagement = (props) => {
             setFilteredPatients(response.patients || []);
         } catch (error) {
             console.error('Error fetching patients:', error);
-            setError('Failed to fetch patients');
+            // Error handled via toast
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error',
