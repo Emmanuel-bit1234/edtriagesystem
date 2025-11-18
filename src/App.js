@@ -11,6 +11,7 @@ import { EDPrediction } from "./pages/EDPrediction";
 import { NurseReport } from "./pages/NurseReport";
 import { PatientsManagement } from "./pages/PatientsManagement";
 import UserManagement from "./pages/UserManagement";
+import Messages from "./pages/Messages";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
 
@@ -226,6 +227,11 @@ const App = () => {
                     label: "Patients Management",
                     icon: "pi pi-fw pi-users",
                     to: "/patients-management",
+                },
+                {
+                    label: "Messages",
+                    icon: "pi pi-fw pi-comments",
+                    to: "/messages",
                 },
                 // User Management - Admin only
                 ...(isAdmin() ? [{
@@ -446,6 +452,7 @@ const App = () => {
                             <Route path="/EDPrediction" component={EDPrediction} />
                             <Route path="/nurse-report" component={NurseReport} />
                             <Route path="/patients-management" component={PatientsManagement} />
+                            <Route path="/messages" component={Messages} />
                             <Route path="/user-management" render={() => {
                                 if (isAdmin()) {
                                     return <UserManagement />;
