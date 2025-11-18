@@ -10,6 +10,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { EDPrediction } from "./pages/EDPrediction";
 import { NurseReport } from "./pages/NurseReport";
 import { PatientsManagement } from "./pages/PatientsManagement";
+import UserManagement from "./pages/UserManagement";
 import LoginNew from "./pages/LoginNew";
 import Register from "./pages/Register";
 
@@ -45,7 +46,9 @@ const App = () => {
 
     // Helper function to check if user is admin
     const isAdmin = () => {
-        return currentUser?.name === 'Admin' || 
+        // Check role field first (from API), then fallback to name/email check for backward compatibility
+        return currentUser?.role === 'Admin' || 
+               currentUser?.name === 'Admin' || 
                currentUser?.username === 'Admin' || 
                currentUser?.email === 'Admin@edtriage.co.za';
     };
@@ -224,6 +227,12 @@ const App = () => {
                     icon: "pi pi-fw pi-users",
                     to: "/patients-management",
                 },
+                // User Management - Admin only
+                ...(isAdmin() ? [{
+                    label: "User Management",
+                    icon: "pi pi-fw pi-user-edit",
+                    to: "/user-management",
+                }] : []),
                 //     {
                 //         label: "Administration",
                 //         icon: "pi pi-fw pi-folder-open",
@@ -437,6 +446,14 @@ const App = () => {
                             <Route path="/EDPrediction" component={EDPrediction} />
                             <Route path="/nurse-report" component={NurseReport} />
                             <Route path="/patients-management" component={PatientsManagement} />
+                            <Route path="/user-management" render={() => {
+                                if (isAdmin()) {
+                                    return <UserManagement />;
+                                } else {
+                                    // Redirect non-admin users
+                                    return <Redirect to="/EDPrediction" />;
+                                }
+                            }} />
                         </div>
                     </div>
                 </>

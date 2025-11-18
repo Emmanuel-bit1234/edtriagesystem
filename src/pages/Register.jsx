@@ -3,6 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
 import { Toast } from 'primereact/toast';
+import { Dropdown } from 'primereact/dropdown';
 import { useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import Logo from '../assets/images/Logo.jpg';
@@ -13,6 +14,7 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [role, setRole] = useState('Nurse');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -21,6 +23,14 @@ const Register = () => {
     const toast = useRef(null);
     const history = useHistory();
     const predictionAPI = new PredictionAPI();
+
+    // Available roles
+    const roles = [
+        { label: 'Nurse', value: 'Nurse' },
+        { label: 'Doctor', value: 'Doctor' },
+        { label: 'Admin', value: 'Admin' },
+        { label: 'User', value: 'User' }
+    ];
 
     // Email validation function
     const validateEmail = (email) => {
@@ -139,7 +149,7 @@ const Register = () => {
         setLoading(true);
 
         try {
-            await predictionAPI.register(name, email, password);
+            await predictionAPI.register(name, email, password, role);
             toast.current.show({
                 severity: 'success',
                 summary: 'Registration Successful',
@@ -151,10 +161,11 @@ const Register = () => {
             }, 2000);
         } catch (error) {
             console.error('Registration error:', error);
+            const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Registration failed. Please try again.';
             toast.current.show({
                 severity: 'error',
                 summary: 'Registration Failed',
-                detail: error.response?.data?.message || 'Registration failed. Please try again.'
+                detail: errorMessage
             });
         } finally {
             setLoading(false);
@@ -270,6 +281,21 @@ const Register = () => {
                                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                             />
                                         </div>
+                                    </div>
+                                    <div className="p-field my-3">
+                                        <label htmlFor="role" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Role</label>
+                                        <Dropdown
+                                            id="role"
+                                            value={role}
+                                            options={roles}
+                                            onChange={(e) => setRole(e.value)}
+                                            placeholder="Select a role"
+                                            className="p-inputtext-lg p-d-block"
+                                            style={{ width: '100%' }}
+                                        />
+                                        <small className="p-text-secondary" style={{ display: 'block', marginTop: '4px' }}>
+                                            Defaults to Nurse if not specified
+                                        </small>
                                     </div>
 
                                     <Button

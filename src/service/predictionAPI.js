@@ -67,13 +67,13 @@ export default function PredictionAPI() {
             });
     };
 
-    this.register = (name, email, password) => {
+    this.register = (name, email, password, role = 'Nurse') => {
         var url = "https://triagecdssproxy.vercel.app/auth/register";
-        return axios.post(url, { name, email, password })
+        return axios.post(url, { name, email, password, role })
             .then((response) => {
                 if (response.data.token) {
                     localStorage.setItem('authToken', response.data.token);
-                    localStorage.setItem('user', JSON.stringify(response.data.user || { email, name }));
+                    localStorage.setItem('user', JSON.stringify(response.data.user || { email, name, role }));
                 }
                 return response.data;
             });

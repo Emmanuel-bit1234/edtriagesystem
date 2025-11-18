@@ -42,7 +42,8 @@ export const NurseReport = (props) => {
         if (storedUser) {
             try {
                 const userData = JSON.parse(storedUser);
-                const adminCheck = userData.name === 'Admin' || 
+                const adminCheck = userData.role === 'Admin' || 
+                                  userData.name === 'Admin' || 
                                   userData.username === 'Admin' || 
                                   userData.email === 'Admin@edtriage.co.za';
                 setIsAdmin(adminCheck);
