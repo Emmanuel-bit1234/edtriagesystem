@@ -14,7 +14,7 @@ import { MultiSelect } from "primereact/multiselect";
 import MessagingAPI from "../service/messagingAPI";
 import UserAPI from "../service/userAPI";
 
-const GroupManagement = ({ onGroupSelected }) => {
+const GroupManagement = ({ onGroupSelected, onGroupCreated }) => {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -80,31 +80,12 @@ const GroupManagement = ({ onGroupSelected }) => {
                     return isCreator || isMember;
                 });
                 
-                // Ensure each group has participants array for count calculation
-                const groupsWithParticipants = userGroups.map(group => {
-                    const participants = group.participants || [];
-                    const creatorId = group.creatorId || group.createdBy?.id || group.createdBy;
-                    const updatedGroup = { ...group };
-                    
-                    // Ensure creator is in participants for display purposes
-                    // But keep original participantCount for accurate counting
-                    if (creatorId) {
-                        const creatorInParticipants = participants.some(p => {
-                            const pId = p?.id || p;
-                            return String(pId) === String(creatorId);
-                        });
-                        
-                        if (!creatorInParticipants) {
-                            updatedGroup.participants = [...participants, { id: creatorId }];
-                        } else {
-                            updatedGroup.participants = participants;
-                        }
-                    } else {
-                        updatedGroup.participants = participants;
-                    }
-                    
-                    return updatedGroup;
-                });
+                // Use groups as-is from API - creator should already be in participants
+                // since we now explicitly add them when creating groups
+                const groupsWithParticipants = userGroups.map(group => ({
+                    ...group,
+                    participants: group.participants || []
+                }));
                 
                 setGroups(groupsWithParticipants);
             } else {
@@ -149,11 +130,41 @@ const GroupManagement = ({ onGroupSelected }) => {
         }
 
         try {
-            await messagingAPI.createGroup(
+            const response = await messagingAPI.createGroup(
                 groupName.trim(),
                 groupDescription.trim() || null,
                 selectedUserIds
             );
+
+            // Get the created group ID
+            const createdGroup = response.group || response;
+            const groupId = createdGroup.id;
+
+            // Ensure creator is added as participant if not already included
+            // Check if creator is in the selected users first
+            if (currentUser && groupId) {
+                const currentUserId = currentUser.id || currentUser.userId;
+                if (currentUserId) {
+                    const creatorInSelected = selectedUserIds.some(id => 
+                        String(id) === String(currentUserId)
+                    );
+                    
+                    // Only add creator if they weren't already selected
+                    if (!creatorInSelected) {
+                        try {
+                            // Try to add creator - if they're already a participant, this should be a no-op
+                            await messagingAPI.addUsersToGroup(groupId, [currentUserId]);
+                        } catch (addError) {
+                            // If error is because user is already a participant, that's fine
+                            // Otherwise log the error but continue
+                            if (addError.response?.status !== 400 && addError.response?.status !== 409) {
+                                console.error('Error adding creator to group:', addError);
+                            }
+                            // Continue even if this fails - backend might have already added creator
+                        }
+                    }
+                }
+            }
 
             if (toast.current) {
                 toast.current.show({
@@ -172,6 +183,11 @@ const GroupManagement = ({ onGroupSelected }) => {
 
             // Reload groups
             loadGroups();
+
+            // Notify parent to refresh conversations
+            if (onGroupCreated) {
+                onGroupCreated();
+            }
         } catch (error) {
             console.error('Error creating group:', error);
             if (toast.current) {
@@ -348,38 +364,27 @@ const GroupManagement = ({ onGroupSelected }) => {
     };
 
     const participantCountTemplate = (rowData) => {
-        // Calculate count including creator
         const participants = rowData.participants || [];
-        const creatorId = rowData.creatorId || rowData.createdBy?.id || rowData.createdBy;
         const apiCount = rowData.participantCount;
+        const creatorId = rowData.creatorId || rowData.createdBy?.id || rowData.createdBy;
         
         let count = 0;
         
-        // Check if creator is in participants array
-        const creatorInParticipants = creatorId ? participants.some(p => {
-            const pId = p?.id || p;
-            return String(pId) === String(creatorId);
-        }) : false;
-        
-        // Priority: Use API participantCount if available (it represents actual added members)
-        // Then add creator if not already counted
+        // Priority 1: Use API participantCount if available (most reliable from backend)
         if (apiCount !== undefined && apiCount !== null) {
             count = apiCount;
-            
-            // Always add creator if it exists (API count doesn't include creator)
-            if (creatorId) {
-                count += 1;
-            }
         }
-        // If no API count, use participants array
+        // Priority 2: If we have a participants array with items, use it (deduplicated)
         else if (participants.length > 0) {
-            count = participants.length;
-            
-            // If creator is not in participants array, add 1
-            if (creatorId && !creatorInParticipants) {
-                count += 1;
-            }
-        } 
+            const uniqueParticipantIds = new Set();
+            participants.forEach(p => {
+                const pId = p?.id || p;
+                if (pId) {
+                    uniqueParticipantIds.add(String(pId));
+                }
+            });
+            count = uniqueParticipantIds.size;
+        }
         // Fallback: if we have a creator, count is at least 1
         else if (creatorId) {
             count = 1;

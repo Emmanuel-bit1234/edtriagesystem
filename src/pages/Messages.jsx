@@ -355,7 +355,7 @@ export const Messages = () => {
                         </TabPanel>
 
                         {isAdmin && (
-                            <TabPanel header="Groups">
+                            <TabPanel header="My Groups">
                                 <GroupManagement 
                                     onGroupSelected={(group) => {
                                         const conversation = {
@@ -368,6 +368,10 @@ export const Messages = () => {
                                             unreadCount: 0
                                         };
                                         handleConversationClick(conversation);
+                                    }}
+                                    onGroupCreated={() => {
+                                        // Refresh conversations when a group is created
+                                        loadConversations();
                                     }}
                                 />
                             </TabPanel>
