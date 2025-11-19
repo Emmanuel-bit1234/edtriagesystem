@@ -176,7 +176,7 @@ export const Messages = () => {
                     {!isDirect && (
                         <div className="mb-1">
                             <Tag 
-                                value={conversation.type} 
+                                value={conversation.type ? conversation.type.charAt(0).toUpperCase() + conversation.type.slice(1) : conversation.type} 
                                 severity="info"
                                 style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
                             />
@@ -225,14 +225,6 @@ export const Messages = () => {
                             icon="pi pi-plus"
                             onClick={handleStartNewConversation}
                             className="p-button-outlined"
-                        />
-                        <Button
-                            label="Refresh"
-                            icon="pi pi-refresh"
-                            onClick={loadConversations}
-                            className="p-button-text"
-                            loading={refreshing}
-                            disabled={refreshing}
                         />
                     </div>
 
@@ -289,6 +281,29 @@ export const Messages = () => {
                         <TabPanel header="Search Users">
                             <UserSearch
                                 onUserSelect={async (user) => {
+                                    if (!user || !user.id) {
+                                        if (toast.current) {
+                                            toast.current.show({
+                                                severity: 'error',
+                                                summary: 'Error',
+                                                detail: 'Invalid user selected. Please try again.'
+                                            });
+                                        }
+                                        return;
+                                    }
+
+                                    const currentUserId = currentUser?.id || currentUser?.userId;
+                                    if (!currentUserId) {
+                                        if (toast.current) {
+                                            toast.current.show({
+                                                severity: 'error',
+                                                summary: 'Error',
+                                                detail: 'Unable to identify current user. Please refresh the page.'
+                                            });
+                                        }
+                                        return;
+                                    }
+
                                     try {
                                         // Try to get or create conversation from API
                                         const data = await messagingAPI.getOrCreateDirectConversation(user.id);
@@ -309,41 +324,30 @@ export const Messages = () => {
                                         // If API call fails, create a temporary conversation structure
                                         // This allows the chat to open even if the backend endpoint isn't ready
                                         // The conversation will be created when the first message is sent
-                                        const currentUserId = currentUser?.id || currentUser?.userId;
-                                        if (currentUserId) {
-                                            const tempConversation = {
-                                                id: `temp-${currentUserId}-${user.id}`, // Temporary ID
-                                                type: 'direct',
-                                                otherParticipant: user,
-                                                participants: [
-                                                    { id: currentUserId, name: currentUser?.name, email: currentUser?.email },
-                                                    { id: user.id, name: user.name, email: user.email }
-                                                ],
-                                                lastMessage: null,
-                                                unreadCount: 0,
-                                                createdAt: new Date().toISOString(),
-                                                isTemporary: true // Flag to know we need to create it on backend
-                                            };
-                                            setSelectedConversation(tempConversation);
-                                            setShowChatDialog(true);
-                                            setActiveTab(0);
-                                            
-                                            if (toast.current) {
-                                                toast.current.show({
-                                                    severity: 'info',
-                                                    summary: 'Note',
-                                                    detail: 'Conversation will be created when you send your first message',
-                                                    life: 3000
-                                                });
-                                            }
-                                        } else {
-                                            if (toast.current) {
-                                                toast.current.show({
-                                                    severity: 'error',
-                                                    summary: 'Error',
-                                                    detail: error.response?.data?.error || 'Failed to start conversation. Please try again.'
-                                                });
-                                            }
+                                        const tempConversation = {
+                                            id: `temp-${currentUserId}-${user.id}`, // Temporary ID
+                                            type: 'direct',
+                                            otherParticipant: user,
+                                            participants: [
+                                                { id: currentUserId, name: currentUser?.name, email: currentUser?.email },
+                                                { id: user.id, name: user.name, email: user.email }
+                                            ],
+                                            lastMessage: null,
+                                            unreadCount: 0,
+                                            createdAt: new Date().toISOString(),
+                                            isTemporary: true // Flag to know we need to create it on backend
+                                        };
+                                        setSelectedConversation(tempConversation);
+                                        setShowChatDialog(true);
+                                        setActiveTab(0);
+                                        
+                                        if (toast.current) {
+                                            toast.current.show({
+                                                severity: 'info',
+                                                summary: 'Note',
+                                                detail: 'Conversation will be created when you send your first message',
+                                                life: 3000
+                                            });
                                         }
                                     }
                                 }}

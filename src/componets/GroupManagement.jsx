@@ -22,6 +22,7 @@ const GroupManagement = ({ onGroupSelected }) => {
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [loadingUsers, setLoadingUsers] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const toast = useRef(null);
     const messagingAPI = new MessagingAPI();
     const userAPI = new UserAPI();
@@ -31,17 +32,85 @@ const GroupManagement = ({ onGroupSelected }) => {
     const [groupDescription, setGroupDescription] = useState("");
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [submitted, setSubmitted] = useState(false);
+    const [usersToAdd, setUsersToAdd] = useState([]);
+    const [showAllMembers, setShowAllMembers] = useState(false);
 
     useEffect(() => {
-        loadGroups();
-        loadAllUsers();
+        // Get current user
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setCurrentUser(userData);
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+            }
+        }
     }, []);
+
+    useEffect(() => {
+        if (currentUser) {
+            loadGroups();
+        }
+        loadAllUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentUser]);
 
     const loadGroups = async () => {
         try {
             setLoading(true);
             const data = await messagingAPI.getAllGroups();
-            setGroups(data.groups || []);
+            const allGroups = data.groups || [];
+            
+            // Filter to show groups where user is creator OR member
+            if (currentUser) {
+                const currentUserId = currentUser.id || currentUser.userId;
+                const userGroups = allGroups.filter(group => {
+                    // Check if user is the creator
+                    const creatorId = group.creatorId || group.createdBy?.id || group.createdBy;
+                    const isCreator = creatorId === currentUserId || creatorId === String(currentUserId);
+                    
+                    // Check if user is a member/participant
+                    const participants = group.participants || [];
+                    const isMember = participants.some(participant => {
+                        const participantId = participant.id || participant;
+                        return participantId === currentUserId || participantId === String(currentUserId);
+                    });
+                    
+                    return isCreator || isMember;
+                });
+                
+                // Ensure each group has participants array for count calculation
+                const groupsWithParticipants = userGroups.map(group => {
+                    const participants = group.participants || [];
+                    const creatorId = group.creatorId || group.createdBy?.id || group.createdBy;
+                    const updatedGroup = { ...group };
+                    
+                    // Ensure creator is in participants for display purposes
+                    // But keep original participantCount for accurate counting
+                    if (creatorId) {
+                        const creatorInParticipants = participants.some(p => {
+                            const pId = p?.id || p;
+                            return String(pId) === String(creatorId);
+                        });
+                        
+                        if (!creatorInParticipants) {
+                            updatedGroup.participants = [...participants, { id: creatorId }];
+                        } else {
+                            updatedGroup.participants = participants;
+                        }
+                    } else {
+                        updatedGroup.participants = participants;
+                    }
+                    
+                    return updatedGroup;
+                });
+                
+                setGroups(groupsWithParticipants);
+            } else {
+                // If no current user, show empty array
+                setGroups([]);
+            }
         } catch (error) {
             console.error('Error loading groups:', error);
             if (toast.current) {
@@ -118,7 +187,38 @@ const GroupManagement = ({ onGroupSelected }) => {
     const handleViewGroupDetails = async (group) => {
         try {
             const data = await messagingAPI.getGroupDetails(group.id);
-            setSelectedGroup(data.group);
+            const groupData = data.group;
+            
+            // Ensure creator is included in participants list
+            const creatorId = groupData.creatorId || groupData.createdBy?.id || groupData.createdBy;
+            const participants = groupData.participants || [];
+            
+            // Check if creator is already in participants
+            const creatorInParticipants = participants.some(p => {
+                const pId = p.id || p;
+                return pId === creatorId || pId === String(creatorId);
+            });
+            
+            // If creator is not in participants, add them
+            if (creatorId && !creatorInParticipants) {
+                // Try to get creator info from userAPI or use placeholder
+                try {
+                    const creatorData = await userAPI.getUserById(creatorId);
+                    groupData.participants = [
+                        { id: creatorId, name: creatorData.user?.name || 'Creator', email: creatorData.user?.email || '' },
+                        ...participants
+                    ];
+                } catch (error) {
+                    // If we can't fetch creator details, add a placeholder
+                    groupData.participants = [
+                        { id: creatorId, name: 'Creator', email: '' },
+                        ...participants
+                    ];
+                }
+            }
+            
+            setSelectedGroup(groupData);
+            setShowAllMembers(false); // Reset expansion state when viewing a new group
             setShowDetailsDialog(true);
         } catch (error) {
             console.error('Error loading group details:', error);
@@ -174,6 +274,7 @@ const GroupManagement = ({ onGroupSelected }) => {
                     detail: 'Users added to group successfully'
                 });
             }
+            setUsersToAdd([]); // Clear selection after adding
             handleViewGroupDetails({ id: selectedGroup.id });
             loadGroups();
         } catch (error) {
@@ -247,9 +348,46 @@ const GroupManagement = ({ onGroupSelected }) => {
     };
 
     const participantCountTemplate = (rowData) => {
+        // Calculate count including creator
+        const participants = rowData.participants || [];
+        const creatorId = rowData.creatorId || rowData.createdBy?.id || rowData.createdBy;
+        const apiCount = rowData.participantCount;
+        
+        let count = 0;
+        
+        // Check if creator is in participants array
+        const creatorInParticipants = creatorId ? participants.some(p => {
+            const pId = p?.id || p;
+            return String(pId) === String(creatorId);
+        }) : false;
+        
+        // Priority: Use API participantCount if available (it represents actual added members)
+        // Then add creator if not already counted
+        if (apiCount !== undefined && apiCount !== null) {
+            count = apiCount;
+            
+            // Always add creator if it exists (API count doesn't include creator)
+            if (creatorId) {
+                count += 1;
+            }
+        }
+        // If no API count, use participants array
+        else if (participants.length > 0) {
+            count = participants.length;
+            
+            // If creator is not in participants array, add 1
+            if (creatorId && !creatorInParticipants) {
+                count += 1;
+            }
+        } 
+        // Fallback: if we have a creator, count is at least 1
+        else if (creatorId) {
+            count = 1;
+        }
+        
         return (
             <Tag 
-                value={rowData.participantCount || 0} 
+                value={count} 
                 severity="info"
             />
         );
@@ -290,12 +428,6 @@ const GroupManagement = ({ onGroupSelected }) => {
                     onClick={() => setShowCreateDialog(true)}
                     className="p-button-success"
                 />
-                <Button
-                    label="Refresh"
-                    icon="pi pi-refresh"
-                    onClick={loadGroups}
-                    className="p-button-text"
-                />
             </div>
 
             {loading ? (
@@ -329,7 +461,6 @@ const GroupManagement = ({ onGroupSelected }) => {
                             style={{ minWidth: '250px' }}
                         />
                         <Column
-                            field="participantCount"
                             header="Members"
                             body={participantCountTemplate}
                             sortable
@@ -399,6 +530,10 @@ const GroupManagement = ({ onGroupSelected }) => {
                         onChange={(e) => setSelectedUserIds(e.value)}
                         placeholder="Select users"
                         display="chip"
+                        maxSelectedLabels={2}
+                        selectedItemsLabel="{0} +"
+                        filter
+                        filterPlaceholder="Search by name or email"
                         loading={loadingUsers}
                         className={submitted && selectedUserIds.length === 0 ? 'p-invalid' : ''}
                     />
@@ -418,6 +553,8 @@ const GroupManagement = ({ onGroupSelected }) => {
                     onHide={() => {
                         setShowDetailsDialog(false);
                         setSelectedGroup(null);
+                        setUsersToAdd([]); // Clear selection when dialog closes
+                        setShowAllMembers(false); // Reset expansion state
                     }}
                     maximizable
                 >
@@ -432,36 +569,68 @@ const GroupManagement = ({ onGroupSelected }) => {
                         <strong>Members ({selectedGroup.participants?.length || 0}):</strong>
                         <div className="mt-2">
                             {selectedGroup.participants && selectedGroup.participants.length > 0 ? (
-                                <DataTable
-                                    value={selectedGroup.participants}
-                                    className="p-datatable-sm"
-                                >
-                                    <Column
-                                        body={(rowData) => (
-                                            <Avatar
-                                                label={rowData.name?.charAt(0).toUpperCase() || '?'}
-                                                shape="circle"
-                                                style={{ backgroundColor: '#2196F3', color: '#ffffff' }}
+                                <>
+                                    <div style={{ 
+                                        maxHeight: showAllMembers ? '400px' : 'none',
+                                        overflowY: showAllMembers ? 'auto' : 'visible'
+                                    }}>
+                                        <DataTable
+                                            value={showAllMembers || selectedGroup.participants.length <= 5 
+                                                ? selectedGroup.participants 
+                                                : selectedGroup.participants.slice(0, 5)}
+                                            className="p-datatable-sm"
+                                        >
+                                            <Column
+                                                body={(rowData) => (
+                                                    <Avatar
+                                                        label={rowData.name?.charAt(0).toUpperCase() || '?'}
+                                                        shape="circle"
+                                                        style={{ backgroundColor: '#2196F3', color: '#ffffff' }}
+                                                    />
+                                                )}
+                                                header=""
+                                                style={{ width: '3rem' }}
                                             />
-                                        )}
-                                        header=""
-                                        style={{ width: '3rem' }}
-                                    />
-                                    <Column field="name" header="Name" />
-                                    <Column field="email" header="Email" />
-                                    <Column
-                                        body={(rowData) => (
+                                            <Column 
+                                                field="name" 
+                                                header="Name"
+                                                body={(rowData) => {
+                                                    const creatorId = selectedGroup.creatorId || selectedGroup.createdBy?.id || selectedGroup.createdBy;
+                                                    const isCreator = rowData.id === creatorId || String(rowData.id) === String(creatorId);
+                                                    return (
+                                                        <span>
+                                                            {rowData.name || 'Unknown'}
+                                                            {isCreator && <span className="text-500 ml-2">(Creator)</span>}
+                                                        </span>
+                                                    );
+                                                }}
+                                            />
+                                            <Column field="email" header="Email" />
+                                            <Column
+                                                body={(rowData) => (
+                                                    <Button
+                                                        icon="pi pi-times"
+                                                        className="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                                        onClick={() => handleRemoveUser(rowData.id)}
+                                                        tooltip="Remove User"
+                                                    />
+                                                )}
+                                                header="Action"
+                                                style={{ width: '5rem' }}
+                                            />
+                                        </DataTable>
+                                    </div>
+                                    {selectedGroup.participants.length > 5 && (
+                                        <div className="mt-2 text-center">
                                             <Button
-                                                icon="pi pi-times"
-                                                className="p-button-rounded p-button-text p-button-danger p-button-sm"
-                                                onClick={() => handleRemoveUser(rowData.id)}
-                                                tooltip="Remove User"
+                                                label={showAllMembers ? "Show Less" : `Show All (${selectedGroup.participants.length})`}
+                                                icon={showAllMembers ? "pi pi-chevron-up" : "pi pi-chevron-down"}
+                                                className="p-button-text p-button-sm"
+                                                onClick={() => setShowAllMembers(!showAllMembers)}
                                             />
-                                        )}
-                                        header="Action"
-                                        style={{ width: '5rem' }}
-                                    />
-                                </DataTable>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <p className="text-500">No members</p>
                             )}
@@ -470,16 +639,35 @@ const GroupManagement = ({ onGroupSelected }) => {
 
                     <div className="field">
                         <label htmlFor="addUsers">Add More Users</label>
-                        <MultiSelect
-                            id="addUsers"
-                            options={allUsers.filter(u => 
-                                !selectedGroup.participants?.some(p => p.id === u.value)
-                            )}
-                            onChange={(e) => handleAddUsers(e.value)}
-                            placeholder="Select users to add"
-                            display="chip"
-                            loading={loadingUsers}
-                        />
+                        <div className="flex align-items-center" style={{ minWidth: 0, width: '100%', gap: '1rem' }}>
+                            <div style={{ flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 4.5rem)' }}>
+                                <MultiSelect
+                                    id="addUsers"
+                                    value={usersToAdd}
+                                    options={allUsers.filter(u => 
+                                        !selectedGroup.participants?.some(p => p.id === u.value)
+                                    )}
+                                    onChange={(e) => setUsersToAdd(e.value)}
+                                    placeholder="Select users to add"
+                                    display="chip"
+                                    maxSelectedLabels={2}
+                                    selectedItemsLabel="{0} +"
+                                    filter
+                                    filterPlaceholder="Search by name or email"
+                                    loading={loadingUsers}
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+                            <Button
+                                icon="pi pi-plus"
+                                onClick={() => handleAddUsers(usersToAdd)}
+                                disabled={usersToAdd.length === 0}
+                                className="p-button-success p-button-rounded"
+                                tooltip="Add Users"
+                                tooltipOptions={{ position: 'top' }}
+                                style={{ flexShrink: 0, width: '2.5rem', height: '2.5rem', minWidth: '2.5rem' }}
+                            />
+                        </div>
                     </div>
                 </Dialog>
             )}

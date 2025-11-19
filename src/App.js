@@ -28,6 +28,7 @@ import Cookies from "js-cookie";
 import PredictionAPI from "./service/predictionAPI";
 import IdleTimeoutService from "./service/IdleTimeoutService";
 import IdleTimeoutDialog from "./componets/IdleTimeoutDialog";
+import MessagingAPI from "./service/messagingAPI";
 
 const App = () => {
     const [layoutMode] = useState("static");
@@ -43,7 +44,9 @@ const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [showIdleDialog, setShowIdleDialog] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [unreadMessageCount, setUnreadMessageCount] = useState(0);
     const predictionAPI = useMemo(() => new PredictionAPI(), []);
+    const messagingAPI = useMemo(() => new MessagingAPI(), []);
 
     // Helper function to check if user is admin
     const isAdmin = () => {
@@ -130,6 +133,33 @@ const App = () => {
             setShowIdleDialog(false);
         }
     }, [isLoggedIn, predictionAPI]);
+
+    // Poll for unread message count
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setUnreadMessageCount(0);
+            return;
+        }
+
+        const loadUnreadCount = async () => {
+            try {
+                const data = await messagingAPI.getConversations();
+                const conversations = data.conversations || [];
+                const totalUnread = conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
+                setUnreadMessageCount(totalUnread);
+            } catch (error) {
+                console.error('Error loading unread count:', error);
+            }
+        };
+
+        // Load immediately
+        loadUnreadCount();
+
+        // Poll every 5 seconds
+        const pollInterval = setInterval(loadUnreadCount, 5000);
+
+        return () => clearInterval(pollInterval);
+    }, [isLoggedIn, messagingAPI]);
 
 
 
@@ -232,6 +262,9 @@ const App = () => {
                     label: "Messages",
                     icon: "pi pi-fw pi-comments",
                     to: "/messages",
+                    badge: unreadMessageCount > 0 ? unreadMessageCount : null,
+                    badgeStyleClass: unreadMessageCount > 0 ? "p-badge-danger" : null,
+                    showDot: unreadMessageCount > 0,
                 },
                 // User Management - Admin only
                 ...(isAdmin() ? [{

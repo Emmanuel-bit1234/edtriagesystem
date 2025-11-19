@@ -40,7 +40,22 @@ const AppSubmenu = (props) => {
 
     const renderLinkContent = (item) => {
         let submenuIcon = item.items && <i className="pi pi-fw pi-angle-down menuitem-toggle-icon"></i>;
-        let badge = item.badge && <Badge value={item.badge} />;
+        let badge = item.badge && (
+            <Badge 
+                value={item.badge} 
+                className={item.badgeStyleClass || ""}
+            />
+        );
+        // Show red dot if badge exists but value is null/0 (for visual indicator only)
+        let redDot = item.badge === null && item.showDot && (
+            <span className="p-badge p-badge-danger" style={{ 
+                width: '8px', 
+                height: '8px', 
+                borderRadius: '50%',
+                padding: 0,
+                minWidth: '8px'
+            }}></span>
+        );
 
         return (
             <React.Fragment>
@@ -48,6 +63,7 @@ const AppSubmenu = (props) => {
                 <span>{item.label}</span>
                 {submenuIcon}
                 {badge}
+                {redDot}
                 <Ripple />
             </React.Fragment>
         );

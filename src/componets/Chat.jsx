@@ -17,6 +17,9 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
     const scrollPanelRef = useRef(null);
     const toast = useRef(null);
     const messagingAPI = new MessagingAPI();
+    const isUserScrollingRef = useRef(false);
+    const lastMessageCountRef = useRef(0);
+    const scrollTimeoutRef = useRef(null);
 
     useEffect(() => {
         if (conversation) {
@@ -48,8 +51,40 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
     }, [conversation?.id]);
 
     useEffect(() => {
-        scrollToBottom();
+        // Only auto-scroll if:
+        // 1. New messages were actually added (message count increased)
+        // 2. User is not manually scrolling
+        // 3. User is already near the bottom
+        const currentMessageCount = messages.length;
+        const hadNewMessages = currentMessageCount > lastMessageCountRef.current;
+        
+        if (hadNewMessages && !isUserScrollingRef.current) {
+            // Check if user is near bottom before scrolling
+            checkAndScrollToBottom();
+        }
+        
+        lastMessageCountRef.current = currentMessageCount;
     }, [messages]);
+
+    const checkAndScrollToBottom = () => {
+        if (scrollPanelRef.current) {
+            const scrollElement = scrollPanelRef.current?.getElement?.();
+            if (scrollElement) {
+                const content = scrollElement.querySelector('.p-scrollpanel-content');
+                if (content) {
+                    const scrollTop = content.scrollTop;
+                    const scrollHeight = content.scrollHeight;
+                    const clientHeight = content.clientHeight;
+                    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+                    
+                    // Only scroll if user is within 100px of the bottom
+                    if (distanceFromBottom < 100) {
+                        scrollToBottom();
+                    }
+                }
+            }
+        }
+    };
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
@@ -70,6 +105,40 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         }
     };
 
+    // Track user scrolling
+    useEffect(() => {
+        if (!scrollPanelRef.current) return;
+
+        const scrollElement = scrollPanelRef.current?.getElement?.();
+        if (!scrollElement) return;
+
+        const content = scrollElement.querySelector('.p-scrollpanel-content');
+        if (!content) return;
+
+        const handleScroll = () => {
+            isUserScrollingRef.current = true;
+            
+            // Clear existing timeout
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+            
+            // Reset scrolling flag after user stops scrolling for 1 second
+            scrollTimeoutRef.current = setTimeout(() => {
+                isUserScrollingRef.current = false;
+            }, 1000);
+        };
+
+        content.addEventListener('scroll', handleScroll);
+
+        return () => {
+            content.removeEventListener('scroll', handleScroll);
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+        };
+    }, [conversation?.id]);
+
     const loadMessages = async (silent = false) => {
         if (!conversation) return;
 
@@ -78,6 +147,7 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         if (conversation.isTemporary || conversationIdStr.startsWith('temp-')) {
             setMessages([]);
             setLoading(false);
+            lastMessageCountRef.current = 0;
             return;
         }
 
@@ -88,13 +158,25 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
             const data = await messagingAPI.getConversationMessages(conversation.id, {
                 limit: 50
             });
-            setMessages(data.messages || []);
+            const newMessages = data.messages || [];
+            
+            // Only update if messages actually changed (to avoid unnecessary re-renders)
+            setMessages(prevMessages => {
+                const prevIds = new Set(prevMessages.map(m => m.id));
+                const newIds = new Set(newMessages.map(m => m.id));
+                const hasChanges = prevMessages.length !== newMessages.length || 
+                                 ![...newIds].every(id => prevIds.has(id));
+                
+                return hasChanges ? newMessages : prevMessages;
+            });
+            
             setHasMore(data.hasMore || false);
         } catch (error) {
             console.error('Error loading messages:', error);
             // If conversation doesn't exist yet, just set empty messages
             if (!silent) {
                 setMessages([]);
+                lastMessageCountRef.current = 0;
             }
         } finally {
             if (!silent) {
@@ -182,6 +264,13 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
             // Add new message to the list
             setMessages(prev => [...prev, data.message]);
             
+            // Mark conversation as read immediately since user just sent a message
+            try {
+                await messagingAPI.markConversationAsRead(conversationId);
+            } catch (error) {
+                console.error('Error marking conversation as read:', error);
+            }
+            
             // Notify parent to refresh conversations
             if (onMessageSent) {
                 onMessageSent();
@@ -266,8 +355,13 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                                 <p className="text-500 text-sm">Start the conversation!</p>
                             </div>
                         ) : (
-                            messages.map((message) => {
+                            messages.map((message, index) => {
                                 const isOwnMessage = isCurrentUser(message.sender?.id || message.senderId);
+                                const previousMessage = index > 0 ? messages[index - 1] : null;
+                                const previousIsOwnMessage = previousMessage ? isCurrentUser(previousMessage.sender?.id || previousMessage.senderId) : false;
+                                const isSameSender = previousMessage && 
+                                    (isOwnMessage === previousIsOwnMessage) &&
+                                    ((message.sender?.id || message.senderId) === (previousMessage.sender?.id || previousMessage.senderId));
                                 
                                 return (
                                     <div
@@ -275,22 +369,34 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                                         className={`flex ${
                                             isOwnMessage ? 'flex-row-reverse' : ''
                                         }`}
-                                        style={{ alignItems: 'flex-start', gap: '0.75rem' }}
+                                        style={{ 
+                                            alignItems: 'flex-start', 
+                                            gap: '0.75rem',
+                                            marginTop: isSameSender ? '0.5rem' : '1rem'
+                                        }}
                                     >
-                                        <div style={{ paddingTop: '0.75rem', flexShrink: 0 }}>
-                                            <Avatar
-                                                label={message.sender?.name?.charAt(0).toUpperCase() || '?'}
-                                                shape="circle"
-                                                size="normal"
-                                                style={{ 
-                                                    backgroundColor: isOwnMessage ? '#2196F3' : '#6c757d',
-                                                    color: '#ffffff',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    overflow: 'visible'
-                                                }}
-                                            />
+                                        <div style={{ 
+                                            paddingTop: isSameSender ? '0.75rem' : '0.75rem', 
+                                            flexShrink: 0,
+                                            width: '2.5rem',
+                                            display: 'flex',
+                                            justifyContent: isOwnMessage ? 'flex-end' : 'flex-start'
+                                        }}>
+                                            {!isSameSender && (
+                                                <Avatar
+                                                    label={message.sender?.name?.charAt(0).toUpperCase() || '?'}
+                                                    shape="circle"
+                                                    size="normal"
+                                                    style={{ 
+                                                        backgroundColor: isOwnMessage ? '#2196F3' : '#6c757d',
+                                                        color: '#ffffff',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        overflow: 'visible'
+                                                    }}
+                                                />
+                                            )}
                                         </div>
                                         <div
                                             className={`flex flex-column ${

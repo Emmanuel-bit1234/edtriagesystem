@@ -45,13 +45,14 @@ const UserSearch = ({ onUserSelect }) => {
                     query: query.trim(),
                     limit: 20 
                 });
-                setUsers(data.users || []);
+                setUsers(data.users || data || []);
             } catch (error) {
                 console.error('Error searching users:', error);
                 setUsers([]);
                 // Log error details for debugging
                 if (error.response) {
                     console.error('Response error:', error.response.data);
+                    console.error('Response status:', error.response.status);
                 }
             } finally {
                 setLoading(false);
