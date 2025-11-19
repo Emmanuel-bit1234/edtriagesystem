@@ -20,9 +20,11 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
     const isUserScrollingRef = useRef(false);
     const lastMessageCountRef = useRef(0);
     const scrollTimeoutRef = useRef(null);
+    const hasScrolledToBottomRef = useRef(false);
 
     useEffect(() => {
         if (conversation) {
+            hasScrolledToBottomRef.current = false; // Reset scroll flag when conversation changes
             loadMessages();
             // Mark conversation as read when opened (skip if temporary)
             const conversationIdStr = String(conversation.id || '');
@@ -32,6 +34,18 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversation?.id]);
+
+    // Scroll to bottom when messages are first loaded for a conversation
+    useEffect(() => {
+        if (!loading && messages.length > 0 && !hasScrolledToBottomRef.current) {
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                scrollToBottom();
+                hasScrolledToBottomRef.current = true;
+            }, 200);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, messages.length]);
 
     // Poll for new messages every 3 seconds
     useEffect(() => {
