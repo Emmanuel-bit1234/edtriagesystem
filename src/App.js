@@ -145,7 +145,16 @@ const App = () => {
             try {
                 const data = await messagingAPI.getConversations();
                 const conversations = data.conversations || [];
-                const totalUnread = conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
+                // Get the currently open conversation ID (if any)
+                const openConversationId = localStorage.getItem('openConversationId');
+                // Exclude the currently open conversation from unread count
+                const totalUnread = conversations.reduce((sum, conv) => {
+                    // Don't count unread messages for the currently open conversation
+                    if (openConversationId && String(conv.id) === openConversationId) {
+                        return sum;
+                    }
+                    return sum + (conv.unreadCount || 0);
+                }, 0);
                 setUnreadMessageCount(totalUnread);
             } catch (error) {
                 console.error('Error loading unread count:', error);

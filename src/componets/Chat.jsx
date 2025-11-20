@@ -21,10 +21,14 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
     const lastMessageCountRef = useRef(0);
     const scrollTimeoutRef = useRef(null);
     const hasScrolledToBottomRef = useRef(false);
+    const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
+    const isNearBottomRef = useRef(true);
 
     useEffect(() => {
         if (conversation) {
             hasScrolledToBottomRef.current = false; // Reset scroll flag when conversation changes
+            setShowNewMessageIndicator(false); // Reset indicator when conversation changes
+            isNearBottomRef.current = true; // Reset near bottom flag
             loadMessages();
             // Mark conversation as read when opened (skip if temporary)
             const conversationIdStr = String(conversation.id || '');
@@ -65,20 +69,99 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
     }, [conversation?.id]);
 
     useEffect(() => {
-        // Only auto-scroll if:
-        // 1. New messages were actually added (message count increased)
-        // 2. User is not manually scrolling
-        // 3. User is already near the bottom
+        // Check if new messages arrived
         const currentMessageCount = messages.length;
         const hadNewMessages = currentMessageCount > lastMessageCountRef.current;
         
-        if (hadNewMessages && !isUserScrollingRef.current) {
-            // Check if user is near bottom before scrolling
-            checkAndScrollToBottom();
+        console.log('Messages effect:', { 
+            currentMessageCount, 
+            lastCount: lastMessageCountRef.current, 
+            hadNewMessages, 
+            loading,
+            isNearBottom: isNearBottomRef.current 
+        });
+        
+        if (hadNewMessages && currentMessageCount > 0 && !loading) {
+            console.log('New messages detected, checking scroll position...');
+            // Function to check scroll position and show/hide indicator
+            const checkAndUpdateIndicator = () => {
+                if (!scrollPanelRef.current) {
+                    // If scrollPanel not ready, check the ref state
+                    if (!isNearBottomRef.current) {
+                        setShowNewMessageIndicator(true);
+                    }
+                    return;
+                }
+                
+                const scrollElement = scrollPanelRef.current?.getElement?.();
+                if (!scrollElement) {
+                    if (!isNearBottomRef.current) {
+                        setShowNewMessageIndicator(true);
+                    }
+                    return;
+                }
+                
+                // Find the scrollable content element - try multiple approaches
+                let content = null;
+                
+                // Method 1: Standard PrimeReact structure
+                content = scrollElement.querySelector('.p-scrollpanel-content');
+                
+                // Method 2: Alternative structure
+                if (!content) {
+                    const wrapper = scrollElement.querySelector('.p-scrollpanel-wrapper');
+                    if (wrapper) {
+                        content = wrapper.querySelector('.p-scrollpanel-content') || wrapper;
+                    }
+                }
+                
+                // Method 3: Direct child
+                if (!content) {
+                    content = scrollElement.firstElementChild;
+                }
+                
+                // Method 4: The element itself
+                if (!content) {
+                    content = scrollElement;
+                }
+                
+                if (content) {
+                    const scrollTop = content.scrollTop || 0;
+                    const scrollHeight = content.scrollHeight || 0;
+                    const clientHeight = content.clientHeight || 0;
+                    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+                    const isNearBottom = distanceFromBottom < 150;
+                    
+                    isNearBottomRef.current = isNearBottom;
+                    
+                    if (!isNearBottom && distanceFromBottom > 0) {
+                        // User is scrolled up - show indicator
+                        console.log('Showing new message indicator - scrolled up, distance:', distanceFromBottom);
+                        setShowNewMessageIndicator(true);
+                    } else {
+                        // User is near bottom - auto-scroll and hide indicator
+                        if (!isUserScrollingRef.current) {
+                            checkAndScrollToBottom();
+                        }
+                        setShowNewMessageIndicator(false);
+                    }
+                } else {
+                    // Fallback: if we can't find content, use ref state
+                    if (!isNearBottomRef.current) {
+                        setShowNewMessageIndicator(true);
+                    }
+                }
+            };
+            
+            // Check immediately and after DOM updates
+            checkAndUpdateIndicator();
+            setTimeout(checkAndUpdateIndicator, 50);
+            setTimeout(checkAndUpdateIndicator, 200);
+            setTimeout(checkAndUpdateIndicator, 500);
         }
         
         lastMessageCountRef.current = currentMessageCount;
-    }, [messages]);
+    }, [messages, loading]);
 
     const checkAndScrollToBottom = () => {
         if (scrollPanelRef.current) {
@@ -91,8 +174,11 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                     const clientHeight = content.clientHeight;
                     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
                     
-                    // Only scroll if user is within 100px of the bottom
-                    if (distanceFromBottom < 100) {
+                    // Update near bottom state
+                    isNearBottomRef.current = distanceFromBottom < 150;
+                    
+                    // Only scroll if user is within 150px of the bottom
+                    if (isNearBottomRef.current) {
                         scrollToBottom();
                     }
                 }
@@ -113,6 +199,8 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                     const content = scrollElement.querySelector('.p-scrollpanel-content');
                     if (content) {
                         content.scrollTop = content.scrollHeight;
+                        isNearBottomRef.current = true;
+                        setShowNewMessageIndicator(false);
                     }
                 }
             }, 100);
@@ -129,8 +217,35 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         const content = scrollElement.querySelector('.p-scrollpanel-content');
         if (!content) return;
 
+        // Initial check of scroll position
+        const checkInitialPosition = () => {
+            const scrollTop = content.scrollTop;
+            const scrollHeight = content.scrollHeight;
+            const clientHeight = content.clientHeight;
+            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+            isNearBottomRef.current = distanceFromBottom < 150;
+        };
+
+        // Check after a small delay to ensure content is rendered
+        setTimeout(checkInitialPosition, 200);
+
         const handleScroll = () => {
             isUserScrollingRef.current = true;
+            
+            // Check if user is near bottom
+            const scrollTop = content.scrollTop;
+            const scrollHeight = content.scrollHeight;
+            const clientHeight = content.clientHeight;
+            const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+            const wasNearBottom = isNearBottomRef.current;
+            isNearBottomRef.current = distanceFromBottom < 150;
+            
+            // Hide indicator if user scrolls to bottom
+            if (isNearBottomRef.current) {
+                setShowNewMessageIndicator(false);
+            }
+            // If user was near bottom but scrolled up, keep indicator hidden for now
+            // (it will show when new messages arrive)
             
             // Clear existing timeout
             if (scrollTimeoutRef.current) {
@@ -151,7 +266,7 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                 clearTimeout(scrollTimeoutRef.current);
             }
         };
-    }, [conversation?.id]);
+    }, [conversation?.id, messages.length]);
 
     const loadMessages = async (silent = false) => {
         if (!conversation) return;
@@ -309,7 +424,10 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
             }
         } finally {
             setSending(false);
-            setTimeout(scrollToBottom, 100);
+            setTimeout(() => {
+                scrollToBottom();
+                setShowNewMessageIndicator(false);
+            }, 100);
         }
     };
 
@@ -350,7 +468,7 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
         <div className="flex flex-column" style={{ height: '100%', minHeight: 0 }}>
             <Toast ref={toast} />
             {/* Messages Area */}
-            <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
                 <ScrollPanel 
                     ref={scrollPanelRef}
                     style={{ 
@@ -450,6 +568,41 @@ const Chat = ({ conversation, currentUser, onClose, onMessageSent }) => {
                         <div ref={messagesEndRef} />
                     </div>
                 </ScrollPanel>
+                {/* New Message Indicator */}
+                {showNewMessageIndicator && (
+                    <div 
+                        style={{ 
+                            position: 'absolute', 
+                            bottom: '70px', 
+                            left: '50%', 
+                            transform: 'translateX(-50%)',
+                            zIndex: 1000,
+                            pointerEvents: 'auto',
+                            width: 'auto',
+                            minWidth: '150px',
+                            display: 'block'
+                        }}
+                    >
+                        <Button
+                            label="New message"
+                            icon="pi pi-arrow-down"
+                            iconPos="right"
+                            onClick={() => {
+                                scrollToBottom();
+                                setShowNewMessageIndicator(false);
+                            }}
+                            className="p-button-sm"
+                            style={{
+                                backgroundColor: '#2196F3',
+                                borderColor: '#2196F3',
+                                color: '#ffffff',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                width: '100%',
+                                display: 'block'
+                            }}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Message Input */}

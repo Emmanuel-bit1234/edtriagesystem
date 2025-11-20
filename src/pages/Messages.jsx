@@ -13,6 +13,7 @@ import { Column } from "primereact/column";
 import { Tag } from "primereact/tag";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import MessagingAPI from "../service/messagingAPI";
+import UserAPI from "../service/userAPI";
 import Chat from "../componets/Chat";
 import UserSearch from "../componets/UserSearch";
 import GroupManagement from "../componets/GroupManagement";
@@ -27,8 +28,11 @@ export const Messages = () => {
     const [activeConversationTab, setActiveConversationTab] = useState(0);
     const [currentUser, setCurrentUser] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [userCache, setUserCache] = useState({}); // Cache for user information
+    const fetchingUsersRef = useRef(new Set()); // Track which users are being fetched
     const toast = useRef(null);
     const messagingAPI = new MessagingAPI();
+    const userAPI = new UserAPI();
 
     useEffect(() => {
         // Check if current user is admin
@@ -73,7 +77,55 @@ export const Messages = () => {
                 }
             }
             const data = await messagingAPI.getConversations();
-            setConversations(data.conversations || []);
+            const updatedConversations = data.conversations || [];
+            setConversations(updatedConversations);
+            
+            // Pre-fetch user information for all unique sender IDs in group conversations
+            const uniqueSenderIds = new Set();
+            updatedConversations.forEach(conv => {
+                if (conv.type === 'group' && conv.lastMessage?.senderId) {
+                    uniqueSenderIds.add(String(conv.lastMessage.senderId));
+                }
+            });
+            
+            // Fetch user info for all unique sender IDs that aren't in cache and aren't being fetched
+            setUserCache(prevCache => {
+                const fetchPromises = Array.from(uniqueSenderIds)
+                    .filter(senderId => {
+                        const isCurrentUser = senderId === String(currentUser?.id);
+                        const inCache = prevCache[senderId];
+                        const beingFetched = fetchingUsersRef.current.has(senderId);
+                        return !isCurrentUser && !inCache && !beingFetched;
+                    })
+                    .map(senderId => {
+                        fetchingUsersRef.current.add(senderId);
+                        return userAPI.getUserById(senderId)
+                            .then(response => {
+                                // Handle both direct user object and wrapped { user: {...} } response
+                                const user = response.user || response;
+                                if (user && user.name) {
+                                    setUserCache(prev => ({
+                                        ...prev,
+                                        [senderId]: user
+                                    }));
+                                }
+                                fetchingUsersRef.current.delete(senderId);
+                            })
+                            .catch(err => {
+                                console.error(`Error fetching user ${senderId}:`, err);
+                                fetchingUsersRef.current.delete(senderId);
+                            });
+                    });
+                
+                // Don't wait for all fetches to complete - let them happen in background
+                if (fetchPromises.length > 0) {
+                    Promise.all(fetchPromises).catch(console.error);
+                }
+                
+                return prevCache; // Return unchanged cache
+            });
+            
+            return updatedConversations;
         } catch (error) {
             console.error('Error loading conversations:', error);
             if (!silent && toast.current) {
@@ -83,6 +135,7 @@ export const Messages = () => {
                     detail: error.response?.data?.error || 'Failed to load conversations'
                 });
             }
+            return [];
         } finally {
             if (!silent) {
                 setLoading(false);
@@ -94,12 +147,45 @@ export const Messages = () => {
     const handleConversationClick = (conversation) => {
         setSelectedConversation(conversation);
         setShowChatDialog(true);
+        // Store currently open conversation ID so App.js can exclude it from unread count
+        if (conversation.id) {
+            localStorage.setItem('openConversationId', String(conversation.id));
+        }
     };
 
-    const handleCloseChat = () => {
+    const handleCloseChat = async () => {
+        // Mark conversation as read before closing if it's still open
+        if (selectedConversation && selectedConversation.id) {
+            const conversationIdStr = String(selectedConversation.id || '');
+            if (!selectedConversation.isTemporary && !conversationIdStr.startsWith('temp-')) {
+                try {
+                    await messagingAPI.markConversationAsRead(selectedConversation.id);
+                } catch (error) {
+                    console.error('Error marking conversation as read:', error);
+                }
+            }
+        }
         setShowChatDialog(false);
         setSelectedConversation(null);
-        loadConversations(); // Refresh conversations to update unread counts
+        // Clear the open conversation ID
+        localStorage.removeItem('openConversationId');
+        // Refresh conversations to update unread counts after marking as read
+        await loadConversations();
+    };
+
+    const handleMessageSent = async () => {
+        // Refresh conversations to update unread counts
+        const updatedConversations = await loadConversations(true); // Silent refresh
+        
+        // Update selectedConversation with the latest data from conversations list
+        if (selectedConversation) {
+            const updatedConversation = updatedConversations.find(c => 
+                c.id === selectedConversation.id
+            );
+            if (updatedConversation) {
+                setSelectedConversation(updatedConversation);
+            }
+        }
     };
 
     const handleStartNewConversation = () => {
@@ -115,9 +201,35 @@ export const Messages = () => {
         const displayEmail = isDirect 
             ? conversation.otherParticipant?.email || ''
             : null;
-        const avatarLabel = displayName ? displayName.charAt(0).toUpperCase() : '?';
+        
+        // Get avatar label - handle emojis for group names
+        let avatarLabel = '?';
+        if (displayName) {
+            if (isDirect) {
+                // For direct messages, use first letter uppercase
+                avatarLabel = displayName.charAt(0).toUpperCase();
+            } else {
+                // For groups, check if first character is an emoji
+                const firstChar = displayName[0];
+                // Check if it's an emoji (emoji are typically outside ASCII range or are multi-byte)
+                const isEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/u.test(firstChar) || 
+                                firstChar.codePointAt(0) > 127;
+                if (isEmoji) {
+                    // Use the emoji as-is (might need to get more characters for multi-byte emojis)
+                    // Get the first emoji character(s) - emojis can be 1-4 code units
+                    const emojiMatch = displayName.match(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}][\u{FE00}-\u{FE0F}\u{200D}]*/u);
+                    avatarLabel = emojiMatch ? emojiMatch[0] : firstChar;
+                } else {
+                    // Regular character, use first letter uppercase
+                    avatarLabel = firstChar.toUpperCase();
+                }
+            }
+        }
+        
         const lastMessage = conversation.lastMessage;
-        const unreadCount = conversation.unreadCount || 0;
+        // Don't show badge if this conversation is currently open
+        const isCurrentlyOpen = selectedConversation && selectedConversation.id === conversation.id;
+        const unreadCount = isCurrentlyOpen ? 0 : (conversation.unreadCount || 0);
 
         return (
             <div
@@ -184,7 +296,74 @@ export const Messages = () => {
                     )}
                     {lastMessage ? (
                         <div className="text-sm text-600" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {lastMessage.content}
+                            {!isDirect ? (
+                                // For groups, show sender name
+                                (() => {
+                                    const senderId = lastMessage.sender?.id || lastMessage.senderId;
+                                    const currentUserId = currentUser?.id;
+                                    
+                                    const isCurrentUserSender = senderId && currentUserId && (
+                                        String(senderId) === String(currentUserId) || 
+                                        parseInt(senderId) === parseInt(currentUserId) ||
+                                        senderId === currentUserId
+                                    );
+                                    
+                                    let senderName = 'Unknown';
+                                    
+                                    // First check if it's the current user
+                                    if (isCurrentUserSender) {
+                                        senderName = currentUser?.name || 'You';
+                                    } 
+                                    // Check lastMessage.sender.name
+                                    else if (lastMessage.sender?.name) {
+                                        senderName = lastMessage.sender.name;
+                                    } 
+                                    // Check lastMessage.senderName
+                                    else if (lastMessage.senderName) {
+                                        senderName = lastMessage.senderName;
+                                    } 
+                                    // Check if sender is a string
+                                    else if (typeof lastMessage.sender === 'string') {
+                                        senderName = lastMessage.sender;
+                                    }
+                                    // If still unknown and we have senderId, try to find in participants
+                                    else if (senderId && conversation.participants) {
+                                        const participant = conversation.participants.find(p => {
+                                            const pId = p?.id || p?.userId || p;
+                                            return String(pId) === String(senderId) || 
+                                                   parseInt(pId) === parseInt(senderId) ||
+                                                   pId === senderId;
+                                        });
+                                        if (participant) {
+                                            senderName = participant.name || participant.userName || participant.user?.name || 'Unknown';
+                                        }
+                                    }
+                                    // If still unknown and we have senderId, check cache
+                                    else if (senderId) {
+                                        const cacheKey = String(senderId);
+                                        if (userCache[cacheKey]) {
+                                            senderName = userCache[cacheKey].name || 'Unknown';
+                                        }
+                                        // User will be fetched in loadConversations, so it will appear on next render
+                                    }
+                                    
+                                    // If still unknown, try to get from lastMessage.createdBy
+                                    if (senderName === 'Unknown') {
+                                        if (lastMessage.createdBy?.name) {
+                                            senderName = lastMessage.createdBy.name;
+                                        } else if (lastMessage.createdBy) {
+                                            senderName = typeof lastMessage.createdBy === 'string' 
+                                                ? lastMessage.createdBy 
+                                                : (lastMessage.createdBy.name || 'Unknown');
+                                        }
+                                    }
+                                    
+                                    return `${senderName}: ${lastMessage.content}`;
+                                })()
+                            ) : (
+                                // For direct messages, just show content
+                                lastMessage.content
+                            )}
                         </div>
                     ) : (
                         <div className="text-sm text-400 italic">No messages yet</div>
@@ -397,7 +576,7 @@ export const Messages = () => {
                             conversation={selectedConversation}
                             currentUser={currentUser}
                             onClose={handleCloseChat}
-                            onMessageSent={loadConversations}
+                            onMessageSent={handleMessageSent}
                         />
                     )}
                 </Dialog>
